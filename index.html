@@ -348,7 +348,7 @@
     <!-- 메인 -->
     <div id="mainSystem" class="hidden">
         <!-- 사이드바 -->
-        <aside class="sidebar fixed left-0 top-0 w-60 h-screen border-r border-white/5 hidden md:block" style="background: linear-gradient(180deg, #12121a 0%, #09090b 100%); overflow-y:auto; z-index: 50;">
+        <aside class="sidebar fixed left-0 top-0 h-screen border-r border-white/5 hidden md:block" style="width: 240px; background: linear-gradient(180deg, #12121a 0%, #09090b 100%); overflow-y:auto; z-index: 50;">
             <!-- 로고 -->
             <div class="p-5 border-b border-white/5">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
@@ -453,7 +453,7 @@
         </div>
 
         <!-- 메인 컨텐츠 -->
-        <main class="md:ml-60 pt-16 p-6 pb-24 md:pb-6 min-h-screen">
+        <main class="pt-20 p-6 pb-24 md:pb-6 min-h-screen" style="margin-left: 0;" id="mainContent">
             <!-- 대시보드 -->
             <div id="tab-dashboard" class="tab-content">
                 <div class="mb-8">
@@ -563,7 +563,9 @@
                         </table>
                     </div>
                 </div>
-                <!-- 라이더 관리 -->
+            </div>
+            
+            <!-- 라이더 관리 -->
                 <div id="tab-riders" class="tab-content hidden">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <h2 class="text-2xl font-bold">🏍️ 라이더 관리</h2>
@@ -2346,6 +2348,10 @@ async function handleLogin(e) {
         await loadAllData();
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('mainSystem').classList.remove('hidden');
+        // PC에서 main 영역 margin-left 설정
+        if (window.innerWidth >= 768) {
+            document.getElementById('mainContent').style.marginLeft = '240px';
+        }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
         showToast(currentUser.name + '님 환영합니다!');
@@ -2373,6 +2379,10 @@ async function restoreSession() {
         await loadAllData();
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('mainSystem').classList.remove('hidden');
+        // PC에서 main 영역 margin-left 설정
+        if (window.innerWidth >= 768) {
+            document.getElementById('mainContent').style.marginLeft = '240px';
+        }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
         return true;
