@@ -265,10 +265,10 @@
         /* 사이드바 스타일 */
         .menu-group { margin-bottom: 8px; }
         .menu-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding: 12px 12px 8px 12px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding: 14px 12px 10px 12px;
             letter-spacing: 0.02em;
         }
         .sidebar-item {
@@ -414,7 +414,7 @@
                 <div class="menu-group">
                     <div class="menu-title">📋 문서/세무</div>
                     <button onclick="showTab('tax')" id="nav-tax" class="sidebar-item w-full"><span class="dot"></span>세무 관리</button>
-                    <button onclick="showTab('docsmenu')" id="nav-docsmenu" class="sidebar-item w-full"><span class="dot"></span>문서 관리</button>
+                    <button onclick="showTab('docs')" id="nav-docs" class="sidebar-item w-full"><span class="dot"></span>문서 관리</button>
                     <button onclick="showTab('excel')" id="nav-excel" class="sidebar-item w-full"><span class="dot"></span>업로드 양식</button>
                 </div>
 
@@ -427,10 +427,7 @@
                 </div>
             </nav>
             
-            <!-- 하단 저작권 -->
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5 text-center">
-                <p class="text-zinc-600 text-xs">© 2025 TeamBro</p>
-            </div>
+
         </aside>
 
         <!-- 상단 헤더 -->
@@ -1375,6 +1372,7 @@
                         <h2 class="text-2xl font-bold">💳 카드 사용내역</h2>
                         <div class="flex gap-2">
                             <button onclick="exportCardTransExcel()" class="btn-secondary btn-sm">📊 다운로드</button>
+                            <button onclick="openCardTransModal()" class="btn-primary btn-sm">+ 사용내역 등록</button>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -1693,6 +1691,45 @@
                 </div>
                 <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="card-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('cardModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 카드 사용내역 등록 모달 -->
+    <div id="cardTransModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:600px">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">💳 사용내역 등록</h3><button onclick="closeModal('cardTransModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <form id="cardTransForm" onsubmit="submitCardTrans(event)" class="space-y-4">
+                <input type="hidden" id="cardtrans-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-purple-400 mb-1">사용일시 *</label><input type="datetime-local" id="cardtrans-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">카드 *</label><select id="cardtrans-card" class="input-field" required><option value="">선택</option></select></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-purple-400 mb-1">가맹점명 *</label><input type="text" id="cardtrans-merchant" class="input-field" required placeholder="스타벅스 강남점"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">금액 *</label><input type="number" id="cardtrans-amount" class="input-field" required placeholder="0"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-purple-400 mb-1">업종</label><input type="text" id="cardtrans-category" class="input-field" placeholder="음식점, 주유소 등"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">승인번호</label><input type="text" id="cardtrans-approval" class="input-field" placeholder="12345678"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-purple-400 mb-1">증빙 상태</label>
+                        <select id="cardtrans-evidence" class="input-field">
+                            <option value="pending">미제출</option>
+                            <option value="submitted">제출</option>
+                            <option value="approved">승인</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-sm text-purple-400 mb-1">회계 처리</label>
+                        <select id="cardtrans-accounting" class="input-field">
+                            <option value="pending">미처리</option>
+                            <option value="journalized">분개완료</option>
+                        </select>
+                    </div>
+                </div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="cardtrans-memo" class="input-field" rows="2"></textarea></div>
+                <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('cardTransModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
     </div>
@@ -2227,18 +2264,37 @@ function toggleSidebar() {
 }
 
 function showTab(tab) {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    // 사이드바 아이템 active 처리
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById('nav-' + tab);
     if (btn) btn.classList.add('active');
+    
+    // 탭 컨텐츠 전환
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     const tabEl = document.getElementById('tab-' + tab);
     if (tabEl) tabEl.classList.remove('hidden');
+    
+    // 페이지 타이틀 업데이트
+    const titles = {
+        'dashboard': '대시보드', 'riders': '라이더 관리', 'partners': '협력사 관리', 
+        'sales': '영업자 관리', 'entities': '법인 관리', 'sett-dashboard': '정산 현황',
+        'platform': '플랫폼정산입금', 'sett-advance': '선정산 지급', 'weekly-payout': '주정산 지급',
+        'reconcile': '대사 관리', 'bank': '현금출납장', 'accounting': '매입매출장',
+        'taxinvoice': '세금계산서', 'ledger': '총계정원장', 'journal': '분개장',
+        'cards': '법인카드 관리', 'card-usage': '카드 사용내역', 'employees': '직원 관리',
+        'payroll': '급여 관리', 'contracts': '근로계약', 'tax': '세무서류 보관함',
+        'docs': '법인서류 보관함', 'excel': '업로드 양식', 'users': '사용자 관리',
+        'logs': '감사 로그', 'settings': '시스템 설정'
+    };
+    const titleEl = document.getElementById('pageTitle');
+    if (titleEl) titleEl.textContent = titles[tab] || tab;
     
     // 기초정보
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'riders') { loadStats('rider'); renderTable('rider'); loadPartnerOptions(); }
     if (tab === 'partners') { loadStats('partner'); renderTable('partner'); }
     if (tab === 'sales') { loadStats('sales'); renderTable('sales'); }
+    if (tab === 'entities') { loadEntities(); }
     
     // 정산관리
     if (tab === 'sett-dashboard') loadSettlementDashboard();
@@ -2266,7 +2322,6 @@ function showTab(tab) {
     // 문서/세무
     if (tab === 'tax') { loadTaxDocuments(); }
     if (tab === 'docs') { loadCorpDocuments(); }
-    if (tab === 'entities') { loadEntities(); loadCorpDocuments(); }
     
     // 시스템
     if (tab === 'users') renderUserTable();
@@ -2816,14 +2871,124 @@ function renderCardTable() {
 }
 
 function renderCardTransTable() {
-    const tbody = document.getElementById('cardTransTableBody');
-    if (!cardTransList.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    // 통계 업데이트
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const monthlyUsage = cardTransList.filter(t => t.transaction_date?.startsWith(thisMonth)).reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+    const noReceipt = cardTransList.filter(t => t.evidence_status === 'pending').length;
+    const pending = cardTransList.filter(t => t.accounting_status === 'pending').length;
+    
+    const monthlyEl = document.getElementById('card-usage-monthly');
+    const countEl = document.getElementById('card-usage-count');
+    const noReceiptEl = document.getElementById('card-usage-noreceipt');
+    const pendingEl = document.getElementById('card-usage-pending');
+    
+    if (monthlyEl) monthlyEl.textContent = '₩' + monthlyUsage.toLocaleString();
+    if (countEl) countEl.textContent = cardTransList.length + '건';
+    if (noReceiptEl) noReceiptEl.textContent = noReceipt + '건';
+    if (pendingEl) pendingEl.textContent = pending + '건';
+    
+    const tbody = document.getElementById('cardUsageTableBody');
+    if (!tbody) return;
+    
+    if (!cardTransList.length) { 
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; 
+        return; 
+    }
+    
     const evidenceStatus = { pending: '미제출', submitted: '제출', approved: '승인' };
-    const accStatus = { pending: '미분개', journalized: '완료' };
-    tbody.innerHTML = cardTransList.slice(0, 10).map(t => {
+    const accStatus = { pending: '미처리', journalized: '완료' };
+    
+    tbody.innerHTML = cardTransList.map(t => {
         const card = cardList.find(c => c.id == t.card_id);
-        return '<tr><td>' + t.transaction_date + '</td><td>' + (card ? card.card_alias : '-') + '</td><td>' + (t.merchant_name || '-') + '</td><td class="text-right font-bold">₩' + parseInt(t.amount || 0).toLocaleString() + '</td><td><span class="badge ' + (t.evidence_status === 'approved' ? 'badge-active' : 'badge-pending') + '">' + (evidenceStatus[t.evidence_status] || '미제출') + '</span></td><td><span class="badge ' + (t.accounting_status === 'journalized' ? 'badge-active' : 'badge-pending') + '">' + (accStatus[t.accounting_status] || '미분개') + '</span></td></tr>';
+        return '<tr>' +
+            '<td>' + (t.transaction_date || '-') + '</td>' +
+            '<td>' + (card ? card.card_alias : '-') + '</td>' +
+            '<td>' + (t.merchant_name || '-') + '</td>' +
+            '<td class="text-right font-bold">₩' + parseInt(t.amount || 0).toLocaleString() + '</td>' +
+            '<td><span class="badge ' + (t.evidence_status === 'approved' ? 'badge-active' : 'badge-pending') + '">' + (evidenceStatus[t.evidence_status] || '미제출') + '</span></td>' +
+            '<td><span class="badge ' + (t.accounting_status === 'journalized' ? 'badge-active' : 'badge-pending') + '">' + (accStatus[t.accounting_status] || '미처리') + '</span></td>' +
+            '<td><button onclick="editCardTrans(' + t.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteCardTrans(' + t.id + ')" class="btn-danger btn-sm">삭제</button></td>' +
+            '</tr>';
     }).join('');
+}
+
+function openCardTransModal() {
+    document.getElementById('cardTransForm').reset();
+    document.getElementById('cardtrans-id').value = '';
+    document.getElementById('cardtrans-date').value = new Date().toISOString().slice(0, 16);
+    
+    // 카드 옵션 로드
+    const select = document.getElementById('cardtrans-card');
+    select.innerHTML = '<option value="">선택</option>' + cardList.map(c => '<option value="' + c.id + '">' + (c.card_alias || c.card_number_masked) + '</option>').join('');
+    
+    openModal('cardTransModal');
+}
+
+function editCardTrans(id) {
+    const t = cardTransList.find(x => x.id === id);
+    if (!t) return;
+    
+    document.getElementById('cardtrans-id').value = t.id;
+    document.getElementById('cardtrans-date').value = t.transaction_date ? t.transaction_date.replace(' ', 'T').slice(0, 16) : '';
+    
+    const select = document.getElementById('cardtrans-card');
+    select.innerHTML = '<option value="">선택</option>' + cardList.map(c => '<option value="' + c.id + '">' + (c.card_alias || c.card_number_masked) + '</option>').join('');
+    select.value = t.card_id || '';
+    
+    document.getElementById('cardtrans-merchant').value = t.merchant_name || '';
+    document.getElementById('cardtrans-amount').value = t.amount || '';
+    document.getElementById('cardtrans-category').value = t.category || '';
+    document.getElementById('cardtrans-approval').value = t.approval_number || '';
+    document.getElementById('cardtrans-evidence').value = t.evidence_status || 'pending';
+    document.getElementById('cardtrans-accounting').value = t.accounting_status || 'pending';
+    document.getElementById('cardtrans-memo').value = t.memo || '';
+    
+    openModal('cardTransModal');
+}
+
+async function submitCardTrans(e) {
+    e.preventDefault();
+    const id = document.getElementById('cardtrans-id').value;
+    const data = {
+        transaction_date: document.getElementById('cardtrans-date').value.replace('T', ' '),
+        card_id: parseInt(document.getElementById('cardtrans-card').value) || null,
+        merchant_name: document.getElementById('cardtrans-merchant').value,
+        amount: parseFloat(document.getElementById('cardtrans-amount').value) || 0,
+        category: document.getElementById('cardtrans-category').value || null,
+        approval_number: document.getElementById('cardtrans-approval').value || null,
+        evidence_status: document.getElementById('cardtrans-evidence').value,
+        accounting_status: document.getElementById('cardtrans-accounting').value,
+        memo: document.getElementById('cardtrans-memo').value || null
+    };
+    
+    let result;
+    if (id) {
+        result = await supabaseCall('card_transactions', 'PATCH', data, '?id=eq.' + id);
+        if (result) {
+            const idx = cardTransList.findIndex(t => t.id == id);
+            if (idx >= 0) cardTransList[idx] = { ...cardTransList[idx], ...data };
+            showToast('사용내역 수정 완료');
+        }
+    } else {
+        result = await supabaseCall('card_transactions', 'POST', data);
+        if (result && result[0]) {
+            cardTransList.unshift(result[0]);
+            showToast('사용내역 등록 완료');
+        }
+    }
+    
+    closeModal('cardTransModal');
+    renderCardTransTable();
+}
+
+async function deleteCardTrans(id) {
+    if (!confirm('이 사용내역을 삭제하시겠습니까?')) return;
+    
+    await supabaseCall('card_transactions', 'DELETE', null, '?id=eq.' + id);
+    cardTransList = cardTransList.filter(t => t.id !== id);
+    
+    showToast('사용내역 삭제 완료');
+    renderCardTransTable();
 }
 
 function openCardModal() {
