@@ -2264,6 +2264,8 @@ function toggleSidebar() {
 }
 
 function showTab(tab) {
+    console.log('showTab called:', tab);
+    
     // 사이드바 아이템 active 처리
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById('nav-' + tab);
@@ -2272,7 +2274,11 @@ function showTab(tab) {
     // 탭 컨텐츠 전환
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     const tabEl = document.getElementById('tab-' + tab);
-    if (tabEl) tabEl.classList.remove('hidden');
+    console.log('tabEl found:', tabEl);
+    if (tabEl) {
+        tabEl.classList.remove('hidden');
+        console.log('hidden removed, classes:', tabEl.className);
+    }
     
     // 페이지 타이틀 업데이트
     const titles = {
