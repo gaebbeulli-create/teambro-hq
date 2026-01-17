@@ -2308,7 +2308,7 @@ function showTab(tab) {
     if (tab === 'accounting') { renderSalesPurchaseTable(); }
     if (tab === 'taxinvoice') renderTaxInvoiceTable();
     if (tab === 'ledger') renderLedgerTable();
-    if (tab === 'journal') renderJournalTable();
+    if (tab === 'journal') renderJournalTable2();
     
     // 카드/자산
     if (tab === 'cards') renderCardTable();
@@ -2325,7 +2325,8 @@ function showTab(tab) {
     
     // 시스템
     if (tab === 'users') renderUserTable();
-    if (tab === 'logs') renderAuditLogs();
+    if (tab === 'logs') { try { renderAuditLogs(); } catch(e) { console.log('audit logs error', e); } }
+    if (tab === 'settings') { /* 설정 페이지 */ }
 }
 
 async function handleLogin(e) {
