@@ -5,82 +5,275 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>TEAM BRO - 본사 ERP</title>
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0a0a0f">
+    <meta name="theme-color" content="#09090b">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
         :root {
-            --primary: #06b6d4;
-            --primary-light: #22d3ee;
-            --primary-dark: #0891b2;
-            --accent: #8b5cf6;
-            --bg-dark: #0a0a0f;
-            --bg-card: #12121a;
-            --bg-hover: #1a1a25;
-            --border: rgba(6, 182, 212, 0.15);
-            --text: #e2e8f0;
-            --text-muted: #64748b;
+            --bg-primary: #09090b;
+            --bg-secondary: #18181b;
+            --bg-tertiary: #27272a;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-1: #a855f7;
+            --accent-2: #ec4899;
+            --accent-3: #3b82f6;
+            --gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f97316 100%);
         }
-        @keyframes glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .logo-text { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: glow 3s ease-in-out infinite; }
-        .glass-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; transition: all 0.2s; }
-        .glass-card:hover { border-color: rgba(6, 182, 212, 0.3); }
-        body { background: var(--bg-dark); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        
+        body { 
+            background: var(--bg-primary); 
+            color: var(--text-primary);
+            background-image: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.15), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 0%, rgba(168, 85, 247, 0.1), transparent);
+        }
+        
+        .glass-card { 
+            background: rgba(24, 24, 27, 0.8); 
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border); 
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover { 
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-border {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: var(--gradient);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+        }
+        
         .hidden { display: none; }
+        
         .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th { background: rgba(6, 182, 212, 0.08); padding: 14px 16px; text-align: left; font-size: 11px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .data-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 13px; color: var(--text); }
-        .data-table tr:hover { background: var(--bg-hover); }
-        .input-field { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(100, 116, 139, 0.3); color: white; padding: 12px 16px; border-radius: 10px; width: 100%; transition: all 0.2s; font-size: 14px; }
-        .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1); }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; font-weight: 600; padding: 12px 24px; border-radius: 10px; cursor: pointer; border: none; transition: all 0.2s; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3); }
-        .btn-secondary { background: transparent; border: 1px solid rgba(6, 182, 212, 0.3); color: var(--primary); padding: 12px 24px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
-        .btn-secondary:hover { background: rgba(6, 182, 212, 0.1); border-color: var(--primary); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 12px 24px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .data-table th { 
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 14px 16px; 
+            text-align: left; 
+            font-size: 11px; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td { 
+            padding: 16px; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 13px; 
+            color: var(--text-primary);
+        }
+        .data-table tr:hover { background: rgba(255, 255, 255, 0.02); }
+        
+        .input-field { 
+            background: var(--bg-primary); 
+            border: 1px solid var(--border); 
+            color: var(--text-primary); 
+            padding: 12px 16px; 
+            border-radius: 12px; 
+            width: 100%; 
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .input-field:focus { 
+            outline: none; 
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+        .input-field::placeholder { color: var(--text-muted); }
+        
+        .btn-primary { 
+            background: var(--gradient);
+            color: white; 
+            font-weight: 600; 
+            padding: 12px 24px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            border: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .btn-primary:hover { 
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+        
+        .btn-secondary { 
+            background: var(--bg-tertiary); 
+            border: 1px solid var(--border); 
+            color: var(--text-primary); 
+            padding: 12px 24px; 
+            border-radius: 12px; 
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .btn-secondary:hover { 
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-hover);
+        }
+        
+        .btn-danger { 
+            background: rgba(239, 68, 68, 0.1); 
+            border: 1px solid rgba(239, 68, 68, 0.2); 
+            color: #f87171; 
+            padding: 12px 24px; 
+            border-radius: 12px; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-        .btn-sm { padding: 8px 14px; font-size: 12px; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideIn 0.2s ease-out; }
-        .badge { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; }
-        .badge-active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        .badge-inactive { background: rgba(107, 114, 128, 0.15); color: #9CA3AF; }
-        .badge-pending { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        
+        .btn-sm { padding: 8px 16px; font-size: 12px; }
+        
+        .modal-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0, 0, 0, 0.8); 
+            backdrop-filter: blur(8px);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 100; 
+            padding: 16px;
+        }
+        .modal-content { 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 28px; 
+            max-width: 700px; 
+            width: 100%; 
+            max-height: 90vh; 
+            overflow-y: auto;
+            animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .badge { 
+            padding: 6px 12px; 
+            border-radius: 8px; 
+            font-size: 11px; 
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .badge-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+        .badge-inactive { background: rgba(113, 113, 122, 0.15); color: #a1a1aa; }
+        .badge-pending { background: rgba(250, 204, 21, 0.15); color: #facc15; }
         .badge-biz { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-        .badge-info { background: rgba(6, 182, 212, 0.15); color: var(--primary-light); }
+        .badge-info { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
         .badge-error { background: rgba(239, 68, 68, 0.15); color: #f87171; }
         .badge-nonbiz { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
-        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        .toast { position: fixed; top: 20px; right: 20px; padding: 14px 24px; border-radius: 10px; z-index: 200; font-weight: 500; animation: slideIn 0.3s ease-out; }
-        .toast-success { background: rgba(16, 185, 129, 0.95); color: white; }
-        .toast-error { background: rgba(239, 68, 68, 0.95); color: white; }
-        .toast-info { background: rgba(6, 182, 212, 0.95); color: white; }
-        .nav-btn { color: var(--text-muted); transition: all 0.2s; border-radius: 8px; }
-        .nav-btn:hover { background: rgba(6, 182, 212, 0.1); color: var(--text); }
-        .nav-btn.active { background: rgba(6, 182, 212, 0.15); color: var(--primary); }
-        .tab-btn { border-bottom: 2px solid transparent; padding-bottom: 8px; }
-        .tab-btn.active { border-bottom-color: var(--primary); color: var(--primary); }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.2s; }
-        .stat-card:hover { border-color: rgba(6, 182, 212, 0.3); transform: translateY(-2px); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.5); }
-        @media (max-width: 768px) { .sidebar { display: none !important; } .mobile-nav { display: flex !important; } }
+        .badge-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+        
+        .toast { 
+            position: fixed; 
+            top: 24px; 
+            right: 24px; 
+            padding: 16px 24px; 
+            border-radius: 12px; 
+            z-index: 200;
+            font-weight: 500;
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+        .toast-success { background: rgba(34, 197, 94, 0.9); color: white; }
+        .toast-error { background: rgba(239, 68, 68, 0.9); color: white; }
+        .toast-info { background: rgba(168, 85, 247, 0.9); color: white; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .nav-btn { 
+            color: var(--text-secondary); 
+            transition: all 0.2s;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .nav-btn:hover { 
+            background: rgba(255, 255, 255, 0.05); 
+            color: var(--text-primary);
+        }
+        .nav-btn.active { 
+            background: rgba(168, 85, 247, 0.15); 
+            color: #c084fc;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+        
+        .glow-purple { box-shadow: 0 0 60px rgba(168, 85, 247, 0.2); }
+        .glow-pink { box-shadow: 0 0 60px rgba(236, 72, 153, 0.2); }
+        .glow-blue { box-shadow: 0 0 60px rgba(59, 130, 246, 0.2); }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+        
+        @media (max-width: 768px) { 
+            .sidebar { display: none !important; } 
+            .mobile-nav { display: flex !important; } 
+        }
     </style>
 </head>
 <body class="min-h-screen">
     <div id="toast-container"></div>
 
     <!-- 로딩 -->
-    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-dark)">
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-primary)">
         <div class="text-center">
-            <h1 class="text-4xl font-black logo-text mb-4">TEAM BRO</h1>
-            <div class="flex items-center justify-center gap-1">
-                <div class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0s"></div>
-                <div class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0.1s"></div>
-                <div class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style="animation-delay: 0.2s"></div>
+            <h1 class="text-5xl font-extrabold gradient-text mb-6">TEAM BRO</h1>
+            <div class="flex items-center justify-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+                <div class="w-2 h-2 rounded-full bg-pink-500 animate-pulse" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 rounded-full bg-orange-500 animate-pulse" style="animation-delay: 0.4s"></div>
             </div>
         </div>
     </div>
@@ -88,40 +281,47 @@
     <!-- 로그인 -->
     <div id="loginPage" class="hidden relative z-10 min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-md">
-            <div class="text-center mb-10">
-                <h1 class="text-5xl font-black logo-text mb-3">TEAM BRO</h1>
-                <p class="text-cyan-400/70 text-sm">본사 ERP 시스템</p>
+            <div class="text-center mb-12">
+                <h1 class="text-6xl font-extrabold gradient-text mb-4">TEAM BRO</h1>
+                <p class="text-zinc-500 text-sm">본사 통합 ERP 시스템</p>
             </div>
-            <div class="glass-card p-8">
-                <form onsubmit="handleLogin(event)" class="space-y-5">
-                    <div><label class="block text-sm font-semibold text-cyan-400 mb-2">아이디</label><input type="text" id="loginUsername" class="input-field" required placeholder="아이디를 입력하세요"></div>
-                    <div><label class="block text-sm font-semibold text-cyan-400 mb-2">비밀번호</label><input type="password" id="loginPassword" class="input-field" required placeholder="비밀번호를 입력하세요"></div>
-                    <div id="loginError" class="hidden p-3 rounded-lg bg-red-400/10 text-red-400 text-sm"></div>
-                    <button type="submit" class="w-full btn-primary text-lg py-4">로그인</button>
+            <div class="glass-card p-8 glow-purple">
+                <form onsubmit="handleLogin(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">아이디</label>
+                        <input type="text" id="loginUsername" class="input-field" required placeholder="아이디를 입력하세요">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">비밀번호</label>
+                        <input type="password" id="loginPassword" class="input-field" required placeholder="비밀번호를 입력하세요">
+                    </div>
+                    <div id="loginError" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"></div>
+                    <button type="submit" class="w-full btn-primary text-base py-4 mt-2">로그인</button>
                 </form>
             </div>
+            <p class="text-center text-zinc-600 text-xs mt-8">© 2025 TEAM BRO. All rights reserved.</p>
         </div>
     </div>
 
     <!-- 메인 -->
     <div id="mainSystem" class="hidden">
-        <header class="relative z-10 border-b border-cyan-500/20" style="background: linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, var(--bg-dark) 100%)">
+        <header class="relative z-10 border-b border-white/5" style="background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(20px);">
             <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="text-cyan-400 text-2xl hover:text-lime-300 hidden md:block" id="hamburgerBtn">☰</button>
+                    <button onclick="toggleSidebar()" class="text-purple-400 text-2xl hover:text-lime-300 hidden md:block" id="hamburgerBtn">☰</button>
                     <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
-                        <h1 class="text-2xl font-black text-cyan-400">🏢 TEAM BRO</h1>
+                        <h1 class="text-2xl font-black text-purple-400">🏢 TEAM BRO</h1>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span id="headerUserName" class="text-cyan-400 font-bold hidden md:inline">관리자</span>
+                    <span id="headerUserName" class="text-purple-400 font-bold hidden md:inline">관리자</span>
                     <button onclick="logout()" class="text-gray-400 hover:text-red-400 text-sm">로그아웃</button>
                 </div>
             </div>
         </header>
 
         <div class="flex">
-            <aside class="sidebar w-56 min-h-screen border-r border-cyan-500/20 bg-black/50 hidden md:block" id="sidebarMenu" style="overflow-y:auto; max-height:calc(100vh - 60px)">
+            <aside class="sidebar w-56 min-h-screen border-r border-purple-500/20 bg-black/50 hidden md:block" id="sidebarMenu" style="overflow-y:auto; max-height:calc(100vh - 60px)">
                 <nav class="p-4 space-y-1">
                     <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-btn active w-full text-left px-3 py-2 rounded-lg text-sm">📊 대시보드</button>
                     
@@ -214,7 +414,7 @@
                 </nav>
             </aside>
 
-            <div class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-black border-t border-cyan-500/20 z-40">
+            <div class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-black border-t border-purple-500/20 z-40">
                 <button onclick="showTab('dashboard')" class="flex-1 py-3 text-center text-xs text-gray-400">📊<br>대시보드</button>
                 <button onclick="showTab('riders')" class="flex-1 py-3 text-center text-xs text-gray-400">🏍️<br>라이더</button>
                 <button onclick="showTab('partners')" class="flex-1 py-3 text-center text-xs text-gray-400">🤝<br>협력사</button>
@@ -228,7 +428,7 @@
                     
                     <!-- 기본 통계 -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('riders')"><div class="text-gray-400 text-xs mb-1">라이더</div><div class="text-2xl font-bold text-cyan-400" id="stat-riders">0명</div></div>
+                        <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('riders')"><div class="text-gray-400 text-xs mb-1">라이더</div><div class="text-2xl font-bold text-purple-400" id="stat-riders">0명</div></div>
                         <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('partners')"><div class="text-gray-400 text-xs mb-1">협력사</div><div class="text-2xl font-bold text-blue-400" id="stat-partners">0개</div></div>
                         <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('sales')"><div class="text-gray-400 text-xs mb-1">영업자</div><div class="text-2xl font-bold text-purple-400" id="stat-sales">0명</div></div>
                         <div class="glass-card rounded-xl p-4 text-center"><div class="text-gray-400 text-xs mb-1">이번달 수수료</div><div class="text-2xl font-bold text-green-400">₩0</div></div>
@@ -236,7 +436,7 @@
                     
                     <!-- 그룹사 현황 -->
                     <div class="mb-6">
-                        <h3 class="text-lg font-bold text-cyan-400 mb-4">🏢 그룹사 현황</h3>
+                        <h3 class="text-lg font-bold text-purple-400 mb-4">🏢 그룹사 현황</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- 브로컴퍼니 -->
                             <div class="glass-card rounded-xl p-4 border-l-4 border-blue-400">
@@ -247,7 +447,7 @@
                                 <div class="space-y-2 text-sm">
                                     <div class="flex justify-between"><span class="text-gray-400">이번달 매출</span><span class="text-white font-bold" id="bc-revenue">₩0</span></div>
                                     <div class="flex justify-between"><span class="text-gray-400">이번달 정산</span><span class="text-yellow-400" id="bc-settlement">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">수익 (수수료)</span><span class="text-cyan-400 font-bold" id="bc-profit">₩0</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">수익 (수수료)</span><span class="text-purple-400 font-bold" id="bc-profit">₩0</span></div>
                                 </div>
                                 <a href="https://brocompany.broerp.kr" target="_blank" class="block mt-3 text-center text-xs text-blue-400 hover:underline">ERP 바로가기 →</a>
                             </div>
@@ -261,20 +461,20 @@
                                 <div class="space-y-2 text-sm">
                                     <div class="flex justify-between"><span class="text-gray-400">이번달 렌탈수익</span><span class="text-white font-bold" id="bm-revenue">₩0</span></div>
                                     <div class="flex justify-between"><span class="text-gray-400">미수금</span><span class="text-red-400" id="bm-arrears">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">순수익</span><span class="text-cyan-400 font-bold" id="bm-profit">₩0</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">순수익</span><span class="text-purple-400 font-bold" id="bm-profit">₩0</span></div>
                                 </div>
                                 <a href="https://bromotors.broerp.kr" target="_blank" class="block mt-3 text-center text-xs text-purple-400 hover:underline">ERP 바로가기 →</a>
                             </div>
                             
                             <!-- 그룹 합계 -->
-                            <div class="glass-card rounded-xl p-4 border-l-4 border-cyan-400">
+                            <div class="glass-card rounded-xl p-4 border-l-4 border-purple-400">
                                 <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-bold text-cyan-400">그룹 합계</h4>
+                                    <h4 class="font-bold text-purple-400">그룹 합계</h4>
                                     <span class="text-xs text-gray-400">이번달</span>
                                 </div>
                                 <div class="space-y-2 text-sm">
                                     <div class="flex justify-between"><span class="text-gray-400">총 매출</span><span class="text-white font-bold" id="group-revenue">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">총 수익</span><span class="text-cyan-400 font-bold" id="group-profit">₩0</span></div>
+                                    <div class="flex justify-between"><span class="text-gray-400">총 수익</span><span class="text-purple-400 font-bold" id="group-profit">₩0</span></div>
                                     <div class="flex justify-between"><span class="text-gray-400">자금 잔액</span><span class="text-green-400 font-bold" id="group-balance">₩0</span></div>
                                 </div>
                             </div>
@@ -284,7 +484,7 @@
                     <!-- 자금 집행/회수 -->
                     <div class="mb-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-cyan-400">💰 자금 집행/회수</h3>
+                            <h3 class="text-lg font-bold text-purple-400">💰 자금 집행/회수</h3>
                             <button onclick="openFundModal()" class="btn-primary btn-sm">+ 자금 등록</button>
                         </div>
                         
@@ -304,7 +504,7 @@
                             </div>
                             <div class="glass-card rounded-xl p-3 text-center">
                                 <div class="text-gray-400 text-xs">이번달 순이동</div>
-                                <div class="text-xl font-bold text-cyan-400" id="fund-monthly-net">₩0</div>
+                                <div class="text-xl font-bold text-purple-400" id="fund-monthly-net">₩0</div>
                             </div>
                         </div>
                         
@@ -331,7 +531,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="rider-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="rider-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterList('rider','active')"><div class="text-gray-400 text-xs">활성</div><div class="text-xl font-bold text-green-400" id="rider-active">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterList('rider','inactive')"><div class="text-gray-400 text-xs">비활성</div><div class="text-xl font-bold text-gray-400" id="rider-inactive">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">주민번호 미등록</div><div class="text-xl font-bold text-red-400" id="rider-nossn">0</div></div>
@@ -362,7 +562,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="partner-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="partner-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">사업자</div><div class="text-xl font-bold text-blue-400" id="partner-biz">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">비사업자</div><div class="text-xl font-bold text-orange-400" id="partner-nonbiz">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">소속 라이더</div><div class="text-xl font-bold text-purple-400" id="partner-riders">0</div></div>
@@ -386,7 +586,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="sales-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="sales-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">개인</div><div class="text-xl font-bold text-purple-400" id="sales-ind">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">개인사업자</div><div class="text-xl font-bold text-blue-400" id="sales-sole">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">법인</div><div class="text-xl font-bold text-pink-400" id="sales-corp">0</div></div>
@@ -427,7 +627,7 @@
                     
                     <!-- 통계 -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체 법인</div><div class="text-xl font-bold text-cyan-400" id="entity-total">0개</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체 법인</div><div class="text-xl font-bold text-purple-400" id="entity-total">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">활성</div><div class="text-xl font-bold text-green-400" id="entity-active">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">비활성</div><div class="text-xl font-bold text-gray-400" id="entity-inactive">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">첨부서류</div><div class="text-xl font-bold text-blue-400" id="entity-docs">0개</div></div>
@@ -452,7 +652,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="sett-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="sett-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterSettlement('pending')"><div class="text-gray-400 text-xs">대기</div><div class="text-xl font-bold text-yellow-400" id="sett-pending">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterSettlement('confirmed')"><div class="text-gray-400 text-xs">확정</div><div class="text-xl font-bold text-blue-400" id="sett-confirmed">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterSettlement('paid')"><div class="text-gray-400 text-xs">지급완료</div><div class="text-xl font-bold text-green-400" id="sett-paid">0</div></div>
@@ -483,9 +683,9 @@
                     </div>
                     
                     <!-- 직원 목록 -->
-                    <h3 class="text-lg font-bold mb-3 text-cyan-400">👤 직원 목록</h3>
+                    <h3 class="text-lg font-bold mb-3 text-purple-400">👤 직원 목록</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="emp-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="emp-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">정규직</div><div class="text-xl font-bold text-blue-400" id="emp-regular">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">계약직</div><div class="text-xl font-bold text-yellow-400" id="emp-contract">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">4대보험</div><div class="text-xl font-bold text-green-400" id="emp-insured">0</div></div>
@@ -498,7 +698,7 @@
                     <!-- 급여 내역 -->
                     <h3 class="text-lg font-bold mb-3 text-purple-400">💰 급여 지급 내역</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">이번달 지급</div><div class="text-xl font-bold text-cyan-400" id="pay-count">0건</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">이번달 지급</div><div class="text-xl font-bold text-purple-400" id="pay-count">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 지급액</div><div class="text-xl font-bold text-blue-400" id="pay-gross">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 공제액</div><div class="text-xl font-bold text-red-400" id="pay-deduct">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">실지급 합계</div><div class="text-xl font-bold text-green-400" id="pay-net">₩0</div></div>
@@ -552,7 +752,7 @@
                     
                     <!-- 카테고리 탭 -->
                     <div class="flex gap-2 mb-4 border-b border-white/10 pb-2">
-                        <button onclick="filterTaxDocs('all')" id="taxDocTab-all" class="px-4 py-2 rounded-t-lg text-sm font-bold bg-cyan-500/20 text-cyan-400">전체</button>
+                        <button onclick="filterTaxDocs('all')" id="taxDocTab-all" class="px-4 py-2 rounded-t-lg text-sm font-bold bg-purple-500/20 text-purple-400">전체</button>
                         <button onclick="filterTaxDocs('withholding')" id="taxDocTab-withholding" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">원천세 신고</button>
                         <button onclick="filterTaxDocs('statement')" id="taxDocTab-statement" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">지급명세서</button>
                         <button onclick="filterTaxDocs('other')" id="taxDocTab-other" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">기타 서류</button>
@@ -560,7 +760,7 @@
                     
                     <!-- 통계 -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체 파일</div><div class="text-xl font-bold text-cyan-400" id="taxdoc-total">0개</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체 파일</div><div class="text-xl font-bold text-purple-400" id="taxdoc-total">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">원천세 신고</div><div class="text-xl font-bold text-blue-400" id="taxdoc-withholding">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">지급명세서</div><div class="text-xl font-bold text-purple-400" id="taxdoc-statement">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">기타 서류</div><div class="text-xl font-bold text-yellow-400" id="taxdoc-other">0개</div></div>
@@ -603,7 +803,7 @@
                     
                     <!-- 카테고리 탭 -->
                     <div class="flex gap-2 mb-4 border-b border-white/10 pb-2 flex-wrap">
-                        <button onclick="filterCorpDocs('all')" id="corpDocTab-all" class="px-4 py-2 rounded-t-lg text-sm font-bold bg-cyan-500/20 text-cyan-400">전체</button>
+                        <button onclick="filterCorpDocs('all')" id="corpDocTab-all" class="px-4 py-2 rounded-t-lg text-sm font-bold bg-purple-500/20 text-purple-400">전체</button>
                         <button onclick="filterCorpDocs('business')" id="corpDocTab-business" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">사업자등록증</button>
                         <button onclick="filterCorpDocs('corporate')" id="corpDocTab-corporate" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">법인등기부등본</button>
                         <button onclick="filterCorpDocs('contract')" id="corpDocTab-contract" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">계약서</button>
@@ -613,7 +813,7 @@
                     
                     <!-- 통계 -->
                     <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="corpdoc-total">0개</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="corpdoc-total">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">사업자등록</div><div class="text-xl font-bold text-blue-400" id="corpdoc-business">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">등기부등본</div><div class="text-xl font-bold text-purple-400" id="corpdoc-corporate">0개</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">계약서</div><div class="text-xl font-bold text-yellow-400" id="corpdoc-contract">0개</div></div>
@@ -664,7 +864,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="card-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="card-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">사용중</div><div class="text-xl font-bold text-green-400" id="card-active">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">일시중지</div><div class="text-xl font-bold text-yellow-400" id="card-suspended">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">이번달 사용액</div><div class="text-xl font-bold text-purple-400" id="card-monthly">₩0</div></div>
@@ -694,7 +894,7 @@
                         </div>
                         <div class="glass-card rounded-xl p-4 text-center">
                             <div class="text-gray-400 text-xs mb-1">차액 (수익)</div>
-                            <div class="text-2xl font-bold text-cyan-400" id="sett-dash-profit">₩0</div>
+                            <div class="text-2xl font-bold text-purple-400" id="sett-dash-profit">₩0</div>
                         </div>
                         <div class="glass-card rounded-xl p-4 text-center">
                             <div class="text-gray-400 text-xs mb-1">대사 미완료</div>
@@ -703,7 +903,7 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="glass-card rounded-xl p-4">
-                            <h3 class="font-bold mb-4 text-cyan-400">📥 최근 플랫폼 정산</h3>
+                            <h3 class="font-bold mb-4 text-purple-400">📥 최근 플랫폼 정산</h3>
                             <table class="data-table"><thead><tr><th>주차</th><th>플랫폼</th><th>금액</th><th>상태</th></tr></thead>
                             <tbody id="settDashPlatformTable"><tr><td colspan="4" class="text-center py-4 text-gray-500">데이터 없음</td></tr></tbody></table>
                         </div>
@@ -722,7 +922,7 @@
                         <button onclick="openPlatformModal()" class="btn-primary btn-sm">+ 정산 등록</button>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="plat-total">0건</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="plat-total">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 건수</div><div class="text-xl font-bold text-yellow-400" id="plat-count-stat">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">공급가 합계</div><div class="text-xl font-bold text-green-400" id="plat-supply-stat">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 금액</div><div class="text-xl font-bold text-blue-400" id="plat-amount">₩0</div></div>
@@ -759,11 +959,11 @@
                     </div>
                     
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="settadv-total">0건</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="settadv-total">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">대기</div><div class="text-xl font-bold text-yellow-400" id="settadv-pending">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">지급완료</div><div class="text-xl font-bold text-green-400" id="settadv-transferred">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 지급액</div><div class="text-xl font-bold text-red-400" id="settadv-amount">₩0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">수수료 수익</div><div class="text-xl font-bold text-cyan-400" id="settadv-fee-income">₩0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">수수료 수익</div><div class="text-xl font-bold text-purple-400" id="settadv-fee-income">₩0</div></div>
                     </div>
                     
                     <!-- 필터 -->
@@ -791,7 +991,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="rec-total">0건</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="rec-total">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">대기</div><div class="text-xl font-bold text-yellow-400" id="rec-pending">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">완료</div><div class="text-xl font-bold text-green-400" id="rec-matched">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">불일치</div><div class="text-xl font-bold text-red-400" id="rec-issue">0건</div></div>
@@ -815,7 +1015,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="weekly-total">0건</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="weekly-total">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">대기</div><div class="text-xl font-bold text-yellow-400" id="weekly-pending">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">지급완료</div><div class="text-xl font-bold text-green-400" id="weekly-paid">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 지급액</div><div class="text-xl font-bold text-blue-400" id="weekly-amount">₩0</div></div>
@@ -848,7 +1048,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 입금</div><div class="text-xl font-bold text-blue-400" id="bank-deposit">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 출금</div><div class="text-xl font-bold text-red-400" id="bank-withdrawal">₩0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">현재 잔액</div><div class="text-xl font-bold text-cyan-400" id="bank-balance">₩0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">현재 잔액</div><div class="text-xl font-bold text-purple-400" id="bank-balance">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">거래건수</div><div class="text-xl font-bold text-purple-400" id="bank-count">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">미연결</div><div class="text-xl font-bold text-yellow-400" id="bank-unlinked">0건</div></div>
                     </div>
@@ -927,7 +1127,7 @@
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">매출 부가세</div><div class="text-xl font-bold text-blue-300" id="acc-sales-vat">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">매입 부가세</div><div class="text-xl font-bold text-red-300" id="acc-purchase-vat">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">납부 부가세</div><div class="text-xl font-bold text-yellow-400" id="acc-vat-pay">₩0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">순이익</div><div class="text-xl font-bold text-cyan-400" id="acc-profit">₩0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">순이익</div><div class="text-xl font-bold text-purple-400" id="acc-profit">₩0</div></div>
                     </div>
                     
                     <!-- 매입매출장 -->
@@ -1150,7 +1350,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-cyan-400" id="emp2-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-purple-400" id="emp2-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">정규직</div><div class="text-xl font-bold text-blue-400" id="emp2-regular">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">계약직</div><div class="text-xl font-bold text-yellow-400" id="emp2-contract">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">4대보험</div><div class="text-xl font-bold text-green-400" id="emp2-insured">0</div></div>
@@ -1170,10 +1370,10 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">이번달 지급</div><div class="text-xl font-bold text-cyan-400" id="pay2-count">0건</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">이번달 지급</div><div class="text-xl font-bold text-purple-400" id="pay2-count">0건</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 지급액</div><div class="text-xl font-bold text-blue-400" id="pay2-gross">₩0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 공제액</div><div class="text-xl font-bold text-red-400" id="pay2-deduct">₩0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">실지급액</div><div class="text-xl font-bold text-cyan-400" id="pay2-net">₩0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">실지급액</div><div class="text-xl font-bold text-purple-400" id="pay2-net">₩0</div></div>
                     </div>
                     <div class="glass-card rounded-xl overflow-hidden">
                         <table class="data-table"><thead><tr><th>지급월</th><th>직원</th><th>기본급</th><th>수당</th><th>공제</th><th>실지급</th><th>상태</th><th>관리</th></tr></thead>
@@ -1190,7 +1390,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체 계약</div><div class="text-xl font-bold text-cyan-400" id="contract-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체 계약</div><div class="text-xl font-bold text-purple-400" id="contract-total">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">유효 계약</div><div class="text-xl font-bold text-green-400" id="contract-active">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">만료 예정</div><div class="text-xl font-bold text-yellow-400" id="contract-expiring">0</div></div>
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">만료됨</div><div class="text-xl font-bold text-red-400" id="contract-expired">0</div></div>
@@ -1229,28 +1429,28 @@
     <!-- 라이더 모달 -->
     <div id="riderModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-4"><h3 id="riderModalTitle" class="text-xl font-bold text-cyan-400">🏍️ 라이더 등록</h3><button onclick="closeModal('riderModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="riderModalTitle" class="text-xl font-bold text-purple-400">🏍️ 라이더 등록</h3><button onclick="closeModal('riderModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="riderForm" onsubmit="submitForm('rider',event)" class="space-y-4">
                 <input type="hidden" id="rider-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">이름 *</label><input type="text" id="rider-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">연락처</label><input type="tel" id="rider-phone" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">이름 *</label><input type="text" id="rider-name" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">연락처</label><input type="tel" id="rider-phone" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">협력사</label><select id="rider-partner" class="input-field"><option value="">선택안함</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">협력사</label><select id="rider-partner" class="input-field"><option value="">선택안함</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">주소</label><input type="text" id="rider-address" class="input-field"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">주소</label><input type="text" id="rider-address" class="input-field"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">은행</label><select id="rider-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option><option value="KAKAO">카카오</option><option value="TOSS">토스</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">계좌번호</label><input type="text" id="rider-account-no" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">은행</label><select id="rider-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option><option value="KAKAO">카카오</option><option value="TOSS">토스</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">계좌번호</label><input type="text" id="rider-account-no" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">예금주</label><input type="text" id="rider-account-holder" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">주민번호</label><input type="text" id="rider-ssn" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">예금주</label><input type="text" id="rider-account-holder" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">주민번호</label><input type="text" id="rider-ssn" class="input-field"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">원천징수</label><select id="rider-tax-type" class="input-field"><option value="">선택</option><option value="3.3">3.3%</option><option value="8.8">8.8%</option><option value="none">없음</option></select></div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="rider-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">원천징수</label><select id="rider-tax-type" class="input-field"><option value="">선택</option><option value="3.3">3.3%</option><option value="8.8">8.8%</option><option value="none">없음</option></select></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="rider-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('riderModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1259,31 +1459,31 @@
     <!-- 협력사 모달 -->
     <div id="partnerModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-4"><h3 id="partnerModalTitle" class="text-xl font-bold text-cyan-400">🤝 협력사 등록</h3><button onclick="closeModal('partnerModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="partnerModalTitle" class="text-xl font-bold text-purple-400">🤝 협력사 등록</h3><button onclick="closeModal('partnerModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="partnerForm" onsubmit="submitForm('partner',event)" class="space-y-4">
                 <input type="hidden" id="partner-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">협력사명 *</label><input type="text" id="partner-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">협력사코드 *</label><input type="text" id="partner-code" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">협력사명 *</label><input type="text" id="partner-name" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">협력사코드 *</label><input type="text" id="partner-code" class="input-field" required></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">구분</label><select id="partner-type" class="input-field" onchange="toggleBizFields()"><option value="non_biz">비사업자</option><option value="biz">사업자</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">대표자명</label><input type="text" id="partner-rep" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">구분</label><select id="partner-type" class="input-field" onchange="toggleBizFields()"><option value="non_biz">비사업자</option><option value="biz">사업자</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">대표자명</label><input type="text" id="partner-rep" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">연락처</label><input type="tel" id="partner-phone" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">이메일</label><input type="email" id="partner-email" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">연락처</label><input type="tel" id="partner-phone" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">이메일</label><input type="email" id="partner-email" class="input-field"></div>
                 </div>
                 <div id="partnerBizFields" class="hidden grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">사업자번호</label><input type="text" id="partner-bizno" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">업종</label><input type="text" id="partner-biztype" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">사업자번호</label><input type="text" id="partner-bizno" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">업종</label><input type="text" id="partner-biztype" class="input-field"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">주소</label><input type="text" id="partner-address" class="input-field"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">주소</label><input type="text" id="partner-address" class="input-field"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">은행</label><select id="partner-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">계좌번호</label><input type="text" id="partner-accountno" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">은행</label><select id="partner-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">계좌번호</label><input type="text" id="partner-accountno" class="input-field"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="partner-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="partner-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('partnerModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1292,37 +1492,37 @@
     <!-- 영업자 모달 -->
     <div id="salesModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:800px">
-            <div class="flex justify-between items-center mb-4"><h3 id="salesModalTitle" class="text-xl font-bold text-cyan-400">💼 영업자 등록</h3><button onclick="closeModal('salesModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="salesModalTitle" class="text-xl font-bold text-purple-400">💼 영업자 등록</h3><button onclick="closeModal('salesModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="salesForm" onsubmit="submitForm('sales',event)" class="space-y-4">
                 <input type="hidden" id="sales-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">영업자코드 *</label><input type="text" id="sales-code" class="input-field" placeholder="SB-0001" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">유형 *</label><select id="sales-type" class="input-field" required onchange="toggleSalesBizFields()"><option value="individual">개인</option><option value="sole_prop">개인사업자</option><option value="corporation">법인</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">영업자코드 *</label><input type="text" id="sales-code" class="input-field" placeholder="SB-0001" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">유형 *</label><select id="sales-type" class="input-field" required onchange="toggleSalesBizFields()"><option value="individual">개인</option><option value="sole_prop">개인사업자</option><option value="corporation">법인</option></select></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">이름 *</label><input type="text" id="sales-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">연락처</label><input type="tel" id="sales-phone" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">이름 *</label><input type="text" id="sales-name" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">연락처</label><input type="tel" id="sales-phone" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">이메일</label><input type="email" id="sales-email" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">지역</label><input type="text" id="sales-region" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">이메일</label><input type="email" id="sales-email" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지역</label><input type="text" id="sales-region" class="input-field"></div>
                 </div>
                 <div id="salesBizFields" class="hidden grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">사업자번호</label><input type="text" id="sales-bizno" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">대표자명</label><input type="text" id="sales-repname" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">사업자번호</label><input type="text" id="sales-bizno" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">대표자명</label><input type="text" id="sales-repname" class="input-field"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">주소</label><input type="text" id="sales-address" class="input-field"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">주소</label><input type="text" id="sales-address" class="input-field"></div>
                 <div class="grid grid-cols-3 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">은행</label><select id="sales-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option><option value="KAKAO">카카오</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">예금주</label><input type="text" id="sales-bank-holder" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">계좌번호</label><input type="text" id="sales-bank-account" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">은행</label><select id="sales-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option><option value="KAKAO">카카오</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">예금주</label><input type="text" id="sales-bank-holder" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">계좌번호</label><input type="text" id="sales-bank-account" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-3 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급주기</label><select id="sales-payout-cycle" class="input-field"><option value="monthly">월</option><option value="weekly">주</option><option value="per_case">건별</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">원천징수율</label><select id="sales-withholding-rate" class="input-field"><option value="0.033">3.3%</option><option value="0.088">8.8%</option><option value="0">없음</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="sales-status" class="input-field"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급주기</label><select id="sales-payout-cycle" class="input-field"><option value="monthly">월</option><option value="weekly">주</option><option value="per_case">건별</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">원천징수율</label><select id="sales-withholding-rate" class="input-field"><option value="0.033">3.3%</option><option value="0.088">8.8%</option><option value="0">없음</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="sales-status" class="input-field"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="sales-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="sales-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('salesModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1331,17 +1531,17 @@
     <!-- 사용자 모달 -->
     <div id="userModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:500px">
-            <div class="flex justify-between items-center mb-4"><h3 id="userModalTitle" class="text-xl font-bold text-cyan-400">👤 사용자 등록</h3><button onclick="closeModal('userModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="userModalTitle" class="text-xl font-bold text-purple-400">👤 사용자 등록</h3><button onclick="closeModal('userModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="userForm" onsubmit="submitUser(event)" class="space-y-4">
                 <input type="hidden" id="user-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">이름 *</label><input type="text" id="user-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">아이디 *</label><input type="text" id="user-username" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">이름 *</label><input type="text" id="user-name" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">아이디 *</label><input type="text" id="user-username" class="input-field" required></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">비밀번호</label><input type="password" id="user-password" class="input-field"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">비밀번호</label><input type="password" id="user-password" class="input-field"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">권한</label><select id="user-role" class="input-field"><option value="STAFF">직원</option><option value="MANAGER">매니저</option><option value="ADMIN">관리자</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="user-status" class="input-field"><option value="true">활성</option><option value="false">비활성</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">권한</label><select id="user-role" class="input-field"><option value="STAFF">직원</option><option value="MANAGER">매니저</option><option value="ADMIN">관리자</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="user-status" class="input-field"><option value="true">활성</option><option value="false">비활성</option></select></div>
                 </div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('userModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
@@ -1351,22 +1551,22 @@
     <!-- 정산 모달 -->
     <div id="settlementModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:900px">
-            <div class="flex justify-between items-center mb-4"><h3 id="settlementModalTitle" class="text-xl font-bold text-cyan-400">💰 정산 등록</h3><button onclick="closeModal('settlementModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="settlementModalTitle" class="text-xl font-bold text-purple-400">💰 정산 등록</h3><button onclick="closeModal('settlementModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="settlementForm" onsubmit="submitSettlement(event)" class="space-y-4">
                 <input type="hidden" id="sett-id">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">정산주차 *</label><input type="text" id="sett-week" class="input-field" placeholder="2025-W03" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">근무시작(수)</label><input type="date" id="sett-start" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">근무종료(화)</label><input type="date" id="sett-end" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급예정일(금)</label><input type="date" id="sett-paydate" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">정산주차 *</label><input type="text" id="sett-week" class="input-field" placeholder="2025-W03" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">근무시작(수)</label><input type="date" id="sett-start" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">근무종료(화)</label><input type="date" id="sett-end" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급예정일(금)</label><input type="date" id="sett-paydate" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">라이더 *</label><select id="sett-rider" class="input-field" required><option value="">선택</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">협력사</label><select id="sett-partner" class="input-field"><option value="">선택</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">플랫폼</label><select id="sett-platform" class="input-field"><option value="">선택</option><option value="baemin">배민</option><option value="coupang">쿠팡이츠</option><option value="yogiyo">요기요</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">라이더 *</label><select id="sett-rider" class="input-field" required><option value="">선택</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">협력사</label><select id="sett-partner" class="input-field"><option value="">선택</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">플랫폼</label><select id="sett-platform" class="input-field"><option value="">선택</option><option value="baemin">배민</option><option value="coupang">쿠팡이츠</option><option value="yogiyo">요기요</option></select></div>
                 </div>
                 <div class="border-t border-white/10 pt-4 mt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">💵 수입 항목</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">💵 수입 항목</h4>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">배달료</label><input type="number" id="sett-delivery" class="input-field" value="0" onchange="calcSettlement()"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">미션비</label><input type="number" id="sett-mission" class="input-field" value="0" onchange="calcSettlement()"></div>
@@ -1394,13 +1594,13 @@
                 </div>
                 <div class="border-t border-white/10 pt-4 mt-4">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div class="glass-card rounded-lg p-3"><div class="text-xs text-gray-400">총 수입</div><div class="text-lg font-bold text-cyan-400" id="calc-gross">₩0</div></div>
+                        <div class="glass-card rounded-lg p-3"><div class="text-xs text-gray-400">총 수입</div><div class="text-lg font-bold text-purple-400" id="calc-gross">₩0</div></div>
                         <div class="glass-card rounded-lg p-3"><div class="text-xs text-gray-400">총 공제</div><div class="text-lg font-bold text-red-400" id="calc-deduct">₩0</div></div>
                         <div class="glass-card rounded-lg p-3"><div class="text-xs text-gray-400">선정산</div><div class="text-lg font-bold text-purple-400" id="calc-advance">₩0</div></div>
                         <div class="glass-card rounded-lg p-3"><div class="text-xs text-gray-400">실지급액</div><div class="text-lg font-bold text-green-400" id="calc-net">₩0</div></div>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="sett-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="sett-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('settlementModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1409,27 +1609,27 @@
     <!-- 카드 등록 모달 -->
     <div id="cardModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:600px">
-            <div class="flex justify-between items-center mb-4"><h3 id="cardModalTitle" class="text-xl font-bold text-cyan-400">💳 카드 등록</h3><button onclick="closeModal('cardModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="cardModalTitle" class="text-xl font-bold text-purple-400">💳 카드 등록</h3><button onclick="closeModal('cardModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="cardForm" onsubmit="submitCard(event)" class="space-y-4">
                 <input type="hidden" id="card-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">카드별칭 *</label><input type="text" id="card-alias" class="input-field" placeholder="운영비카드" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">소속법인</label><input type="text" id="card-company" class="input-field" placeholder="팀브로"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">카드별칭 *</label><input type="text" id="card-alias" class="input-field" placeholder="운영비카드" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">소속법인</label><input type="text" id="card-company" class="input-field" placeholder="팀브로"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">카드사 *</label><select id="card-company-name" class="input-field" required><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option><option value="BC">BC</option><option value="SAMSUNG">삼성</option><option value="LOTTE">롯데</option><option value="HYUNDAI">현대</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">카드번호 (마스킹)</label><input type="text" id="card-number" class="input-field" placeholder="1234-****-****-5678"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">카드사 *</label><select id="card-company-name" class="input-field" required><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option><option value="BC">BC</option><option value="SAMSUNG">삼성</option><option value="LOTTE">롯데</option><option value="HYUNDAI">현대</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">카드번호 (마스킹)</label><input type="text" id="card-number" class="input-field" placeholder="1234-****-****-5678"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">연결통장</label><input type="text" id="card-bank" class="input-field" placeholder="우리은행 1002-xxx"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">유효기간</label><input type="date" id="card-valid" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">연결통장</label><input type="text" id="card-bank" class="input-field" placeholder="우리은행 1002-xxx"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">유효기간</label><input type="date" id="card-valid" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">사용부서</label><input type="text" id="card-dept" class="input-field" placeholder="경영지원팀"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">실사용자</label><input type="text" id="card-user" class="input-field" placeholder="홍길동"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">사용부서</label><input type="text" id="card-dept" class="input-field" placeholder="경영지원팀"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">실사용자</label><input type="text" id="card-user" class="input-field" placeholder="홍길동"></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">💰 한도 설정</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">💰 한도 설정</h4>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">일 한도</label><input type="number" id="card-daily" class="input-field" value="0"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">월 한도</label><input type="number" id="card-monthly" class="input-field" value="0"></div>
@@ -1440,10 +1640,10 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">발급일</label><input type="date" id="card-issued" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="card-status" class="input-field"><option value="active">사용중</option><option value="suspended">일시중지</option><option value="terminated">해지</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">발급일</label><input type="date" id="card-issued" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="card-status" class="input-field"><option value="active">사용중</option><option value="suspended">일시중지</option><option value="terminated">해지</option></select></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="card-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="card-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('cardModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1452,30 +1652,30 @@
     <!-- 플랫폼 정산 모달 -->
     <div id="platformModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">📥 플랫폼 정산 등록</h3><button onclick="closeModal('platformModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">📥 플랫폼 정산 등록</h3><button onclick="closeModal('platformModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="platformForm" onsubmit="submitPlatform(event)" class="space-y-4">
                 <input type="hidden" id="plat-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">플랫폼 *</label><select id="plat-platform" class="input-field" required><option value="">선택</option><option value="baemin">배민</option><option value="coupang">쿠팡이츠</option><option value="yogiyo">요기요</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">정산주차 *</label><input type="text" id="plat-week" class="input-field" placeholder="2025-W03" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">플랫폼 *</label><select id="plat-platform" class="input-field" required><option value="">선택</option><option value="baemin">배민</option><option value="coupang">쿠팡이츠</option><option value="yogiyo">요기요</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">정산주차 *</label><input type="text" id="plat-week" class="input-field" placeholder="2025-W03" required></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">셋트시작</label><input type="date" id="plat-start" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">셋트종료</label><input type="date" id="plat-end" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">셋트시작</label><input type="date" id="plat-start" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">셋트종료</label><input type="date" id="plat-end" class="input-field"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">결제입금일</label><input type="date" id="plat-expected" class="input-field"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">총 완료건수</label><input type="number" id="plat-count" class="input-field" value="0"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">결제입금일</label><input type="date" id="plat-expected" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">총 완료건수</label><input type="number" id="plat-count" class="input-field" value="0"></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">💰 금액</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">💰 금액</h4>
                     <div class="grid grid-cols-3 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">공급가액</label><input type="number" id="plat-supply" class="input-field" value="0" onchange="calcPlatformVat()"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">부가세 (10%)</label><input type="number" id="plat-vat" class="input-field" value="0" readonly></div>
                         <div><label class="block text-sm text-gray-400 mb-1">합계</label><input type="number" id="plat-total-amt" class="input-field" value="0" readonly></div>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="plat-memo" class="input-field" rows="4"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="plat-memo" class="input-field" rows="4"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('platformModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1488,12 +1688,12 @@
             <form id="settAdvanceForm" onsubmit="submitSettAdvance(event)" class="space-y-4">
                 <input type="hidden" id="settadv-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">협력사 *</label><select id="settadv-partner" class="input-field" required><option value="">선택</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급일 *</label><input type="date" id="settadv-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">협력사 *</label><select id="settadv-partner" class="input-field" required><option value="">선택</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급일 *</label><input type="date" id="settadv-date" class="input-field" required></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">정산주차</label><input type="text" id="settadv-week" class="input-field" placeholder="2025-W03"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">정산주차</label><input type="text" id="settadv-week" class="input-field" placeholder="2025-W03"></div>
                 <div class="border-t border-white/10 pt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">💰 금액</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">💰 금액</h4>
                     <div class="grid grid-cols-3 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">공급가액</label><input type="number" id="settadv-supply" class="input-field" value="0" onchange="calcSettAdvanceTotal()"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">부가세 (10%)</label><input type="number" id="settadv-vat" class="input-field" value="0" readonly></div>
@@ -1508,8 +1708,8 @@
                         <div><label class="block text-sm text-gray-400 mb-1">실지급액</label><input type="number" id="settadv-net" class="input-field" value="0" readonly></div>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="settadv-status" class="input-field"><option value="pending">대기</option><option value="transferred">지급완료</option></select></div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="settadv-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="settadv-status" class="input-field"><option value="pending">대기</option><option value="transferred">지급완료</option></select></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="settadv-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('settAdvanceModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1518,9 +1718,9 @@
     <!-- 세무서류 업로드 모달 -->
     <div id="taxUploadModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:500px">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">📤 세무서류 업로드</h3><button onclick="closeModal('taxUploadModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">📤 세무서류 업로드</h3><button onclick="closeModal('taxUploadModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="taxUploadForm" onsubmit="submitTaxUpload(event)" class="space-y-4">
-                <div><label class="block text-sm text-cyan-400 mb-1">카테고리 *</label>
+                <div><label class="block text-sm text-purple-400 mb-1">카테고리 *</label>
                     <select id="taxdoc-category" class="input-field" required>
                         <option value="">선택</option>
                         <option value="withholding">원천세 신고</option>
@@ -1528,20 +1728,20 @@
                         <option value="other">기타 서류</option>
                     </select>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">서류일자</label>
+                <div><label class="block text-sm text-purple-400 mb-1">서류일자</label>
                     <input type="date" id="taxdoc-date" class="input-field">
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">파일 선택 * (최대 10개)</label>
+                <div><label class="block text-sm text-purple-400 mb-1">파일 선택 * (최대 10개)</label>
                     <input type="file" id="taxdoc-file" class="input-field" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx" multiple required onchange="checkFileLimit(this)">
                     <p class="text-gray-500 text-xs mt-1">PDF, 이미지, 엑셀, 워드 파일 지원 | 한 번에 최대 10개</p>
                     <div id="selectedFileList" class="mt-2 text-sm text-gray-400"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">설명</label>
+                <div><label class="block text-sm text-purple-400 mb-1">설명</label>
                     <input type="text" id="taxdoc-desc" class="input-field" placeholder="2025년 1월 원천세 신고서">
                 </div>
                 <div id="uploadProgress" class="hidden">
                     <div class="bg-gray-700 rounded-full h-2">
-                        <div id="uploadProgressBar" class="bg-cyan-400 h-2 rounded-full transition-all" style="width:0%"></div>
+                        <div id="uploadProgressBar" class="bg-purple-400 h-2 rounded-full transition-all" style="width:0%"></div>
                     </div>
                     <p id="uploadProgressText" class="text-center text-sm text-gray-400 mt-1">업로드 중... (0/0)</p>
                 </div>
@@ -1555,7 +1755,7 @@
         <div class="modal-content" style="max-width:500px">
             <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">📤 법인서류 업로드</h3><button onclick="closeModal('docUploadModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="docUploadForm" onsubmit="submitDocUpload(event)" class="space-y-4">
-                <div><label class="block text-sm text-cyan-400 mb-1">카테고리 *</label>
+                <div><label class="block text-sm text-purple-400 mb-1">카테고리 *</label>
                     <select id="corpdoc-category" class="input-field" required>
                         <option value="">선택</option>
                         <option value="business">사업자등록증</option>
@@ -1565,15 +1765,15 @@
                         <option value="other">기타</option>
                     </select>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">법인/대상</label>
+                <div><label class="block text-sm text-purple-400 mb-1">법인/대상</label>
                     <input type="text" id="corpdoc-entity" class="input-field" placeholder="팀브로, 브로모터스 등">
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">파일 선택 * (최대 10개)</label>
+                <div><label class="block text-sm text-purple-400 mb-1">파일 선택 * (최대 10개)</label>
                     <input type="file" id="corpdoc-file" class="input-field" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx" multiple required onchange="checkDocFileLimit(this)">
                     <p class="text-gray-500 text-xs mt-1">PDF, 이미지, 엑셀, 워드 파일 지원 | 한 번에 최대 10개</p>
                     <div id="selectedDocFileList" class="mt-2 text-sm text-gray-400"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">설명</label>
+                <div><label class="block text-sm text-purple-400 mb-1">설명</label>
                     <input type="text" id="corpdoc-desc" class="input-field" placeholder="2025년 갱신 사업자등록증">
                 </div>
                 <div id="docUploadProgress" class="hidden">
@@ -1590,13 +1790,13 @@
     <!-- 법인 등록/수정 모달 -->
     <div id="entityModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:700px">
-            <div class="flex justify-between items-center mb-4"><h3 id="entityModalTitle" class="text-xl font-bold text-cyan-400">🏢 법인 등록</h3><button onclick="closeModal('entityModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="entityModalTitle" class="text-xl font-bold text-purple-400">🏢 법인 등록</h3><button onclick="closeModal('entityModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="entityForm" onsubmit="submitEntity(event)" class="space-y-4">
                 <input type="hidden" id="entity-id">
                 
                 <!-- 기본 정보 -->
                 <div class="border-b border-white/10 pb-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">📋 기본 정보</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">📋 기본 정보</h4>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">법인명 *</label><input type="text" id="entity-name" class="input-field" required placeholder="(주)팀브로서울"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">상태</label><select id="entity-status" class="input-field"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
@@ -1631,7 +1831,7 @@
                 </div>
                 
                 <!-- 메모 -->
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="entity-memo" class="input-field" rows="2" placeholder="기타 참고사항"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="entity-memo" class="input-field" rows="2" placeholder="기타 참고사항"></textarea></div>
                 
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('entityModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
@@ -1641,11 +1841,11 @@
     <!-- 법인 상세 모달 -->
     <div id="entityDetailModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:800px">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">🏢 <span id="entityDetailName">법인명</span></h3><button onclick="closeModal('entityDetailModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">🏢 <span id="entityDetailName">법인명</span></h3><button onclick="closeModal('entityDetailModal')" class="text-gray-400 text-2xl">&times;</button></div>
             
             <!-- 탭 -->
             <div class="flex gap-2 mb-4 border-b border-white/10 pb-2">
-                <button onclick="showEntityDetailTab('info')" id="entityDetailTab-info" class="px-4 py-2 rounded-t-lg text-sm font-bold bg-cyan-500/20 text-cyan-400">기본정보</button>
+                <button onclick="showEntityDetailTab('info')" id="entityDetailTab-info" class="px-4 py-2 rounded-t-lg text-sm font-bold bg-purple-500/20 text-purple-400">기본정보</button>
                 <button onclick="showEntityDetailTab('docs')" id="entityDetailTab-docs" class="px-4 py-2 rounded-t-lg text-sm text-gray-400 hover:text-white">첨부서류</button>
             </div>
             
@@ -1675,12 +1875,12 @@
     <!-- 자금 집행/회수 등록 모달 -->
     <div id="fundModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:500px">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">💰 자금 등록</h3><button onclick="closeModal('fundModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">💰 자금 등록</h3><button onclick="closeModal('fundModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="fundForm" onsubmit="submitFund(event)" class="space-y-4">
                 <input type="hidden" id="fund-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">일자 *</label><input type="date" id="fund-date" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">구분 *</label>
+                    <div><label class="block text-sm text-purple-400 mb-1">일자 *</label><input type="date" id="fund-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">구분 *</label>
                         <select id="fund-type" class="input-field" required>
                             <option value="">선택</option>
                             <option value="out">집행 (출금)</option>
@@ -1688,23 +1888,23 @@
                         </select>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">자회사 *</label>
+                <div><label class="block text-sm text-purple-400 mb-1">자회사 *</label>
                     <select id="fund-subsidiary" class="input-field" required>
                         <option value="">선택</option>
                         <option value="brocompany">브로컴퍼니</option>
                         <option value="bromotors">브로모터스</option>
                     </select>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">금액 *</label><input type="number" id="fund-amount" class="input-field" required placeholder="0"></div>
-                <div><label class="block text-sm text-cyan-400 mb-1">용도/내용</label><input type="text" id="fund-purpose" class="input-field" placeholder="운영자금, 수익금 회수 등"></div>
-                <div><label class="block text-sm text-cyan-400 mb-1">상태</label>
+                <div><label class="block text-sm text-purple-400 mb-1">금액 *</label><input type="number" id="fund-amount" class="input-field" required placeholder="0"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">용도/내용</label><input type="text" id="fund-purpose" class="input-field" placeholder="운영자금, 수익금 회수 등"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">상태</label>
                     <select id="fund-status" class="input-field">
                         <option value="completed">완료</option>
                         <option value="pending">대기</option>
                         <option value="cancelled">취소</option>
                     </select>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="fund-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="fund-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('fundModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1713,18 +1913,18 @@
     <!-- 현금출납장 모달 -->
     <div id="bankModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:600px">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">📒 거래 등록</h3><button onclick="closeModal('bankModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">📒 거래 등록</h3><button onclick="closeModal('bankModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="bankForm" onsubmit="submitCashbook(event)" class="space-y-4">
                 <input type="hidden" id="bank-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">일자 *</label><input type="date" id="bank-date" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">구분 *</label><select id="bank-type" class="input-field" required onchange="toggleCashbookLink()"><option value="deposit">입금</option><option value="withdrawal">출금</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">일자 *</label><input type="date" id="bank-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">구분 *</label><select id="bank-type" class="input-field" required onchange="toggleCashbookLink()"><option value="deposit">입금</option><option value="withdrawal">출금</option></select></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">거래처</label><input type="text" id="bank-counterparty" class="input-field" placeholder="배민, 협력사A 등"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">금액 *</label><input type="number" id="bank-amount" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">거래처</label><input type="text" id="bank-counterparty" class="input-field" placeholder="배민, 협력사A 등"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">금액 *</label><input type="number" id="bank-amount" class="input-field" required></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">적요</label><input type="text" id="bank-desc" class="input-field" placeholder="W03 정산금, 선정산 지급 등"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">적요</label><input type="text" id="bank-desc" class="input-field" placeholder="W03 정산금, 선정산 지급 등"></div>
                 <div class="border-t border-white/10 pt-4">
                     <h4 class="text-purple-400 font-bold mb-3">🔗 연결 (선택)</h4>
                     <div class="grid grid-cols-2 gap-4">
@@ -1741,7 +1941,7 @@
                         </div>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="bank-memo2" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="bank-memo2" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('bankModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1750,18 +1950,18 @@
     <!-- 매입매출장 모달 -->
     <div id="salesPurchaseModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:650px">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">📋 매입매출 등록</h3><button onclick="closeModal('salesPurchaseModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">📋 매입매출 등록</h3><button onclick="closeModal('salesPurchaseModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="salesPurchaseForm" onsubmit="submitSalesPurchase(event)" class="space-y-4">
                 <input type="hidden" id="sp-id">
                 <div class="grid grid-cols-3 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">일자 *</label><input type="date" id="sp-date" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">구분 *</label>
+                    <div><label class="block text-sm text-purple-400 mb-1">일자 *</label><input type="date" id="sp-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">구분 *</label>
                         <select id="sp-type" class="input-field" required onchange="toggleSPType()">
                             <option value="sales">매출</option>
                             <option value="purchase">매입</option>
                         </select>
                     </div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">세금계산서</label>
+                    <div><label class="block text-sm text-purple-400 mb-1">세금계산서</label>
                         <select id="sp-tax-status" class="input-field">
                             <option value="pending">미발행</option>
                             <option value="issued">발행</option>
@@ -1770,11 +1970,11 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">거래처 *</label><input type="text" id="sp-counterparty" class="input-field" placeholder="배민, 협력사A 등" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">품목</label><input type="text" id="sp-item" class="input-field" placeholder="W03 정산금, 용역비 등"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">거래처 *</label><input type="text" id="sp-counterparty" class="input-field" placeholder="배민, 협력사A 등" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">품목</label><input type="text" id="sp-item" class="input-field" placeholder="W03 정산금, 용역비 등"></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">💰 금액</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">💰 금액</h4>
                     <div class="grid grid-cols-3 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">공급가액 *</label><input type="number" id="sp-supply" class="input-field" value="0" required onchange="calcSPTotal()"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">부가세 (10%)</label><input type="number" id="sp-vat" class="input-field" value="0" readonly></div>
@@ -1796,26 +1996,26 @@
                         </div>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="sp-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="sp-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('salesPurchaseModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
     </div>
     <div id="weeklyPayoutModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-cyan-400">📆 주정산 지급 등록</h3><button onclick="closeModal('weeklyPayoutModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-purple-400">📆 주정산 지급 등록</h3><button onclick="closeModal('weeklyPayoutModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="weeklyPayoutForm" onsubmit="submitWeeklyPayout(event)" class="space-y-4">
                 <input type="hidden" id="weekly-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">정산주차 *</label><input type="text" id="weekly-week" class="input-field" placeholder="2025-W03" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급일 *</label><input type="date" id="weekly-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">정산주차 *</label><input type="text" id="weekly-week" class="input-field" placeholder="2025-W03" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급일 *</label><input type="date" id="weekly-date" class="input-field" required></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">라이더 *</label><select id="weekly-rider" class="input-field" required><option value="">선택</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">협력사</label><select id="weekly-partner" class="input-field"><option value="">선택</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">라이더 *</label><select id="weekly-rider" class="input-field" required><option value="">선택</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">협력사</label><select id="weekly-partner" class="input-field"><option value="">선택</option></select></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">📊 배달 실적</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">📊 배달 실적</h4>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">배달건수</label><input type="number" id="weekly-count" class="input-field" value="0"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">배달수익</label><input type="number" id="weekly-revenue" class="input-field" value="0" onchange="calcWeeklyPayout()"></div>
@@ -1830,14 +2030,14 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
                         <div><label class="block text-sm text-gray-400 mb-1">총 공제액</label><input type="number" id="weekly-deduction" class="input-field" value="0" readonly></div>
-                        <div><label class="block text-sm text-gray-400 mb-1">실지급액</label><input type="number" id="weekly-net" class="input-field font-bold text-cyan-400" value="0" readonly></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">실지급액</label><input type="number" id="weekly-net" class="input-field font-bold text-purple-400" value="0" readonly></div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="weekly-status" class="input-field"><option value="pending">대기</option><option value="paid">지급완료</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급계좌</label><input type="text" id="weekly-account" class="input-field" placeholder="은행 계좌번호"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="weekly-status" class="input-field"><option value="pending">대기</option><option value="paid">지급완료</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급계좌</label><input type="text" id="weekly-account" class="input-field" placeholder="은행 계좌번호"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="weekly-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="weekly-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('weeklyPayoutModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1846,20 +2046,20 @@
     <!-- 세금계산서 모달 -->
     <div id="taxInvoiceModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:600px">
-            <div class="flex justify-between items-center mb-4"><h3 id="taxInvoiceModalTitle" class="text-xl font-bold text-cyan-400">🧾 세금계산서 등록</h3><button onclick="closeModal('taxInvoiceModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="taxInvoiceModalTitle" class="text-xl font-bold text-purple-400">🧾 세금계산서 등록</h3><button onclick="closeModal('taxInvoiceModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="taxInvoiceForm" onsubmit="submitTaxInvoice(event)" class="space-y-4">
                 <input type="hidden" id="inv-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">유형 *</label><select id="inv-type" class="input-field" required><option value="purchase">매입</option><option value="sales">매출</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">발행일 *</label><input type="date" id="inv-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">유형 *</label><select id="inv-type" class="input-field" required><option value="purchase">매입</option><option value="sales">매출</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">발행일 *</label><input type="date" id="inv-date" class="input-field" required></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">거래처명 *</label><input type="text" id="inv-vendor" class="input-field" required placeholder="거래처명"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">거래처명 *</label><input type="text" id="inv-vendor" class="input-field" required placeholder="거래처명"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">사업자번호</label><input type="text" id="inv-bizno" class="input-field" placeholder="123-45-67890"></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">대표자명</label><input type="text" id="inv-ceo" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">사업자번호</label><input type="text" id="inv-bizno" class="input-field" placeholder="123-45-67890"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">대표자명</label><input type="text" id="inv-ceo" class="input-field"></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
-                    <h4 class="text-cyan-400 font-bold mb-3">💰 금액</h4>
+                    <h4 class="text-purple-400 font-bold mb-3">💰 금액</h4>
                     <div class="grid grid-cols-3 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">공급가액</label><input type="number" id="inv-supply" class="input-field" value="0" onchange="calcTaxInvoice()"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">부가세 (10%)</label><input type="number" id="inv-vat" class="input-field" value="0" readonly></div>
@@ -1867,11 +2067,11 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급상태</label><select id="inv-status" class="input-field"><option value="unpaid">미지급</option><option value="paid">지급완료</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">지급일</label><input type="date" id="inv-paiddate" class="input-field"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급상태</label><select id="inv-status" class="input-field"><option value="unpaid">미지급</option><option value="paid">지급완료</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">지급일</label><input type="date" id="inv-paiddate" class="input-field"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">품목</label><input type="text" id="inv-item" class="input-field" placeholder="품목/서비스명"></div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="inv-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">품목</label><input type="text" id="inv-item" class="input-field" placeholder="품목/서비스명"></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="inv-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('taxInvoiceModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -1880,12 +2080,12 @@
     <!-- 분개 모달 -->
     <div id="journalModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:700px">
-            <div class="flex justify-between items-center mb-4"><h3 id="journalModalTitle" class="text-xl font-bold text-cyan-400">📊 분개 등록</h3><button onclick="closeModal('journalModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4"><h3 id="journalModalTitle" class="text-xl font-bold text-purple-400">📊 분개 등록</h3><button onclick="closeModal('journalModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="journalForm" onsubmit="submitJournal(event)" class="space-y-4">
                 <input type="hidden" id="jnl-id">
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">일자 *</label><input type="date" id="jnl-date" class="input-field" required></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">분개번호</label><input type="text" id="jnl-number" class="input-field" placeholder="자동생성" readonly></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">일자 *</label><input type="date" id="jnl-date" class="input-field" required></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">분개번호</label><input type="text" id="jnl-number" class="input-field" placeholder="자동생성" readonly></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
                     <h4 class="text-blue-400 font-bold mb-3">📥 차변 (Debit)</h4>
@@ -1910,12 +2110,12 @@
                         <div><label class="block text-sm text-gray-400 mb-1">금액</label><input type="number" id="jnl-credit-amount" class="input-field" value="0"></div>
                     </div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">적요 *</label><input type="text" id="jnl-desc" class="input-field" placeholder="거래 내용" required></div>
+                <div><label class="block text-sm text-purple-400 mb-1">적요 *</label><input type="text" id="jnl-desc" class="input-field" placeholder="거래 내용" required></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-cyan-400 mb-1">상태</label><select id="jnl-status" class="input-field"><option value="created">생성</option><option value="confirmed">확정</option></select></div>
-                    <div><label class="block text-sm text-cyan-400 mb-1">증빙</label><input type="text" id="jnl-evidence" class="input-field" placeholder="영수증번호 등"></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">상태</label><select id="jnl-status" class="input-field"><option value="created">생성</option><option value="confirmed">확정</option></select></div>
+                    <div><label class="block text-sm text-purple-400 mb-1">증빙</label><input type="text" id="jnl-evidence" class="input-field" placeholder="영수증번호 등"></div>
                 </div>
-                <div><label class="block text-sm text-cyan-400 mb-1">메모</label><textarea id="jnl-memo" class="input-field" rows="2"></textarea></div>
+                <div><label class="block text-sm text-purple-400 mb-1">메모</label><textarea id="jnl-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('journalModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
         </div>
@@ -2177,7 +2377,7 @@ function renderTable(type) {
         if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
         const types = { individual: '개인', sole_prop: '개인사업자', corporation: '법인' };
         const cycles = { monthly: '월', weekly: '주', per_case: '건별' };
-        tbody.innerHTML = list.map(s => '<tr><td class="font-bold text-cyan-400">' + (s.sales_code||'-') + '</td><td>' + s.name + '</td><td><span class="badge badge-biz">' + (types[s.sales_type]||s.sales_type) + '</span></td><td>' + (s.phone||'-') + '</td><td>' + (cycles[s.payout_cycle]||'-') + '</td><td>' + (s.withholding_rate?(parseFloat(s.withholding_rate)*100).toFixed(1)+'%':'-') + '</td><td><span class="badge ' + (s.status==='active'?'badge-active">활성':'badge-inactive">비활성') + '</span></td><td><button onclick="editItem(\'sales\',' + s.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+        tbody.innerHTML = list.map(s => '<tr><td class="font-bold text-purple-400">' + (s.sales_code||'-') + '</td><td>' + s.name + '</td><td><span class="badge badge-biz">' + (types[s.sales_type]||s.sales_type) + '</span></td><td>' + (s.phone||'-') + '</td><td>' + (cycles[s.payout_cycle]||'-') + '</td><td>' + (s.withholding_rate?(parseFloat(s.withholding_rate)*100).toFixed(1)+'%':'-') + '</td><td><span class="badge ' + (s.status==='active'?'badge-active">활성':'badge-inactive">비활성') + '</span></td><td><button onclick="editItem(\'sales\',' + s.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
     } else if (type === 'settlement') {
         const wf = document.getElementById('settWeekFilter').value;
         const sf = document.getElementById('settStatusFilter').value;
@@ -2195,7 +2395,7 @@ function renderTable(type) {
         tbody.innerHTML = list.map(s => {
             const r = riderList.find(x => x.id == s.rider_id);
             const p = partnerList.find(x => x.id == s.partner_id);
-            return '<tr><td class="font-bold text-cyan-400">' + (s.settlement_week||'-') + '</td><td class="text-xs">' + (s.work_start_date||'') + '<br>~' + (s.work_end_date||'') + '</td><td>' + (r?r.name:'-') + '</td><td>' + (p?p.name:'-') + '</td><td class="text-right">₩' + parseInt(s.gross_amount||0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(s.deduction_amount||0).toLocaleString() + '</td><td class="text-right text-purple-400">₩' + parseInt(s.advance_amount||0).toLocaleString() + '</td><td class="text-right font-bold text-green-400">₩' + parseInt(s.net_amount||0).toLocaleString() + '</td><td><span class="badge ' + (statusClass[s.status]||'badge-inactive') + '">' + (statuses[s.status]||s.status) + '</span></td><td><button onclick="editSettlement(' + s.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+            return '<tr><td class="font-bold text-purple-400">' + (s.settlement_week||'-') + '</td><td class="text-xs">' + (s.work_start_date||'') + '<br>~' + (s.work_end_date||'') + '</td><td>' + (r?r.name:'-') + '</td><td>' + (p?p.name:'-') + '</td><td class="text-right">₩' + parseInt(s.gross_amount||0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(s.deduction_amount||0).toLocaleString() + '</td><td class="text-right text-purple-400">₩' + parseInt(s.advance_amount||0).toLocaleString() + '</td><td class="text-right font-bold text-green-400">₩' + parseInt(s.net_amount||0).toLocaleString() + '</td><td><span class="badge ' + (statusClass[s.status]||'badge-inactive') + '">' + (statuses[s.status]||s.status) + '</span></td><td><button onclick="editSettlement(' + s.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
         }).join('');
     }
 }
@@ -2799,7 +2999,7 @@ function renderJournalTable() {
     if (!journalList.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     const statuses = { created: '생성', confirmed: '확정', cancelled: '취소' };
     const statusClass = { created: 'badge-pending', confirmed: 'badge-active', cancelled: 'badge-inactive' };
-    tbody.innerHTML = journalList.map(j => '<tr><td>' + j.journal_date + '</td><td class="font-bold text-cyan-400">' + (j.journal_no || '-') + '</td><td>' + (j.debit_account || '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(j.debit_amount || 0).toLocaleString() + '</td><td>' + (j.credit_account || '-') + '</td><td class="text-right text-red-400">₩' + parseInt(j.credit_amount || 0).toLocaleString() + '</td><td class="text-xs">' + (j.description || '-') + '</td><td><span class="badge ' + (statusClass[j.status] || 'badge-pending') + '">' + (statuses[j.status] || j.status) + '</span></td><td><button onclick="editJournal(' + j.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    tbody.innerHTML = journalList.map(j => '<tr><td>' + j.journal_date + '</td><td class="font-bold text-purple-400">' + (j.journal_no || '-') + '</td><td>' + (j.debit_account || '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(j.debit_amount || 0).toLocaleString() + '</td><td>' + (j.credit_account || '-') + '</td><td class="text-right text-red-400">₩' + parseInt(j.credit_amount || 0).toLocaleString() + '</td><td class="text-xs">' + (j.description || '-') + '</td><td><span class="badge ' + (statusClass[j.status] || 'badge-pending') + '">' + (statuses[j.status] || j.status) + '</span></td><td><button onclick="editJournal(' + j.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
 }
 
 function openJournalModal() {
@@ -2926,7 +3126,7 @@ function renderEmployeeTable() {
     if (!employeeList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     const types = { regular: '정규직', contract: '계약직' };
     const typeClass = { regular: 'badge-info', contract: 'badge-pending' };
-    tbody.innerHTML = employeeList.map(e => '<tr><td class="font-bold text-cyan-400">' + (e.emp_code || '-') + '</td><td>' + e.name + '</td><td><span class="badge ' + (typeClass[e.emp_type] || 'badge-info') + '">' + (types[e.emp_type] || e.emp_type) + '</span></td><td>' + (e.department || '-') + '</td><td class="text-right">₩' + parseInt(e.base_salary || 0).toLocaleString() + '</td><td>' + (e.insurance_enabled ? '<span class="text-green-400">✓</span>' : '<span class="text-gray-500">-</span>') + '</td><td><span class="badge ' + (e.status === 'active' ? 'badge-active' : 'badge-inactive') + '">' + (e.status === 'active' ? '재직' : '퇴사') + '</span></td><td><button onclick="editEmployee(' + e.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    tbody.innerHTML = employeeList.map(e => '<tr><td class="font-bold text-purple-400">' + (e.emp_code || '-') + '</td><td>' + e.name + '</td><td><span class="badge ' + (typeClass[e.emp_type] || 'badge-info') + '">' + (types[e.emp_type] || e.emp_type) + '</span></td><td>' + (e.department || '-') + '</td><td class="text-right">₩' + parseInt(e.base_salary || 0).toLocaleString() + '</td><td>' + (e.insurance_enabled ? '<span class="text-green-400">✓</span>' : '<span class="text-gray-500">-</span>') + '</td><td><span class="badge ' + (e.status === 'active' ? 'badge-active' : 'badge-inactive') + '">' + (e.status === 'active' ? '재직' : '퇴사') + '</span></td><td><button onclick="editEmployee(' + e.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
 }
 
 function renderPayrollTable() {
@@ -3005,7 +3205,7 @@ function renderContractTable() {
     const contracts = JSON.parse(localStorage.getItem('employee_contracts') || '[]');
     const tbody = document.getElementById('contractTableBody');
     if (!contracts.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">업로드된 파일 없음</td></tr>'; return; }
-    tbody.innerHTML = contracts.map((c, idx) => '<tr><td>' + (c.employee_name || '-') + '</td><td class="text-cyan-400">' + c.file_name + '</td><td>' + (c.uploaded_at || '').substring(0, 10) + '</td><td><button onclick="downloadContract(' + idx + ')" class="btn-secondary btn-sm mr-1">다운</button><button onclick="deleteContract(' + idx + ')" class="btn-sm" style="background:rgba(239,68,68,0.2);color:#EF4444;border:1px solid rgba(239,68,68,0.3);border-radius:8px">삭제</button></td></tr>').join('');
+    tbody.innerHTML = contracts.map((c, idx) => '<tr><td>' + (c.employee_name || '-') + '</td><td class="text-purple-400">' + c.file_name + '</td><td>' + (c.uploaded_at || '').substring(0, 10) + '</td><td><button onclick="downloadContract(' + idx + ')" class="btn-secondary btn-sm mr-1">다운</button><button onclick="deleteContract(' + idx + ')" class="btn-sm" style="background:rgba(239,68,68,0.2);color:#EF4444;border:1px solid rgba(239,68,68,0.3);border-radius:8px">삭제</button></td></tr>').join('');
 }
 
 function downloadContract(idx) {
@@ -3051,7 +3251,7 @@ function renderPlatformTable() {
     const platforms = { baemin: '배민', coupang: '쿠팡', yogiyo: '요기요' };
     const tbody = document.getElementById('platformTableBody');
     if (!platformList.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
-    tbody.innerHTML = platformList.map(p => '<tr><td class="font-bold text-cyan-400">' + p.settlement_week + '</td><td>' + (platforms[p.platform] || p.platform) + '</td><td class="text-xs">' + (p.work_start_date || '') + '<br>~' + (p.work_end_date || '') + '</td><td class="text-right">' + parseInt(p.delivery_count || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.vat_amount || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(p.total_amount || 0).toLocaleString() + '</td><td>' + (p.expected_date || '-') + '</td><td><button onclick="editPlatform(' + p.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    tbody.innerHTML = platformList.map(p => '<tr><td class="font-bold text-purple-400">' + p.settlement_week + '</td><td>' + (platforms[p.platform] || p.platform) + '</td><td class="text-xs">' + (p.work_start_date || '') + '<br>~' + (p.work_end_date || '') + '</td><td class="text-right">' + parseInt(p.delivery_count || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.vat_amount || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(p.total_amount || 0).toLocaleString() + '</td><td>' + (p.expected_date || '-') + '</td><td><button onclick="editPlatform(' + p.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
 }
 
 function renderSettAdvanceTable() {
@@ -3145,7 +3345,7 @@ function renderReconcileTable() {
     if (!reconcileList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     const statuses = { pending: '대기', matched: '완료', issue: '불일치' };
     const statusClass = { pending: 'badge-pending', matched: 'badge-active', issue: 'badge-error' };
-    tbody.innerHTML = reconcileList.map(r => { const pt = partnerList.find(x => x.id == r.partner_id); return '<tr><td class="font-bold text-cyan-400">' + r.settlement_week + '</td><td>' + (pt ? pt.name : '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(r.platform_total || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(r.advance_total || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(r.difference_amount || 0).toLocaleString() + '</td><td class="text-right text-cyan-400">₩' + parseInt(r.fee_income || 0).toLocaleString() + '</td><td><span class="badge ' + (statusClass[r.status] || 'badge-pending') + '">' + (statuses[r.status] || r.status) + '</span></td><td><button onclick="editReconcile(' + r.id + ')" class="btn-secondary btn-sm">상세</button></td></tr>'; }).join('');
+    tbody.innerHTML = reconcileList.map(r => { const pt = partnerList.find(x => x.id == r.partner_id); return '<tr><td class="font-bold text-purple-400">' + r.settlement_week + '</td><td>' + (pt ? pt.name : '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(r.platform_total || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(r.advance_total || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(r.difference_amount || 0).toLocaleString() + '</td><td class="text-right text-purple-400">₩' + parseInt(r.fee_income || 0).toLocaleString() + '</td><td><span class="badge ' + (statusClass[r.status] || 'badge-pending') + '">' + (statuses[r.status] || r.status) + '</span></td><td><button onclick="editReconcile(' + r.id + ')" class="btn-secondary btn-sm">상세</button></td></tr>'; }).join('');
 }
 
 function renderCashbookTable() {
@@ -3446,7 +3646,7 @@ function renderWeeklyPayoutTable() {
     tbody.innerHTML = list.map(w => {
         const rider = riderList.find(r => r.id == w.rider_id);
         const partner = partnerList.find(p => p.id == w.partner_id);
-        return '<tr><td class="font-bold text-cyan-400">' + (w.settlement_week || '-') + '</td><td>' + (rider?.name || '-') + '</td><td>' + (partner?.name || '-') + '</td><td class="text-right">' + parseInt(w.delivery_count || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(w.delivery_revenue || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(w.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-cyan-400">₩' + parseInt(w.net_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (w.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (w.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editWeeklyPayout(' + w.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+        return '<tr><td class="font-bold text-purple-400">' + (w.settlement_week || '-') + '</td><td>' + (rider?.name || '-') + '</td><td>' + (partner?.name || '-') + '</td><td class="text-right">' + parseInt(w.delivery_count || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(w.delivery_revenue || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(w.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-purple-400">₩' + parseInt(w.net_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (w.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (w.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editWeeklyPayout(' + w.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
     }).join('');
 }
 
@@ -4357,7 +4557,7 @@ function renderPayrollTable2() {
     
     tbody.innerHTML = payrollList.map(p => {
         const emp = employeeList.find(e => e.id == p.employee_id);
-        return '<tr><td>' + p.pay_year + '-' + String(p.pay_month).padStart(2, '0') + '</td><td class="font-bold">' + (emp?.name || '-') + '</td><td class="text-right">₩' + parseInt(p.base_salary || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(p.total_allowance || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(p.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-cyan-400">₩' + parseInt(p.net_salary || 0).toLocaleString() + '</td><td><span class="badge ' + (p.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (p.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editPayroll(' + p.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+        return '<tr><td>' + p.pay_year + '-' + String(p.pay_month).padStart(2, '0') + '</td><td class="font-bold">' + (emp?.name || '-') + '</td><td class="text-right">₩' + parseInt(p.base_salary || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(p.total_allowance || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(p.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-purple-400">₩' + parseInt(p.net_salary || 0).toLocaleString() + '</td><td><span class="badge ' + (p.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (p.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editPayroll(' + p.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
     }).join('');
 }
 
@@ -4441,7 +4641,7 @@ function updateFundStats() {
     document.getElementById('fund-total-in').textContent = '₩' + totalIn.toLocaleString();
     document.getElementById('fund-outstanding').textContent = '₩' + outstanding.toLocaleString();
     document.getElementById('fund-monthly-net').textContent = (monthlyNet >= 0 ? '₩' : '-₩') + Math.abs(monthlyNet).toLocaleString();
-    document.getElementById('fund-monthly-net').className = 'text-xl font-bold ' + (monthlyNet >= 0 ? 'text-cyan-400' : 'text-red-400');
+    document.getElementById('fund-monthly-net').className = 'text-xl font-bold ' + (monthlyNet >= 0 ? 'text-purple-400' : 'text-red-400');
     
     // 그룹 잔액
     document.getElementById('group-balance').textContent = '₩' + outstanding.toLocaleString();
@@ -4600,9 +4800,9 @@ function renderEntityCards() {
         const docCount = corpDocList.filter(d => d.entity_name === e.name).length;
         const statusBadge = e.status === 'active' ? '<span class="badge badge-active">활성</span>' : '<span class="badge badge-pending">비활성</span>';
         
-        return '<div class="glass-card rounded-xl p-4 cursor-pointer hover:border-cyan-400/50 transition-all" onclick="openEntityDetail(' + e.id + ')">' +
+        return '<div class="glass-card rounded-xl p-4 cursor-pointer hover:border-purple-400/50 transition-all" onclick="openEntityDetail(' + e.id + ')">' +
             '<div class="flex justify-between items-start mb-3">' +
-            '<h3 class="text-lg font-bold text-cyan-400">' + e.name + '</h3>' +
+            '<h3 class="text-lg font-bold text-purple-400">' + e.name + '</h3>' +
             statusBadge +
             '</div>' +
             '<div class="space-y-2 text-sm">' +
@@ -4747,11 +4947,11 @@ function openEntityDetail(id) {
 function showEntityDetailTab(tab) {
     ['info', 'docs'].forEach(t => {
         document.getElementById('entityDetailContent-' + t).classList.add('hidden');
-        document.getElementById('entityDetailTab-' + t).classList.remove('bg-cyan-500/20', 'text-cyan-400');
+        document.getElementById('entityDetailTab-' + t).classList.remove('bg-purple-500/20', 'text-purple-400');
         document.getElementById('entityDetailTab-' + t).classList.add('text-gray-400');
     });
     document.getElementById('entityDetailContent-' + tab).classList.remove('hidden');
-    document.getElementById('entityDetailTab-' + tab).classList.add('bg-cyan-500/20', 'text-cyan-400');
+    document.getElementById('entityDetailTab-' + tab).classList.add('bg-purple-500/20', 'text-purple-400');
     document.getElementById('entityDetailTab-' + tab).classList.remove('text-gray-400');
 }
 
@@ -4843,13 +5043,13 @@ function filterCorpDocs(category) {
     ['all', 'business', 'corporate', 'contract', 'license', 'other'].forEach(c => {
         const tab = document.getElementById('corpDocTab-' + c);
         if (tab) {
-            tab.classList.remove('bg-cyan-500/20', 'text-cyan-400');
+            tab.classList.remove('bg-purple-500/20', 'text-purple-400');
             tab.classList.add('text-gray-400');
         }
     });
     const activeTab = document.getElementById('corpDocTab-' + category);
     if (activeTab) {
-        activeTab.classList.add('bg-cyan-500/20', 'text-cyan-400');
+        activeTab.classList.add('bg-purple-500/20', 'text-purple-400');
         activeTab.classList.remove('text-gray-400');
     }
     renderCorpDocTable();
@@ -5086,13 +5286,13 @@ function filterTaxDocs(category) {
     ['all', 'withholding', 'statement', 'other'].forEach(c => {
         const tab = document.getElementById('taxDocTab-' + c);
         if (tab) {
-            tab.classList.remove('bg-cyan-500/20', 'text-cyan-400');
+            tab.classList.remove('bg-purple-500/20', 'text-purple-400');
             tab.classList.add('text-gray-400');
         }
     });
     const activeTab = document.getElementById('taxDocTab-' + category);
     if (activeTab) {
-        activeTab.classList.add('bg-cyan-500/20', 'text-cyan-400');
+        activeTab.classList.add('bg-purple-500/20', 'text-purple-400');
         activeTab.classList.remove('text-gray-400');
     }
     renderTaxDocTable();
@@ -5165,7 +5365,7 @@ function checkFileLimit(input) {
     
     // 선택된 파일 목록 표시
     if (files.length > 0) {
-        let html = '<div class="mt-2 p-2 bg-black/30 rounded-lg"><p class="text-cyan-400 text-xs mb-1">선택된 파일 (' + files.length + '개):</p>';
+        let html = '<div class="mt-2 p-2 bg-black/30 rounded-lg"><p class="text-purple-400 text-xs mb-1">선택된 파일 (' + files.length + '개):</p>';
         for (let i = 0; i < files.length; i++) {
             const size = (files[i].size / 1024).toFixed(1);
             html += '<div class="text-xs text-gray-400">• ' + files[i].name + ' (' + size + ' KB)</div>';
