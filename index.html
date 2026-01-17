@@ -261,6 +261,48 @@
             .sidebar { display: none !important; } 
             .mobile-nav { display: flex !important; } 
         }
+        
+        /* 사이드바 스타일 */
+        .menu-group { margin-bottom: 8px; }
+        .menu-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 12px 12px 8px 12px;
+            letter-spacing: 0.02em;
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            transition: all 0.15s;
+            text-align: left;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        .sidebar-item.active {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+        }
+        .sidebar-item .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.5;
+        }
+        .sidebar-item .sidebar-icon {
+            font-size: 16px;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -305,219 +347,225 @@
 
     <!-- 메인 -->
     <div id="mainSystem" class="hidden">
-        <header class="relative z-10 border-b border-white/5" style="background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(20px);">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="text-purple-400 text-2xl hover:text-lime-300 hidden md:block" id="hamburgerBtn">☰</button>
-                    <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
-                        <h1 class="text-2xl font-black text-purple-400">🏢 TEAM BRO</h1>
-                    </div>
+        <!-- 사이드바 -->
+        <aside class="sidebar fixed left-0 top-0 w-60 h-screen border-r border-white/5 hidden md:block" style="background: linear-gradient(180deg, #12121a 0%, #09090b 100%); overflow-y:auto; z-index: 50;">
+            <!-- 로고 -->
+            <div class="p-5 border-b border-white/5">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-sm">TB</div>
+                    <span class="text-lg font-bold gradient-text">TeamBro</span>
                 </div>
+            </div>
+            
+            <nav class="p-4 space-y-6">
+                <!-- 대시보드 -->
+                <div>
+                    <button onclick="showTab('dashboard')" id="nav-dashboard" class="sidebar-item active w-full">
+                        <span class="sidebar-icon">📊</span>
+                        <span>대시보드</span>
+                    </button>
+                </div>
+
+                <!-- 기초정보 -->
+                <div class="menu-group">
+                    <div class="menu-title">👥 기초정보</div>
+                    <button onclick="showTab('riders')" id="nav-riders" class="sidebar-item w-full"><span class="dot"></span>라이더 관리</button>
+                    <button onclick="showTab('partners')" id="nav-partners" class="sidebar-item w-full"><span class="dot"></span>협력사 관리</button>
+                    <button onclick="showTab('sales')" id="nav-sales" class="sidebar-item w-full"><span class="dot"></span>영업자 관리</button>
+                    <button onclick="showTab('entities')" id="nav-entities" class="sidebar-item w-full"><span class="dot"></span>법인 관리</button>
+                </div>
+
+                <!-- 정산관리 -->
+                <div class="menu-group">
+                    <div class="menu-title">💰 정산관리</div>
+                    <button onclick="showTab('sett-dashboard')" id="nav-sett-dashboard" class="sidebar-item w-full"><span class="dot"></span>정산 현황</button>
+                    <button onclick="showTab('platform')" id="nav-platform" class="sidebar-item w-full"><span class="dot"></span>플랫폼정산입금</button>
+                    <button onclick="showTab('sett-advance')" id="nav-sett-advance" class="sidebar-item w-full"><span class="dot"></span>선정산 지급</button>
+                    <button onclick="showTab('weekly-payout')" id="nav-weekly-payout" class="sidebar-item w-full"><span class="dot"></span>주정산 지급</button>
+                    <button onclick="showTab('reconcile')" id="nav-reconcile" class="sidebar-item w-full"><span class="dot"></span>대사 관리</button>
+                </div>
+
+                <!-- 재무관리 -->
+                <div class="menu-group">
+                    <div class="menu-title">💵 재무관리</div>
+                    <button onclick="showTab('bank')" id="nav-bank" class="sidebar-item w-full"><span class="dot"></span>현금출납장</button>
+                    <button onclick="showTab('accounting')" id="nav-accounting" class="sidebar-item w-full"><span class="dot"></span>매입매출장</button>
+                    <button onclick="showTab('taxinvoice')" id="nav-taxinvoice" class="sidebar-item w-full"><span class="dot"></span>세금계산서</button>
+                    <button onclick="showTab('ledger')" id="nav-ledger" class="sidebar-item w-full"><span class="dot"></span>총계정원장</button>
+                    <button onclick="showTab('journal')" id="nav-journal" class="sidebar-item w-full"><span class="dot"></span>분개장</button>
+                </div>
+
+                <!-- 카드/자산 -->
+                <div class="menu-group">
+                    <div class="menu-title">💳 카드/자산</div>
+                    <button onclick="showTab('cards')" id="nav-cards" class="sidebar-item w-full"><span class="dot"></span>법인카드 관리</button>
+                    <button onclick="showTab('card-usage')" id="nav-card-usage" class="sidebar-item w-full"><span class="dot"></span>카드 사용내역</button>
+                </div>
+
+                <!-- 인사관리 -->
+                <div class="menu-group">
+                    <div class="menu-title">🧑‍💼 인사관리</div>
+                    <button onclick="showTab('employees')" id="nav-employees" class="sidebar-item w-full"><span class="dot"></span>직원 관리</button>
+                    <button onclick="showTab('payroll')" id="nav-payroll" class="sidebar-item w-full"><span class="dot"></span>급여 관리</button>
+                    <button onclick="showTab('contracts')" id="nav-contracts" class="sidebar-item w-full"><span class="dot"></span>근로계약</button>
+                </div>
+
+                <!-- 문서/세무 -->
+                <div class="menu-group">
+                    <div class="menu-title">📋 문서/세무</div>
+                    <button onclick="showTab('tax')" id="nav-tax" class="sidebar-item w-full"><span class="dot"></span>세무 관리</button>
+                    <button onclick="showTab('docsmenu')" id="nav-docsmenu" class="sidebar-item w-full"><span class="dot"></span>문서 관리</button>
+                    <button onclick="showTab('excel')" id="nav-excel" class="sidebar-item w-full"><span class="dot"></span>업로드 양식</button>
+                </div>
+
+                <!-- 시스템 -->
+                <div class="menu-group">
+                    <div class="menu-title">⚙️ 시스템</div>
+                    <button onclick="showTab('users')" id="nav-users" class="sidebar-item w-full"><span class="dot"></span>사용자 관리</button>
+                    <button onclick="showTab('logs')" id="nav-logs" class="sidebar-item w-full"><span class="dot"></span>감사 로그</button>
+                    <button onclick="showTab('settings')" id="nav-settings" class="sidebar-item w-full"><span class="dot"></span>시스템 설정</button>
+                </div>
+            </nav>
+            
+            <!-- 하단 저작권 -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5 text-center">
+                <p class="text-zinc-600 text-xs">© 2025 TeamBro</p>
+            </div>
+        </aside>
+
+        <!-- 상단 헤더 -->
+        <header class="fixed top-0 right-0 left-0 md:left-60 z-40 border-b border-white/5" style="background: rgba(9, 9, 11, 0.9); backdrop-filter: blur(20px);">
+            <div class="px-6 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span id="headerUserName" class="text-purple-400 font-bold hidden md:inline">관리자</span>
-                    <button onclick="logout()" class="text-gray-400 hover:text-red-400 text-sm">로그아웃</button>
+                    <button onclick="toggleMobileMenu()" class="text-zinc-400 text-xl md:hidden">☰</button>
+                    <h2 id="pageTitle" class="text-lg font-semibold text-white">대시보드</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="headerUserName" class="text-zinc-400 text-sm hidden md:inline">관리자</span>
+                    <button onclick="logout()" class="text-zinc-500 hover:text-red-400 text-sm transition-colors">로그아웃</button>
                 </div>
             </div>
         </header>
 
-        <div class="flex">
-            <aside class="sidebar w-56 min-h-screen border-r border-purple-500/20 bg-black/50 hidden md:block" id="sidebarMenu" style="overflow-y:auto; max-height:calc(100vh - 60px)">
-                <nav class="p-4 space-y-1">
-                    <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-btn active w-full text-left px-3 py-2 rounded-lg text-sm">📊 대시보드</button>
-                    
-                    <!-- 기초정보 -->
-                    <div class="mt-4">
-                        <button onclick="toggleMenu('basic')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>👥 기초정보</span><span id="arrow-basic" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-basic" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('riders')" id="nav-riders" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 라이더 관리</button>
-                            <button onclick="showTab('partners')" id="nav-partners" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 협력사 관리</button>
-                            <button onclick="showTab('sales')" id="nav-sales" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 영업자 관리</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 정산관리 -->
-                    <div class="mt-2">
-                        <button onclick="toggleMenu('settlement')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>💰 정산관리</span><span id="arrow-settlement" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-settlement" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('sett-dashboard')" id="nav-sett-dashboard" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 정산 현황</button>
-                            <button onclick="showTab('platform')" id="nav-platform" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 플랫폼정산입금</button>
-                            <button onclick="showTab('sett-advance')" id="nav-sett-advance" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 선정산 지급</button>
-                            <button onclick="showTab('weekly-payout')" id="nav-weekly-payout" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 주정산 지급</button>
-                            <button onclick="showTab('reconcile')" id="nav-reconcile" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 대사 관리</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 재무관리 -->
-                    <div class="mt-2">
-                        <button onclick="toggleMenu('finance')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>💵 재무관리</span><span id="arrow-finance" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-finance" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('bank')" id="nav-bank" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 현금출납장</button>
-                            <button onclick="showTab('accounting')" id="nav-accounting" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 매입매출장</button>
-                            <button onclick="showTab('taxinvoice')" id="nav-taxinvoice" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 세금계산서</button>
-                            <button onclick="showTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 총계정원장</button>
-                            <button onclick="showTab('journal')" id="nav-journal" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 분개장</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 카드/자산 -->
-                    <div class="mt-2">
-                        <button onclick="toggleMenu('card')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>💳 카드/자산</span><span id="arrow-card" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-card" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('cards')" id="nav-cards" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 법인카드 관리</button>
-                            <button onclick="showTab('card-usage')" id="nav-card-usage" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 카드 사용내역</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 인사관리 -->
-                    <div class="mt-2">
-                        <button onclick="toggleMenu('hr')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>👥 인사관리</span><span id="arrow-hr" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-hr" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('employees')" id="nav-employees" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 직원 관리</button>
-                            <button onclick="showTab('payroll')" id="nav-payroll" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 급여 관리</button>
-                            <button onclick="showTab('contracts')" id="nav-contracts" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 근로계약</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 문서/세무 -->
-                    <div class="mt-2">
-                        <button onclick="toggleMenu('docs')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>📋 문서/세무</span><span id="arrow-docs" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-docs" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('tax')" id="nav-tax" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 세무 관리</button>
-                            <button onclick="showTab('docsmenu')" id="nav-docsmenu" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 문서 관리</button>
-                            <button onclick="showTab('excel')" id="nav-excel" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 업로드 양식</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 시스템 -->
-                    <div class="mt-2">
-                        <button onclick="toggleMenu('system')" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center">
-                            <span>⚙️ 시스템</span><span id="arrow-system" class="text-xs">▶</span>
-                        </button>
-                        <div id="menu-system" class="ml-4 space-y-1 mt-1 hidden">
-                            <button onclick="showTab('users')" id="nav-users" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 사용자 관리</button>
-                            <button onclick="showTab('logs')" id="nav-logs" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 감사 로그</button>
-                            <button onclick="showTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs">└ 시스템 설정</button>
-                        </div>
-                    </div>
-                </nav>
-            </aside>
+        <!-- 모바일 네비게이션 -->
+        <div class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-lg border-t border-white/5 z-40">
+            <button onclick="showTab('dashboard')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-purple-400 transition-colors">📊<br>대시보드</button>
+            <button onclick="showTab('riders')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-purple-400 transition-colors">🏍️<br>라이더</button>
+            <button onclick="showTab('partners')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-purple-400 transition-colors">🤝<br>협력사</button>
+            <button onclick="showTab('entities')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-purple-400 transition-colors">🏢<br>법인</button>
+        </div>
 
-            <div class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-black border-t border-purple-500/20 z-40">
-                <button onclick="showTab('dashboard')" class="flex-1 py-3 text-center text-xs text-gray-400">📊<br>대시보드</button>
-                <button onclick="showTab('riders')" class="flex-1 py-3 text-center text-xs text-gray-400">🏍️<br>라이더</button>
-                <button onclick="showTab('partners')" class="flex-1 py-3 text-center text-xs text-gray-400">🤝<br>협력사</button>
-                <button onclick="showTab('sales')" class="flex-1 py-3 text-center text-xs text-gray-400">💼<br>영업자</button>
-            </div>
-
-            <main class="flex-1 p-4 md:p-6 pb-24 md:pb-6">
-                <!-- 대시보드 -->
-                <div id="tab-dashboard" class="tab-content">
-                    <h2 class="text-2xl font-bold mb-6">📊 대시보드</h2>
-                    
-                    <!-- 기본 통계 -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('riders')"><div class="text-gray-400 text-xs mb-1">라이더</div><div class="text-2xl font-bold text-purple-400" id="stat-riders">0명</div></div>
-                        <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('partners')"><div class="text-gray-400 text-xs mb-1">협력사</div><div class="text-2xl font-bold text-blue-400" id="stat-partners">0개</div></div>
-                        <div class="glass-card rounded-xl p-4 text-center cursor-pointer" onclick="showTab('sales')"><div class="text-gray-400 text-xs mb-1">영업자</div><div class="text-2xl font-bold text-purple-400" id="stat-sales">0명</div></div>
-                        <div class="glass-card rounded-xl p-4 text-center"><div class="text-gray-400 text-xs mb-1">이번달 수수료</div><div class="text-2xl font-bold text-green-400">₩0</div></div>
+        <!-- 메인 컨텐츠 -->
+        <main class="md:ml-60 pt-16 p-6 pb-24 md:pb-6 min-h-screen">
+            <!-- 대시보드 -->
+            <div id="tab-dashboard" class="tab-content">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-white mb-2">대시보드</h2>
+                    <p class="text-zinc-500 text-sm">팀브로 그룹 통합 현황</p>
+                </div>
+                
+                <!-- 기본 통계 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="glass-card p-5 cursor-pointer" onclick="showTab('riders')">
+                        <div class="text-zinc-500 text-xs mb-2">라이더</div>
+                        <div class="text-2xl font-bold text-white" id="stat-riders">0명</div>
                     </div>
-                    
-                    <!-- 그룹사 현황 -->
-                    <div class="mb-6">
-                        <h3 class="text-lg font-bold text-purple-400 mb-4">🏢 그룹사 현황</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- 브로컴퍼니 -->
-                            <div class="glass-card rounded-xl p-4 border-l-4 border-blue-400">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-bold text-blue-400">브로컴퍼니</h4>
-                                    <span class="badge badge-active">운영중</span>
-                                </div>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between"><span class="text-gray-400">이번달 매출</span><span class="text-white font-bold" id="bc-revenue">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">이번달 정산</span><span class="text-yellow-400" id="bc-settlement">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">수익 (수수료)</span><span class="text-purple-400 font-bold" id="bc-profit">₩0</span></div>
-                                </div>
-                                <a href="https://brocompany.broerp.kr" target="_blank" class="block mt-3 text-center text-xs text-blue-400 hover:underline">ERP 바로가기 →</a>
-                            </div>
-                            
-                            <!-- 브로모터스 -->
-                            <div class="glass-card rounded-xl p-4 border-l-4 border-purple-400">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-bold text-purple-400">브로모터스</h4>
-                                    <span class="badge badge-active">운영중</span>
-                                </div>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between"><span class="text-gray-400">이번달 렌탈수익</span><span class="text-white font-bold" id="bm-revenue">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">미수금</span><span class="text-red-400" id="bm-arrears">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">순수익</span><span class="text-purple-400 font-bold" id="bm-profit">₩0</span></div>
-                                </div>
-                                <a href="https://bromotors.broerp.kr" target="_blank" class="block mt-3 text-center text-xs text-purple-400 hover:underline">ERP 바로가기 →</a>
-                            </div>
-                            
-                            <!-- 그룹 합계 -->
-                            <div class="glass-card rounded-xl p-4 border-l-4 border-purple-400">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="font-bold text-purple-400">그룹 합계</h4>
-                                    <span class="text-xs text-gray-400">이번달</span>
-                                </div>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between"><span class="text-gray-400">총 매출</span><span class="text-white font-bold" id="group-revenue">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">총 수익</span><span class="text-purple-400 font-bold" id="group-profit">₩0</span></div>
-                                    <div class="flex justify-between"><span class="text-gray-400">자금 잔액</span><span class="text-green-400 font-bold" id="group-balance">₩0</span></div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="glass-card p-5 cursor-pointer" onclick="showTab('partners')">
+                        <div class="text-zinc-500 text-xs mb-2">협력사</div>
+                        <div class="text-2xl font-bold text-white" id="stat-partners">0개</div>
                     </div>
-                    
-                    <!-- 자금 집행/회수 -->
-                    <div class="mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-purple-400">💰 자금 집행/회수</h3>
-                            <button onclick="openFundModal()" class="btn-primary btn-sm">+ 자금 등록</button>
+                    <div class="glass-card p-5 cursor-pointer" onclick="showTab('sales')">
+                        <div class="text-zinc-500 text-xs mb-2">영업자</div>
+                        <div class="text-2xl font-bold text-white" id="stat-sales">0명</div>
+                    </div>
+                    <div class="glass-card p-5">
+                        <div class="text-zinc-500 text-xs mb-2">이번달 수수료</div>
+                        <div class="text-2xl font-bold text-emerald-400">₩0</div>
+                    </div>
+                </div>
+                
+                <!-- 그룹사 현황 -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-white mb-4">🏢 그룹사 현황</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- 브로컴퍼니 -->
+                        <div class="glass-card p-5 border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-semibold text-blue-400">브로컴퍼니</h4>
+                                <span class="badge badge-active">운영중</span>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between"><span class="text-zinc-500">이번달 매출</span><span class="text-white font-medium" id="bc-revenue">₩0</span></div>
+                                <div class="flex justify-between"><span class="text-zinc-500">이번달 정산</span><span class="text-amber-400" id="bc-settlement">₩0</span></div>
+                                <div class="flex justify-between"><span class="text-zinc-500">수익 (수수료)</span><span class="text-emerald-400 font-medium" id="bc-profit">₩0</span></div>
+                            </div>
+                            <a href="https://brocompany.broerp.kr" target="_blank" class="block mt-4 text-center text-xs text-blue-400 hover:text-blue-300 transition-colors">ERP 바로가기 →</a>
                         </div>
                         
-                        <!-- 자금 통계 -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                            <div class="glass-card rounded-xl p-3 text-center">
-                                <div class="text-gray-400 text-xs">총 집행</div>
-                                <div class="text-xl font-bold text-red-400" id="fund-total-out">₩0</div>
+                        <!-- 브로모터스 -->
+                        <div class="glass-card p-5 border-l-4 border-purple-500">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-semibold text-purple-400">브로모터스</h4>
+                                <span class="badge badge-active">운영중</span>
                             </div>
-                            <div class="glass-card rounded-xl p-3 text-center">
-                                <div class="text-gray-400 text-xs">총 회수</div>
-                                <div class="text-xl font-bold text-green-400" id="fund-total-in">₩0</div>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between"><span class="text-zinc-500">이번달 렌탈수익</span><span class="text-white font-medium" id="bm-revenue">₩0</span></div>
+                                <div class="flex justify-between"><span class="text-zinc-500">미수금</span><span class="text-red-400" id="bm-arrears">₩0</span></div>
+                                <div class="flex justify-between"><span class="text-zinc-500">순수익</span><span class="text-emerald-400 font-medium" id="bm-profit">₩0</span></div>
                             </div>
-                            <div class="glass-card rounded-xl p-3 text-center">
-                                <div class="text-gray-400 text-xs">미회수 잔액</div>
-                                <div class="text-xl font-bold text-yellow-400" id="fund-outstanding">₩0</div>
-                            </div>
-                            <div class="glass-card rounded-xl p-3 text-center">
-                                <div class="text-gray-400 text-xs">이번달 순이동</div>
-                                <div class="text-xl font-bold text-purple-400" id="fund-monthly-net">₩0</div>
-                            </div>
+                            <a href="https://bromotors.broerp.kr" target="_blank" class="block mt-4 text-center text-xs text-purple-400 hover:text-purple-300 transition-colors">ERP 바로가기 →</a>
                         </div>
                         
-                        <!-- 자금 내역 테이블 -->
-                        <div class="glass-card rounded-xl overflow-hidden">
-                            <table class="data-table">
-                                <thead><tr><th>일자</th><th>자회사</th><th>구분</th><th>금액</th><th>용도</th><th>상태</th><th>관리</th></tr></thead>
-                                <tbody id="fundTableBody"><tr><td colspan="7" class="text-center py-8 text-gray-500">자금 내역이 없습니다</td></tr></tbody>
-                            </table>
+                        <!-- 그룹 합계 -->
+                        <div class="glass-card p-5 border-l-4 border-emerald-500">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-semibold text-emerald-400">그룹 합계</h4>
+                                <span class="text-xs text-zinc-500">이번달</span>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between"><span class="text-zinc-500">총 매출</span><span class="text-white font-medium" id="group-revenue">₩0</span></div>
+                                <div class="flex justify-between"><span class="text-zinc-500">총 수익</span><span class="text-emerald-400 font-medium" id="group-profit">₩0</span></div>
+                                <div class="flex justify-between"><span class="text-zinc-500">자금 잔액</span><span class="text-amber-400 font-medium" id="group-balance">₩0</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                
+                <!-- 자금 집행/회수 -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-white">💰 자금 집행/회수</h3>
+                        <button onclick="openFundModal()" class="btn-primary btn-sm">+ 자금 등록</button>
+                    </div>
+                    
+                    <!-- 자금 통계 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div class="glass-card p-4 text-center">
+                            <div class="text-zinc-500 text-xs mb-1">총 집행</div>
+                            <div class="text-xl font-bold text-red-400" id="fund-total-out">₩0</div>
+                        </div>
+                        <div class="glass-card p-4 text-center">
+                            <div class="text-zinc-500 text-xs mb-1">총 회수</div>
+                            <div class="text-xl font-bold text-emerald-400" id="fund-total-in">₩0</div>
+                        </div>
+                        <div class="glass-card p-4 text-center">
+                            <div class="text-zinc-500 text-xs mb-1">미회수 잔액</div>
+                            <div class="text-xl font-bold text-amber-400" id="fund-outstanding">₩0</div>
+                        </div>
+                        <div class="glass-card p-4 text-center">
+                            <div class="text-zinc-500 text-xs mb-1">이번달 순이동</div>
+                            <div class="text-xl font-bold text-purple-400" id="fund-monthly-net">₩0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 자금 내역 테이블 -->
+                    <div class="glass-card overflow-hidden">
+                        <table class="data-table">
+                            <thead><tr><th>일자</th><th>자회사</th><th>구분</th><th>금액</th><th>용도</th><th>상태</th><th>관리</th></tr></thead>
+                            <tbody id="fundTableBody"><tr><td colspan="7" class="text-center py-8 text-zinc-500">자금 내역이 없습니다</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
                 <!-- 라이더 관리 -->
                 <div id="tab-riders" class="tab-content hidden">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
