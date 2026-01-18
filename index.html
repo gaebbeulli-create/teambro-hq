@@ -2757,12 +2757,9 @@ async function enterSystem(system) {
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
-    } else if (system === 'brocompany') {
-        // 브로컴퍼니 ERP로 이동 (통합 로그인 상태 유지)
-        window.location.href = 'https://gaebbeulli-create.github.io/teambro-erp/';
-    } else if (system === 'bromotors') {
-        // 브로모터스 ERP로 이동 (통합 로그인 상태 유지)
-        window.location.href = 'https://gaebbeulli-create.github.io/bromotors/';
+    } else if (system === 'brocompany' || system === 'bromotors') {
+        // 브로컴퍼니/브로모터스 ERP로 이동 (통합 로그인 상태 유지)
+        window.location.href = 'https://broerp.kr/';
     }
 }
 
