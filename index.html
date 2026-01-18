@@ -9,58 +9,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
         
-        /* 2026 트렌드 - Expressive Minimalism + Soft Spatial */
+        /* 라이트모드 - 클린 화이트 */
         :root {
-            --bg-primary: #fefefe;
-            --bg-secondary: #f8f9fc;
-            --bg-tertiary: #eef1f6;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7f8fa;
+            --bg-tertiary: #eceef2;
             --bg-card: #ffffff;
-            --border: #e8ecf2;
-            --border-hover: #d0d7e2;
-            --text-primary: #1a1f36;
-            --text-secondary: #4a5568;
-            --text-muted: #8492a6;
-            --accent: #635bff;
-            --accent-hover: #5046e5;
-            --accent-light: #f0f0ff;
-            --success: #00d4aa;
-            --success-light: #e6fff9;
-            --warning: #ffb020;
-            --warning-light: #fff8e6;
-            --danger: #ff5a5f;
-            --danger-light: #fff0f0;
-            --sidebar-bg: linear-gradient(180deg, #fefefe 0%, #f8f9fc 100%);
-            --header-bg: rgba(254, 254, 254, 0.85);
-            --card-shadow: 0 2px 8px rgba(26, 31, 54, 0.04), 0 8px 24px rgba(26, 31, 54, 0.06);
-            --card-shadow-hover: 0 4px 12px rgba(26, 31, 54, 0.06), 0 12px 32px rgba(26, 31, 54, 0.1);
+            --border: #e5e8eb;
+            --border-hover: #d1d5db;
+            --text-primary: #191f28;
+            --text-secondary: #4e5968;
+            --text-muted: #8b95a1;
+            --accent: #3182f6;
+            --accent-hover: #1b64da;
+            --accent-light: #e8f3ff;
+            --success: #00c073;
+            --success-light: #e8faf3;
+            --warning: #f59e0b;
+            --warning-light: #fef3e2;
+            --danger: #f04452;
+            --danger-light: #ffeeef;
+            --sidebar-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.95);
         }
         
-        /* 다크모드 - Soft Dark + Gradient Accent */
+        /* 다크모드 - 클린 다크 */
         [data-theme="dark"] {
-            --bg-primary: #0f0f12;
-            --bg-secondary: #16161d;
-            --bg-tertiary: #1e1e28;
-            --bg-card: #1a1a24;
-            --border: #2a2a3a;
-            --border-hover: #3a3a4d;
-            --text-primary: #f0f2f5;
-            --text-secondary: #9ca3b4;
-            --text-muted: #636b7e;
-            --accent: #817dff;
-            --accent-hover: #9590ff;
-            --accent-light: rgba(129, 125, 255, 0.12);
-            --success: #00e6b8;
-            --success-light: rgba(0, 230, 184, 0.12);
-            --warning: #ffc040;
-            --warning-light: rgba(255, 192, 64, 0.12);
+            --bg-primary: #17171c;
+            --bg-secondary: #1f1f25;
+            --bg-tertiary: #2b2b33;
+            --bg-card: #1f1f25;
+            --border: #33333d;
+            --border-hover: #45454f;
+            --text-primary: #ececef;
+            --text-secondary: #9999a1;
+            --text-muted: #6b6b73;
+            --accent: #4a9fff;
+            --accent-hover: #6bb3ff;
+            --accent-light: rgba(74, 159, 255, 0.12);
+            --success: #00d885;
+            --success-light: rgba(0, 216, 133, 0.12);
+            --warning: #ffb84d;
+            --warning-light: rgba(255, 184, 77, 0.12);
             --danger: #ff6b6b;
             --danger-light: rgba(255, 107, 107, 0.12);
-            --sidebar-bg: linear-gradient(180deg, #0f0f12 0%, #16161d 100%);
-            --header-bg: rgba(15, 15, 18, 0.9);
-            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
-            --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.4);
+            --sidebar-bg: #17171c;
+            --header-bg: rgba(23, 23, 28, 0.95);
         }
         
         * { 
@@ -72,30 +68,23 @@
             background: var(--bg-secondary); 
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
-            transition: background 0.4s ease, color 0.3s ease;
+            transition: background 0.2s, color 0.2s;
         }
         
-        /* 카드 - Soft Spatial (부드러운 그림자) */
+        /* 카드 - 심플 */
         .glass-card { 
             background: var(--bg-card);
             border: 1px solid var(--border); 
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+            transition: all 0.15s ease;
         }
         .glass-card:hover { 
             border-color: var(--border-hover);
-            box-shadow: var(--card-shadow-hover);
-            transform: translateY(-2px);
         }
         
-        /* 그라데이션 텍스트 - Vibrant Gradient */
         .gradient-text {
-            background: linear-gradient(135deg, var(--accent) 0%, #00d4aa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
+            color: var(--accent);
+            font-weight: 700;
         }
         
         .hidden { display: none; }
@@ -104,104 +93,96 @@
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { 
             background: var(--bg-secondary); 
-            padding: 14px 18px; 
+            padding: 12px 16px; 
             text-align: left; 
-            font-size: 12px; 
-            font-weight: 700; 
+            font-size: 13px; 
+            font-weight: 600; 
             color: var(--text-muted); 
             border-bottom: 1px solid var(--border);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
         }
         .data-table td { 
-            padding: 16px 18px; 
+            padding: 14px 16px; 
             border-bottom: 1px solid var(--border); 
             font-size: 14px; 
             color: var(--text-primary);
             font-weight: 500;
         }
-        .data-table tr { transition: background 0.2s ease; }
+        .data-table tr { transition: background 0.1s; }
         .data-table tr:hover { background: var(--bg-secondary); }
         .data-table tr:last-child td { border-bottom: none; }
         
         /* 인풋 필드 */
         .input-field { 
             background: var(--bg-primary); 
-            border: 1.5px solid var(--border); 
+            border: 1px solid var(--border); 
             color: var(--text-primary); 
-            padding: 14px 18px; 
-            border-radius: 12px; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
             width: 100%; 
-            transition: all 0.25s ease;
+            transition: all 0.15s;
             font-size: 15px;
             font-weight: 500;
         }
         .input-field:focus { 
             outline: none; 
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-light);
+            box-shadow: 0 0 0 3px var(--accent-light);
         }
         .input-field::placeholder { color: var(--text-muted); }
         
-        /* 버튼 - Gradient Accent */
+        /* 버튼 */
         .btn-primary { 
-            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            background: var(--accent);
             color: white; 
             font-weight: 600; 
-            padding: 14px 28px; 
-            border-radius: 12px; 
+            padding: 12px 24px; 
+            border-radius: 10px; 
             cursor: pointer; 
             border: none;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s;
             font-size: 14px;
-            box-shadow: 0 4px 14px rgba(99, 91, 255, 0.25);
         }
         .btn-primary:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 91, 255, 0.35);
+            background: var(--accent-hover);
         }
         
         .btn-secondary { 
-            background: var(--bg-card); 
-            border: 1.5px solid var(--border); 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border); 
             color: var(--text-primary); 
-            padding: 14px 28px; 
-            border-radius: 12px; 
+            padding: 12px 24px; 
+            border-radius: 10px; 
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.15s;
             font-size: 14px;
             font-weight: 600;
         }
         .btn-secondary:hover { 
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-light);
+            background: var(--bg-tertiary);
         }
         
         .btn-danger { 
-            background: linear-gradient(135deg, var(--danger) 0%, #e53e3e 100%);
+            background: var(--danger);
             border: none; 
             color: white; 
-            padding: 14px 28px; 
-            border-radius: 12px; 
+            padding: 12px 24px; 
+            border-radius: 10px; 
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.15s;
             font-weight: 600;
-            box-shadow: 0 4px 14px rgba(255, 90, 95, 0.25);
         }
         .btn-danger:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 90, 95, 0.35);
+            opacity: 0.9;
         }
         
-        .btn-sm { padding: 10px 18px; font-size: 13px; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
         
         /* 모달 */
         .modal-overlay { 
             position: fixed; 
             inset: 0; 
-            background: rgba(15, 15, 18, 0.6); 
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(4px);
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -211,65 +192,63 @@
         .modal-content { 
             background: var(--bg-card); 
             border: 1px solid var(--border);
-            border-radius: 24px; 
-            padding: 32px; 
+            border-radius: 16px; 
+            padding: 28px; 
             max-width: 600px; 
             width: 100%; 
             max-height: 90vh; 
             overflow-y: auto;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-            animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: modalIn 0.2s ease;
         }
         @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
         
-        /* 배지 - Soft Color */
+        /* 배지 */
         .badge { 
-            padding: 6px 12px; 
-            border-radius: 8px; 
+            padding: 4px 10px; 
+            border-radius: 6px; 
             font-size: 12px; 
             font-weight: 600;
         }
         .badge-active { background: var(--success-light); color: var(--success); }
         .badge-inactive { background: var(--bg-tertiary); color: var(--text-muted); }
-        .badge-pending { background: var(--warning-light); color: #d69e00; }
+        .badge-pending { background: var(--warning-light); color: #d97706; }
         .badge-biz { background: var(--accent-light); color: var(--accent); }
-        .badge-info { background: #f3e8ff; color: #8b5cf6; }
+        .badge-info { background: #f3f0ff; color: #7c3aed; }
         .badge-error { background: var(--danger-light); color: var(--danger); }
-        .badge-nonbiz { background: #fff7ed; color: #ea580c; }
+        .badge-nonbiz { background: #fff4e6; color: #e67700; }
         .badge-success { background: var(--success-light); color: var(--success); }
         
         [data-theme="dark"] .badge-pending { color: var(--warning); }
-        [data-theme="dark"] .badge-info { background: rgba(139, 92, 246, 0.12); color: #a78bfa; }
-        [data-theme="dark"] .badge-nonbiz { background: rgba(234, 88, 12, 0.12); color: #fb923c; }
+        [data-theme="dark"] .badge-info { background: rgba(124, 58, 237, 0.12); color: #a78bfa; }
+        [data-theme="dark"] .badge-nonbiz { background: rgba(230, 119, 0, 0.12); color: #ffa94d; }
         
-        /* 토스트 - Micro Delight Animation */
+        /* 토스트 */
         .toast { 
             position: fixed; 
             top: 24px; 
             right: 24px; 
-            padding: 16px 24px; 
-            border-radius: 14px; 
+            padding: 14px 20px; 
+            border-radius: 10px; 
             z-index: 200;
             font-weight: 600;
             font-size: 14px;
-            animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: toastIn 0.25s ease;
         }
-        .toast-success { background: linear-gradient(135deg, var(--success) 0%, #00c49a 100%); color: white; }
-        .toast-error { background: linear-gradient(135deg, var(--danger) 0%, #e53e3e 100%); color: white; }
-        .toast-info { background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%); color: white; }
+        .toast-success { background: var(--success); color: white; }
+        .toast-error { background: var(--danger); color: white; }
+        .toast-info { background: var(--accent); color: white; }
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-16px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* 스크롤바 */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         
         @media (max-width: 768px) { 
@@ -277,92 +256,87 @@
             .mobile-nav { display: flex !important; } 
         }
         
-        /* 사이드바 - Expressive Minimalism */
-        .menu-group { margin-bottom: 8px; }
+        /* 사이드바 */
+        .menu-group { margin-bottom: 4px; }
         .menu-title {
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 600;
             color: var(--text-muted);
-            padding: 20px 20px 12px 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            padding: 16px 16px 8px 16px;
         }
         .sidebar-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 14px 20px;
-            font-size: 15px;
+            gap: 12px;
+            padding: 11px 16px;
+            font-size: 14px;
             color: var(--text-secondary);
-            border-radius: 12px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 8px;
+            transition: all 0.1s;
             text-align: left;
             background: transparent;
             border: none;
             cursor: pointer;
-            margin: 4px 12px;
+            margin: 2px 8px;
             font-weight: 500;
         }
         .sidebar-item:hover {
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
             color: var(--text-primary);
-            transform: translateX(4px);
         }
         .sidebar-item.active {
-            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
-            color: white;
+            background: var(--accent-light);
+            color: var(--accent);
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
         }
         .sidebar-item .dot {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: currentColor;
-            opacity: 0.7;
         }
         .sidebar-item .sidebar-icon {
-            font-size: 20px;
+            font-size: 18px;
         }
         
-        /* 다크모드 토글 - Micro Delight */
+        /* 다크모드 토글 */
         .theme-toggle {
             position: relative;
-            width: 56px;
-            height: 30px;
+            width: 48px;
+            height: 26px;
             background: var(--bg-tertiary);
-            border-radius: 15px;
+            border-radius: 13px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1.5px solid var(--border);
+            transition: all 0.2s;
+            border: 1px solid var(--border);
         }
         .theme-toggle::after {
             content: '☀️';
             position: absolute;
-            top: 3px;
-            left: 4px;
-            width: 22px;
-            height: 22px;
+            top: 2px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
             background: var(--bg-card);
             border-radius: 50%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 11px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         [data-theme="dark"] .theme-toggle {
-            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
-            border-color: transparent;
+            background: var(--accent);
+            border-color: var(--accent);
         }
         [data-theme="dark"] .theme-toggle::after {
             content: '🌙';
-            left: 28px;
+            left: 23px;
         }
         
         .glow-purple, .glow-blue, .glow-cyan {
-            box-shadow: var(--card-shadow);
+            box-shadow: none;
         }
         
         /* 텍스트 색상 */
@@ -373,7 +347,7 @@
             color: var(--text-primary) !important;
         }
         
-        /* 포인트 컬러 - Vibrant Colors */
+        /* 포인트 컬러 */
         .text-purple-400 { color: #8b5cf6 !important; }
         .text-blue-400 { color: var(--accent) !important; }
         .text-green-400 { color: var(--success) !important; }
@@ -384,18 +358,15 @@
         .text-cyan-400 { color: #06b6d4 !important; }
         
         [data-theme="dark"] .text-purple-400 { color: #a78bfa !important; }
-        [data-theme="dark"] .text-blue-400 { color: #817dff !important; }
-        [data-theme="dark"] .text-green-400 { color: #00e6b8 !important; }
+        [data-theme="dark"] .text-blue-400 { color: #4a9fff !important; }
+        [data-theme="dark"] .text-green-400 { color: #00d885 !important; }
         [data-theme="dark"] .text-red-400 { color: #ff6b6b !important; }
-        [data-theme="dark"] .text-yellow-400 { color: #ffc040 !important; }
         [data-theme="dark"] .text-orange-400 { color: #fb923c !important; }
-        [data-theme="dark"] .text-pink-400 { color: #f472b6 !important; }
-        [data-theme="dark"] .text-cyan-400 { color: #22d3ee !important; }
         
         /* 숫자 크기 */
-        .text-xl { font-size: 1.35rem !important; font-weight: 700 !important; }
-        .text-2xl { font-size: 1.75rem !important; font-weight: 700 !important; }
-        .text-3xl { font-size: 2.25rem !important; font-weight: 700 !important; }
+        .text-xl { font-size: 1.25rem !important; font-weight: 700 !important; }
+        .text-2xl { font-size: 1.5rem !important; font-weight: 700 !important; }
+        .text-3xl { font-size: 2rem !important; font-weight: 700 !important; }
         
         /* 배경색 */
         .bg-white { background: var(--bg-card) !important; }
@@ -406,8 +377,8 @@
             color: var(--text-primary); 
             font-weight: 700;
         }
-        h2 { font-size: 1.5rem; }
-        h3 { font-size: 1.125rem; }
+        h2 { font-size: 1.375rem; }
+        h3 { font-size: 1rem; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -416,11 +387,11 @@
     <!-- 로딩 -->
     <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-secondary)">
         <div class="text-center">
-            <h1 class="text-4xl font-bold mb-6 gradient-text">TEAM BRO</h1>
-            <div class="flex items-center justify-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: var(--accent)"></div>
-                <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: var(--success); animation-delay: 0.15s"></div>
-                <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: #8b5cf6; animation-delay: 0.3s"></div>
+            <h1 class="text-3xl font-bold mb-5" style="color: var(--text-primary)">TEAM BRO</h1>
+            <div class="flex items-center justify-center gap-1.5">
+                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent)"></div>
+                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent); animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent); animation-delay: 0.2s"></div>
             </div>
         </div>
     </div>
@@ -428,38 +399,38 @@
     <!-- 로그인 -->
     <div id="loginPage" class="hidden relative z-10 min-h-screen flex items-center justify-center px-4" style="background: var(--bg-secondary)">
         <div class="w-full max-w-sm">
-            <div class="text-center mb-10">
-                <div class="w-16 h-16 mx-auto mb-5 rounded-2xl flex items-center justify-center font-bold text-white text-xl" style="background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%); box-shadow: 0 8px 24px rgba(99, 91, 255, 0.3);">TB</div>
-                <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary)">TEAM BRO</h1>
-                <p class="text-sm font-medium" style="color: var(--text-muted)">본사 통합 ERP</p>
+            <div class="text-center mb-8">
+                <div class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center font-bold text-white text-lg" style="background: var(--accent);">TB</div>
+                <h1 class="text-2xl font-bold mb-1" style="color: var(--text-primary)">TEAM BRO</h1>
+                <p class="text-sm" style="color: var(--text-muted)">본사 통합 ERP</p>
             </div>
-            <div class="glass-card p-8">
-                <form onsubmit="handleLogin(event)" class="space-y-5">
+            <div class="glass-card p-7">
+                <form onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold mb-2" style="color: var(--text-secondary)">아이디</label>
+                        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-secondary)">아이디</label>
                         <input type="text" id="loginUsername" class="input-field" required placeholder="아이디 입력">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold mb-2" style="color: var(--text-secondary)">비밀번호</label>
+                        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-secondary)">비밀번호</label>
                         <input type="password" id="loginPassword" class="input-field" required placeholder="비밀번호 입력">
                     </div>
-                    <div id="loginError" class="hidden p-3 rounded-xl text-sm font-semibold" style="background: var(--danger-light); color: var(--danger)"></div>
-                    <button type="submit" class="w-full btn-primary py-4 text-base mt-2">로그인</button>
+                    <div id="loginError" class="hidden p-3 rounded-lg text-sm font-medium" style="background: var(--danger-light); color: var(--danger)"></div>
+                    <button type="submit" class="w-full btn-primary py-3 text-sm mt-2">로그인</button>
                 </form>
             </div>
-            <p class="text-center text-xs mt-8 font-medium" style="color: var(--text-muted)">© 2025 TEAM BRO</p>
+            <p class="text-center text-xs mt-6" style="color: var(--text-muted)">© 2025 TEAM BRO</p>
         </div>
     </div>
 
     <!-- 메인 -->
     <div id="mainSystem" class="hidden">
         <!-- 사이드바 -->
-        <aside class="sidebar fixed left-0 top-0 h-screen border-r hidden md:block" style="width: 280px; background: var(--sidebar-bg); border-color: var(--border); overflow-y:auto; z-index: 50;">
+        <aside class="sidebar fixed left-0 top-0 h-screen border-r hidden md:block" style="width: 260px; background: var(--sidebar-bg); border-color: var(--border); overflow-y:auto; z-index: 50;">
             <!-- 로고 -->
-            <div class="p-6 border-b" style="border-color: var(--border)">
+            <div class="p-5 border-b" style="border-color: var(--border)">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-white text-base" style="background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%); box-shadow: 0 4px 12px rgba(99, 91, 255, 0.25);">TB</div>
-                    <span class="text-xl font-bold gradient-text">TeamBro</span>
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-sm" style="background: var(--accent);">TB</div>
+                    <span class="text-lg font-bold" style="color: var(--text-primary)">TeamBro</span>
                 </div>
             </div>
             
@@ -537,16 +508,16 @@
         </aside>
 
         <!-- 상단 헤더 -->
-        <header class="fixed top-0 right-0 z-40 border-b" style="left: 280px; background: var(--header-bg); backdrop-filter: blur(16px); border-color: var(--border);">
-            <div class="px-8 py-4 flex items-center justify-between">
+        <header class="fixed top-0 right-0 z-40 border-b" style="left: 260px; background: var(--header-bg); backdrop-filter: blur(12px); border-color: var(--border);">
+            <div class="px-6 py-3.5 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleMobileMenu()" class="text-xl md:hidden" style="color: var(--text-secondary)">☰</button>
-                    <h2 id="pageTitle" class="text-xl font-bold" style="color: var(--text-primary)">대시보드</h2>
+                    <h2 id="pageTitle" class="text-lg font-bold" style="color: var(--text-primary)">대시보드</h2>
                 </div>
-                <div class="flex items-center gap-5">
+                <div class="flex items-center gap-4">
                     <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드"></div>
-                    <span id="headerUserName" class="text-sm font-semibold hidden md:inline" style="color: var(--text-secondary)">관리자</span>
-                    <button onclick="logout()" class="text-sm font-semibold transition-all hover:opacity-70" style="color: var(--danger)">로그아웃</button>
+                    <span id="headerUserName" class="text-sm font-medium hidden md:inline" style="color: var(--text-secondary)">관리자</span>
+                    <button onclick="logout()" class="text-sm font-medium" style="color: var(--text-muted)">로그아웃</button>
                 </div>
             </div>
         </header>
@@ -2476,7 +2447,7 @@ async function handleLogin(e) {
         document.getElementById('mainSystem').classList.remove('hidden');
         // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '280px';
+            document.getElementById('mainContent').style.marginLeft = '260px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
@@ -2507,7 +2478,7 @@ async function restoreSession() {
         document.getElementById('mainSystem').classList.remove('hidden');
         // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '280px';
+            document.getElementById('mainContent').style.marginLeft = '260px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
