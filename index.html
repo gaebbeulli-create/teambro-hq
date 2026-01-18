@@ -3710,7 +3710,7 @@ async function uploadExcel(type, input) {
     
     // 업로드 시작 표시
     const typeName = type === 'rider' ? '라이더' : type === 'partner' ? '협력사' : '영업자';
-    showToast('📤 ' + typeName + ' 데이터 업로드 중...', 'info');
+    showToast('📤 ' + typeName + ' 데이터 분석 중...', 'info');
     
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -3732,12 +3732,10 @@ async function uploadExcel(type, input) {
             const existingBizNos = new Set(existingData.map(d => d.business_number?.replace(/[^0-9]/g, '')));
             const existingSalesCodes = new Set(existingData.map(d => d.sales_code?.trim().toLowerCase()));
             
+            // 업로드할 데이터 모으기
+            const toInsert = [];
+            
             for (let i = 1; i < rows.length; i++) {
-                // 진행률 표시 (10건마다)
-                if (i % 10 === 0) {
-                    showToast('📤 업로드 중... ' + i + '/' + totalRows, 'info');
-                }
-                
                 const row = rows[i];
                 if (!row || !row[0]) continue;
                 const data = {};
@@ -3764,34 +3762,50 @@ async function uploadExcel(type, input) {
                 const salesCode = data.sales_code?.trim().toLowerCase();
                 
                 if (type === 'rider') {
-                    // 라이더: 주민번호로만 중복 체크
                     if (ssn && existingSSNs.has(ssn)) isDuplicate = true;
                 } else if (type === 'partner') {
-                    // 협력사: 사업자번호 또는 이름으로 중복 체크
                     if (bizNo && existingBizNos.has(bizNo)) isDuplicate = true;
                     if (name && existingNames.has(name)) isDuplicate = true;
                 } else if (type === 'sales') {
-                    // 영업자: 영업자코드 또는 이름+전화번호로 중복 체크
                     if (salesCode && existingSalesCodes.has(salesCode)) isDuplicate = true;
                     if (phone && existingPhones.has(phone)) isDuplicate = true;
                 }
                 
                 if (isDuplicate) {
                     duplicateCount++;
-                    continue; // 중복이면 건너뜀
+                    continue;
                 }
                 
-                const table = type === 'rider' ? 'riders' : type === 'partner' ? 'partners' : 'sales_reps';
                 if (type === 'sales') data.withholding_enabled = true;
-                const result = await supabaseCall(table, 'POST', data);
+                toInsert.push(data);
+                
+                // Set에 추가 (같은 파일 내 중복 방지)
+                if (name) existingNames.add(name);
+                if (phone) existingPhones.add(phone);
+                if (ssn) existingSSNs.add(ssn);
+                if (bizNo) existingBizNos.add(bizNo);
+                if (salesCode) existingSalesCodes.add(salesCode);
+            }
+            
+            // Batch Insert (500건씩)
+            const table = type === 'rider' ? 'riders' : type === 'partner' ? 'partners' : 'sales_reps';
+            const BATCH_SIZE = 500;
+            const totalBatches = Math.ceil(toInsert.length / BATCH_SIZE);
+            
+            showToast('📤 총 ' + toInsert.length + '건 업로드 시작... (중복 ' + duplicateCount + '건 제외)', 'info');
+            
+            for (let b = 0; b < totalBatches; b++) {
+                const batch = toInsert.slice(b * BATCH_SIZE, (b + 1) * BATCH_SIZE);
+                showToast('📤 업로드 중... ' + ((b + 1) * BATCH_SIZE > toInsert.length ? toInsert.length : (b + 1) * BATCH_SIZE) + '/' + toInsert.length + ' (' + Math.round((b + 1) / totalBatches * 100) + '%)', 'info');
+                
+                const result = await supabaseCall(table, 'POST', batch);
                 if (result) {
-                    count++;
-                    // 새로 등록된 데이터를 Set에 추가 (같은 파일 내 중복 방지)
-                    if (name) existingNames.add(name);
-                    if (phone) existingPhones.add(phone);
-                    if (ssn) existingSSNs.add(ssn);
-                    if (bizNo) existingBizNos.add(bizNo);
-                    if (salesCode) existingSalesCodes.add(salesCode);
+                    count += Array.isArray(result) ? result.length : 1;
+                }
+                
+                // 과부하 방지 - 배치 사이 잠시 대기
+                if (b < totalBatches - 1) {
+                    await new Promise(r => setTimeout(r, 100));
                 }
             }
             
@@ -3803,7 +3817,7 @@ async function uploadExcel(type, input) {
             await loadAllData();
             loadStats(type); renderTable(type); loadDashboard();
             if (type === 'partner') loadPartnerOptions();
-        } catch (err) { console.error(err); showToast('업로드 실패', 'error'); }
+        } catch (err) { console.error(err); showToast('업로드 실패: ' + err.message, 'error'); }
     };
     reader.readAsBinaryString(file);
     input.value = '';
