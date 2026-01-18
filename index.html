@@ -402,7 +402,7 @@
             <div class="text-center mb-8">
                 <div class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center font-bold text-white text-lg" style="background: var(--accent);">TB</div>
                 <h1 class="text-2xl font-bold mb-1" style="color: var(--text-primary)">TEAM BRO</h1>
-                <p class="text-sm" style="color: var(--text-muted)">본사 통합 ERP</p>
+                <p class="text-sm" style="color: var(--text-muted)">그룹 통합 관리 시스템</p>
             </div>
             <div class="glass-card p-7">
                 <form onsubmit="handleLogin(event)" class="space-y-4">
@@ -419,6 +419,46 @@
                 </form>
             </div>
             <p class="text-center text-xs mt-6" style="color: var(--text-muted)">© 2025 TEAM BRO</p>
+        </div>
+    </div>
+
+    <!-- 시스템 선택 화면 -->
+    <div id="systemSelectPage" class="hidden relative z-10 min-h-screen flex items-center justify-center px-4" style="background: var(--bg-secondary)">
+        <div class="w-full max-w-2xl">
+            <div class="text-center mb-8">
+                <div class="w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center font-bold text-white text-lg" style="background: var(--accent);">TB</div>
+                <h1 class="text-2xl font-bold mb-1" style="color: var(--text-primary)">시스템 선택</h1>
+                <p class="text-sm" style="color: var(--text-muted)">접속할 시스템을 선택하세요</p>
+                <p class="text-xs mt-2" style="color: var(--text-muted)">로그인: <span id="selectPageUser" class="text-blue-400"></span></p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- 팀브로 HQ -->
+                <div id="selectHQ" class="glass-card p-6 text-center cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all" onclick="enterSystem('hq')">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center text-2xl" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🏢</div>
+                    <h3 class="font-bold text-lg mb-2" style="color: var(--text-primary)">팀브로 HQ</h3>
+                    <p class="text-xs mb-3" style="color: var(--text-muted)">본사 통합 관리</p>
+                    <span class="badge badge-info text-xs">ADMIN / MANAGER</span>
+                </div>
+                
+                <!-- 브로컴퍼니 -->
+                <div id="selectBC" class="glass-card p-6 text-center cursor-pointer hover:ring-2 hover:ring-emerald-500 transition-all" onclick="enterSystem('brocompany')">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center text-2xl" style="background: linear-gradient(135deg, #10b981, #059669);">🚀</div>
+                    <h3 class="font-bold text-lg mb-2" style="color: var(--text-primary)">브로컴퍼니</h3>
+                    <p class="text-xs mb-3" style="color: var(--text-muted)">배달대행 정산</p>
+                    <span class="badge badge-active text-xs">전체 접근</span>
+                </div>
+                
+                <!-- 브로모터스 -->
+                <div id="selectBM" class="glass-card p-6 text-center cursor-pointer hover:ring-2 hover:ring-amber-500 transition-all" onclick="enterSystem('bromotors')">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center text-2xl" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏍️</div>
+                    <h3 class="font-bold text-lg mb-2" style="color: var(--text-primary)">브로모터스</h3>
+                    <p class="text-xs mb-3" style="color: var(--text-muted)">오토바이 렌탈/리스</p>
+                    <span class="badge badge-active text-xs">전체 접근</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <button onclick="handleLogout()" class="text-sm text-gray-400 hover:text-white">로그아웃</button>
+            </div>
         </div>
     </div>
 
@@ -2660,16 +2700,19 @@ async function handleLogin(e) {
     const users = await supabaseCall('hq_users', 'GET', null, '?username=eq.' + encodeURIComponent(username));
     if (users && users.length > 0 && users[0].password_hash === password && users[0].is_active) {
         currentUser = users[0];
-        sessionStorage.setItem('teambro_hq_session', JSON.stringify({ userId: currentUser.id, timestamp: Date.now() }));
-        await loadAllData();
+        // localStorage에 통합 세션 저장 (모든 ERP에서 공유)
+        const session = { 
+            userId: currentUser.id, 
+            username: currentUser.username,
+            name: currentUser.name,
+            role: currentUser.role,
+            timestamp: Date.now() 
+        };
+        localStorage.setItem('teambro_unified_session', JSON.stringify(session));
+        
+        // 시스템 선택 화면으로 이동
         document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('mainSystem').classList.remove('hidden');
-        // PC에서 main 영역 margin-left 설정
-        if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '260px';
-        }
-        document.getElementById('headerUserName').textContent = currentUser.name;
-        loadDashboard();
+        showSystemSelectPage();
         showToast(currentUser.name + '님 환영합니다!');
     } else {
         document.getElementById('loginError').textContent = '로그인 실패';
@@ -2677,30 +2720,81 @@ async function handleLogin(e) {
     }
 }
 
-function logout() {
-    sessionStorage.removeItem('teambro_hq_session');
-    document.getElementById('mainSystem').classList.add('hidden');
-    document.getElementById('loginPage').classList.remove('hidden');
+// 시스템 선택 화면 표시
+function showSystemSelectPage() {
+    document.getElementById('selectPageUser').textContent = currentUser.name + ' (' + currentUser.role + ')';
+    
+    // 권한에 따라 접근 가능 시스템 표시
+    const hqCard = document.getElementById('selectHQ');
+    const canAccessHQ = currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER';
+    
+    if (canAccessHQ) {
+        hqCard.classList.remove('opacity-50', 'cursor-not-allowed');
+        hqCard.classList.add('cursor-pointer');
+        hqCard.onclick = () => enterSystem('hq');
+    } else {
+        hqCard.classList.add('opacity-50', 'cursor-not-allowed');
+        hqCard.classList.remove('cursor-pointer');
+        hqCard.onclick = () => showToast('접근 권한이 없습니다 (ADMIN/MANAGER만 가능)', 'error');
+    }
+    
+    document.getElementById('systemSelectPage').classList.remove('hidden');
 }
 
-async function restoreSession() {
-    const data = sessionStorage.getItem('teambro_hq_session');
-    if (!data) return false;
-    try {
-        const session = JSON.parse(data);
-        if (Date.now() - session.timestamp > 86400000) return false;
-        const users = await supabaseCall('hq_users', 'GET', null, '?id=eq.' + session.userId);
-        if (!users || !users.length || !users[0].is_active) return false;
-        currentUser = users[0];
+// 시스템 진입
+async function enterSystem(system) {
+    if (system === 'hq') {
+        // 팀브로 HQ 진입 - 권한 체크
+        if (currentUser.role !== 'ADMIN' && currentUser.role !== 'MANAGER') {
+            showToast('접근 권한이 없습니다', 'error');
+            return;
+        }
+        document.getElementById('systemSelectPage').classList.add('hidden');
         await loadAllData();
-        document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('mainSystem').classList.remove('hidden');
-        // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
             document.getElementById('mainContent').style.marginLeft = '260px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
+    } else if (system === 'brocompany') {
+        // 브로컴퍼니 ERP로 이동 (통합 로그인 상태 유지)
+        window.location.href = 'https://gaebbeulli-create.github.io/teambro-erp/';
+    } else if (system === 'bromotors') {
+        // 브로모터스 ERP로 이동 (통합 로그인 상태 유지)
+        window.location.href = 'https://gaebbeulli-create.github.io/bromotors/';
+    }
+}
+
+function handleLogout() {
+    localStorage.removeItem('teambro_unified_session');
+    currentUser = null;
+    document.getElementById('systemSelectPage').classList.add('hidden');
+    document.getElementById('mainSystem').classList.add('hidden');
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+}
+
+function logout() {
+    handleLogout();
+}
+
+async function restoreSession() {
+    const data = localStorage.getItem('teambro_unified_session');
+    if (!data) return false;
+    try {
+        const session = JSON.parse(data);
+        if (Date.now() - session.timestamp > 86400000) {
+            localStorage.removeItem('teambro_unified_session');
+            return false;
+        }
+        const users = await supabaseCall('hq_users', 'GET', null, '?id=eq.' + session.userId);
+        if (!users || !users.length || !users[0].is_active) return false;
+        currentUser = users[0];
+        
+        // 세션 복원 시 시스템 선택 화면으로
+        showSystemSelectPage();
         return true;
     } catch (e) { return false; }
 }
@@ -2751,6 +2845,9 @@ function loadDashboard() {
     
     // 자금 데이터 로드
     loadFunds();
+    
+    // 그룹사 현황 로드
+    updateSubsidiaryStats();
 }
 
 function loadStats(type) {
@@ -5772,54 +5869,44 @@ function updateFundStats() {
     document.getElementById('group-balance').textContent = '₩' + outstanding.toLocaleString();
 }
 
-// 자회사 현황 업데이트 (실제 현금출납장 데이터 연동)
+// 자회사 현황 업데이트 (HQ 데이터 기반)
 async function updateSubsidiaryStats() {
     const thisMonth = new Date().toISOString().slice(0, 7);
     
-    // 브로컴퍼니 - 현금출납장에서 이번달 데이터 (테이블 없으면 무시)
-    let bcCashbook = null;
-    try { bcCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31'); } catch(e) {}
-    let bcDeposit = 0, bcWithdraw = 0;
-    if (bcCashbook && bcCashbook.length) {
-        bcDeposit = bcCashbook.reduce((s, c) => s + parseFloat(c.deposit || 0), 0);
-        bcWithdraw = bcCashbook.reduce((s, c) => s + parseFloat(c.withdrawal || 0), 0);
-    }
+    // 브로컴퍼니 - 플랫폼 정산 데이터에서 이번달
+    const bcPlatform = platformList.filter(p => p.settlement_date?.startsWith(thisMonth));
+    const bcRevenue = bcPlatform.reduce((s, p) => s + parseFloat(p.total_amount || 0), 0);
+    const bcSettlement = bcPlatform.reduce((s, p) => s + parseFloat(p.rider_payout || 0), 0);
+    const bcProfit = bcRevenue - bcSettlement;
     
-    // 브로컴퍼니 정산 데이터
-    const bcSettlement = settlementList.filter(s => s.settlement_date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.total_amount || 0), 0);
-    const bcFee = settlementList.filter(s => s.settlement_date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.fee_amount || 0), 0);
+    document.getElementById('bc-revenue').textContent = '₩' + bcRevenue.toLocaleString();
+    document.getElementById('bc-settlement').textContent = '₩' + bcSettlement.toLocaleString();
+    document.getElementById('bc-profit').textContent = '₩' + bcProfit.toLocaleString();
     
-    document.getElementById('bc-revenue').textContent = '₩' + (bcDeposit || bcSettlement).toLocaleString();
-    document.getElementById('bc-settlement').textContent = '₩' + bcWithdraw.toLocaleString();
-    document.getElementById('bc-profit').textContent = '₩' + (bcDeposit - bcWithdraw).toLocaleString();
+    // 브로모터스 - 은행 거래 데이터에서 렌탈 관련 (category가 rental인 것)
+    const bmBank = bankList.filter(b => b.transaction_date?.startsWith(thisMonth));
+    const bmRevenue = bmBank.filter(b => b.type === 'deposit').reduce((s, b) => s + parseFloat(b.amount || 0), 0);
+    const bmWithdraw = bmBank.filter(b => b.type === 'withdraw').reduce((s, b) => s + parseFloat(b.amount || 0), 0);
     
-    // 브로모터스 - 현금출납장에서 이번달 데이터 (테이블 없으면 무시)
-    let bmCashbook = null;
-    try { bmCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31'); } catch(e) {}
-    let bmDeposit = 0, bmWithdraw = 0;
-    if (bmCashbook && bmCashbook.length) {
-        bmDeposit = bmCashbook.reduce((s, c) => s + parseFloat(c.deposit || 0), 0);
-        bmWithdraw = bmCashbook.reduce((s, c) => s + parseFloat(c.withdrawal || 0), 0);
-    }
+    // 미수금 - 선정산 중 미회수
+    const bmArrears = advanceTransferList.filter(a => a.status === 'pending').reduce((s, a) => s + parseFloat(a.amount || 0), 0);
     
-    // 브로모터스 미수금 (렌탈 연체) - 테이블 없으면 무시
-    let bmArrears = null;
-    try { bmArrears = await supabaseCall('contracts', 'GET', null, '?status=eq.active'); } catch(e) {}
-    let totalArrears = 0;
-    if (bmArrears && bmArrears.length) {
-        totalArrears = bmArrears.reduce((s, c) => s + parseFloat(c.arrears_amount || 0), 0);
-    }
-    
-    document.getElementById('bm-revenue').textContent = '₩' + bmDeposit.toLocaleString();
-    document.getElementById('bm-arrears').textContent = '₩' + totalArrears.toLocaleString();
-    document.getElementById('bm-profit').textContent = '₩' + (bmDeposit - bmWithdraw).toLocaleString();
+    document.getElementById('bm-revenue').textContent = '₩' + bmRevenue.toLocaleString();
+    document.getElementById('bm-arrears').textContent = '₩' + bmArrears.toLocaleString();
+    document.getElementById('bm-profit').textContent = '₩' + (bmRevenue - bmWithdraw).toLocaleString();
     
     // 그룹 합계
-    const totalRevenue = (bcDeposit || bcSettlement) + bmDeposit;
-    const totalProfit = (bcDeposit - bcWithdraw) + (bmDeposit - bmWithdraw);
+    const totalRevenue = bcRevenue + bmRevenue;
+    const totalProfit = bcProfit + (bmRevenue - bmWithdraw);
+    const totalBalance = bankList.reduce((s, b) => {
+        if (b.type === 'deposit') return s + parseFloat(b.amount || 0);
+        if (b.type === 'withdraw') return s - parseFloat(b.amount || 0);
+        return s;
+    }, 0);
+    
     document.getElementById('group-revenue').textContent = '₩' + totalRevenue.toLocaleString();
     document.getElementById('group-profit').textContent = '₩' + totalProfit.toLocaleString();
-    document.getElementById('group-balance').textContent = '₩' + totalProfit.toLocaleString();
+    document.getElementById('group-balance').textContent = '₩' + totalBalance.toLocaleString();
 }
 
 // 자금 테이블 렌더
