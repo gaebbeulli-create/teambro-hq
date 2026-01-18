@@ -652,6 +652,7 @@
                             <button onclick="document.getElementById('riderExcelInput').click()" class="btn-secondary btn-sm">📤 업로드</button>
                             <button onclick="exportToExcel('rider')" class="btn-secondary btn-sm">📊 다운</button>
                             <button onclick="openRiderModal()" class="btn-primary btn-sm">+ 등록</button>
+                            <button onclick="deleteAllRiders()" class="btn-danger btn-sm" id="deleteAllRidersBtn" style="display:none">🗑️ 전체삭제</button>
                             <input type="file" id="riderExcelInput" accept=".xlsx,.xls" class="hidden" onchange="uploadExcel('rider', this)">
                         </div>
                     </div>
@@ -1567,20 +1568,23 @@
                         <div><label class="block text-sm text-blue-400 mb-1">주민번호</label><input type="text" id="rider-ssn" class="input-field" placeholder="000000-0000000" maxlength="14" oninput="formatSSN(this)"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
-                        <div><label class="block text-sm text-blue-400 mb-1">소속협력사</label><select id="rider-partner" class="input-field"><option value="">선택안함</option></select></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">연락처</label><input type="tel" id="rider-phone" class="input-field" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
                         <div><label class="block text-sm text-blue-400 mb-1">세금처리</label><select id="rider-tax-type" class="input-field"><option value="">선택</option><option value="원천징수">원천징수</option><option value="과세지출">과세지출</option></select></div>
                     </div>
+                    <div class="mt-3">
+                        <label class="block text-sm text-blue-400 mb-1">주소</label><input type="text" id="rider-address" class="input-field" placeholder="주소 입력">
+                    </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">소속협력사</label><select id="rider-partner" class="input-field"><option value="">선택안함</option></select></div>
                         <div><label class="block text-sm text-blue-400 mb-1">배민 ID</label><input type="text" id="rider-baemin-id" class="input-field" placeholder="배민 라이더 ID"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
                         <div><label class="block text-sm text-blue-400 mb-1">쿠팡 ID</label><input type="text" id="rider-coupang-id" class="input-field" placeholder="쿠팡 라이더 ID"></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="근무">근무</option><option value="퇴사">퇴사</option></select></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
                         <div><label class="block text-sm text-blue-400 mb-1">예금주</label><input type="text" id="rider-account-holder" class="input-field"></div>
                         <div><label class="block text-sm text-blue-400 mb-1">계좌번호</label><input type="text" id="rider-account-no" class="input-field"></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mt-3">
-                        <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="근무">근무</option><option value="퇴사">퇴사</option></select></div>
-                        <div></div>
                     </div>
                 </div>
                 
@@ -2592,7 +2596,16 @@ function showTab(tab) {
     
     // 기초정보
     if (tab === 'dashboard') loadDashboard();
-    if (tab === 'riders') { loadStats('rider'); renderTable('rider'); loadPartnerOptions(); }
+    if (tab === 'riders') { 
+        loadStats('rider'); 
+        renderTable('rider'); 
+        loadPartnerOptions(); 
+        // 마스터 권한만 전체삭제 버튼 표시
+        const deleteAllBtn = document.getElementById('deleteAllRidersBtn');
+        if (deleteAllBtn) {
+            deleteAllBtn.style.display = (currentUser && currentUser.role === 'MASTER') ? 'inline-block' : 'none';
+        }
+    }
     if (tab === 'partners') { loadStats('partner'); renderTable('partner'); }
     if (tab === 'sales') { loadStats('sales'); renderTable('sales'); }
     if (tab === 'entities') { loadEntities(); }
@@ -2841,6 +2854,8 @@ function editItem(type, id) {
         document.getElementById('rider-id').value = r.id;
         document.getElementById('rider-name').value = r.name || '';
         document.getElementById('rider-ssn').value = r.resident_number || '';
+        document.getElementById('rider-phone').value = r.phone || '';
+        document.getElementById('rider-address').value = r.address || '';
         document.getElementById('rider-partner').value = r.partner_id || '';
         document.getElementById('rider-baemin-id').value = r.baemin_id || '';
         document.getElementById('rider-coupang-id').value = r.coupang_id || '';
@@ -2997,6 +3012,7 @@ function showRiderDetail(id) {
                 <div><span class="text-gray-400">연락처:</span> ${r.phone || '-'}</div>
                 <div><span class="text-gray-400">소속 협력사:</span> <span class="font-bold text-blue-400">${p ? p.name : '-'}</span></div>
                 <div><span class="text-gray-400">과세유형:</span> ${r.tax_type || '-'}</div>
+                <div class="col-span-2"><span class="text-gray-400">주소:</span> ${r.address || '-'}</div>
             </div>
         </div>
         
@@ -3081,6 +3097,45 @@ async function deleteRider(id) {
     }
 }
 
+// 라이더 전체 삭제 (마스터 권한만)
+async function deleteAllRiders() {
+    if (!currentUser || currentUser.role !== 'MASTER') {
+        showToast('마스터 권한만 삭제할 수 있습니다', 'error');
+        return;
+    }
+    
+    if (riderList.length === 0) {
+        showToast('삭제할 라이더가 없습니다', 'error');
+        return;
+    }
+    
+    const confirmText = '라이더 ' + riderList.length + '명 전체를 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다!\n\n확인하려면 "전체삭제"를 입력하세요:';
+    const input = prompt(confirmText);
+    
+    if (input !== '전체삭제') {
+        showToast('전체삭제가 취소되었습니다', 'error');
+        return;
+    }
+    
+    try {
+        showToast('삭제 중...', 'info');
+        
+        // 모든 라이더 삭제
+        const result = await supabaseCall('riders', 'DELETE', null, '?id=neq.0');
+        
+        if (result !== false) {
+            showToast('라이더 전체 삭제 완료');
+            await loadAllData();
+            loadStats('rider');
+            renderTable('rider');
+            loadDashboard();
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('삭제 실패', 'error');
+    }
+}
+
 async function deletePartner(id) {
     const p = partnerList.find(x => x.id === id);
     if (!p) return;
@@ -3128,6 +3183,8 @@ async function submitForm(type, e) {
         data = { 
             name: document.getElementById('rider-name').value, 
             resident_number: ssn, 
+            phone: document.getElementById('rider-phone').value || null,
+            address: document.getElementById('rider-address').value || null,
             partner_id: document.getElementById('rider-partner').value || null, 
             baemin_id: document.getElementById('rider-baemin-id').value || null,
             coupang_id: document.getElementById('rider-coupang-id').value || null,
