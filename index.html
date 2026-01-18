@@ -1772,7 +1772,7 @@
                 </div>
                 <div><label class="block text-sm text-blue-400 mb-1">비밀번호</label><input type="password" id="user-password" class="input-field"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">권한</label><select id="user-role" class="input-field"><option value="STAFF">직원</option><option value="MANAGER">매니저</option><option value="ADMIN">관리자</option></select></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">권한</label><select id="user-role" class="input-field"><option value="VIEWER">뷰어 (조회만)</option><option value="STAFF">직원 (조회/등록)</option><option value="MANAGER">매니저 (등록/수정)</option><option value="ADMIN">최고관리자 (모든권한)</option></select></div>
                     <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="user-status" class="input-field"><option value="true">활성</option><option value="false">비활성</option></select></div>
                 </div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('userModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
@@ -2603,7 +2603,7 @@ function showTab(tab) {
         // 마스터 권한만 전체삭제 버튼 표시
         const deleteAllBtn = document.getElementById('deleteAllRidersBtn');
         if (deleteAllBtn) {
-            deleteAllBtn.style.display = (currentUser && currentUser.role === 'MASTER') ? 'inline-block' : 'none';
+            deleteAllBtn.style.display = (currentUser && currentUser.role === 'ADMIN') ? 'inline-block' : 'none';
         }
     }
     if (tab === 'partners') { loadStats('partner'); renderTable('partner'); }
@@ -2785,7 +2785,7 @@ function renderTable(type) {
             const ssnFull = r.resident_number || '-';
             const ssnMasked = r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-';
             const statusBadge = r.status === '퇴사' ? 'badge-inactive">퇴사' : 'badge-active">근무';
-            const deleteBtn = currentUser && currentUser.role === 'MASTER' ? '<button onclick="deleteRider(' + r.id + ')" class="btn-danger btn-sm">삭제</button>' : '';
+            const deleteBtn = currentUser && currentUser.role === 'ADMIN' ? '<button onclick="deleteRider(' + r.id + ')" class="btn-danger btn-sm">삭제</button>' : '';
             return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showRiderDetail(' + r.id + ')">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm mr-1">수정</button>' + deleteBtn + '</td></tr>';
         }).join('');
     } else if (type === 'partner') {
@@ -3060,7 +3060,7 @@ function showRiderDetail(id) {
     
     // 마스터 권한만 삭제 버튼 표시
     const deleteBtn = document.getElementById('riderDetailDeleteBtn');
-    if (currentUser && currentUser.role === 'MASTER') {
+    if (currentUser && currentUser.role === 'ADMIN') {
         deleteBtn.classList.remove('hidden');
         deleteBtn.onclick = () => { closeModal('riderDetailModal'); deleteRider(id); };
     } else {
@@ -3072,8 +3072,8 @@ function showRiderDetail(id) {
 
 // 라이더 삭제 (마스터 권한만)
 async function deleteRider(id) {
-    if (!currentUser || currentUser.role !== 'MASTER') {
-        showToast('마스터 권한만 삭제할 수 있습니다', 'error');
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+        showToast('최고관리자만 삭제할 수 있습니다', 'error');
         return;
     }
     
@@ -3097,10 +3097,10 @@ async function deleteRider(id) {
     }
 }
 
-// 라이더 전체 삭제 (마스터 권한만)
+// 라이더 전체 삭제 (최고관리자만)
 async function deleteAllRiders() {
-    if (!currentUser || currentUser.role !== 'MASTER') {
-        showToast('마스터 권한만 삭제할 수 있습니다', 'error');
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+        showToast('최고관리자만 삭제할 수 있습니다', 'error');
         return;
     }
     
