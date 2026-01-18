@@ -2889,7 +2889,14 @@ function loadStats(type) {
         document.getElementById('rider-total').textContent = riderList.length;
         document.getElementById('rider-active').textContent = riderList.filter(r => r.status === '계약중' || !r.status).length;
         document.getElementById('rider-inactive').textContent = riderList.filter(r => r.status === '계약종료').length;
-        document.getElementById('rider-nossn').textContent = riderList.filter(r => !r.resident_number || r.resident_number.trim() === '').length;
+        // 주민번호 미등록: 계약중인 라이더 중 주민번호 숫자가 6자리 미만인 경우
+        document.getElementById('rider-nossn').textContent = riderList.filter(r => {
+            const isActive = r.status === '계약중' || !r.status;
+            if (!isActive) return false;
+            if (!r.resident_number) return true;
+            const digits = r.resident_number.replace(/[^0-9]/g, '');
+            return digits.length < 6;
+        }).length;
     } else if (type === 'partner') {
         document.getElementById('partner-total').textContent = partnerList.length;
         document.getElementById('partner-biz').textContent = partnerList.filter(p => p.type === 'biz').length;
@@ -2919,8 +2926,9 @@ function renderTable(type) {
         let list = riderList;
         if (sf) list = list.filter(r => r.status === sf);
         if (pf) list = list.filter(r => r.partner_id == pf);
-        if (ssnf === 'has') list = list.filter(r => r.resident_number && r.resident_number.trim() !== '');
-        if (ssnf === 'none') list = list.filter(r => !r.resident_number || r.resident_number.trim() === '');
+        // 주민번호 필터: 숫자 6자리 이상이면 "있음"
+        if (ssnf === 'has') list = list.filter(r => r.resident_number && r.resident_number.replace(/[^0-9]/g, '').length >= 6);
+        if (ssnf === 'none') list = list.filter(r => !r.resident_number || r.resident_number.replace(/[^0-9]/g, '').length < 6);
         if (q) list = list.filter(r => (r.name||'').toLowerCase().includes(q) || (r.phone||'').includes(q));
         
         // 필터된 목록 저장 (다운로드용)
@@ -2930,8 +2938,10 @@ function renderTable(type) {
         if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
         tbody.innerHTML = list.map(r => {
             const p = partnerList.find(x => x.id == r.partner_id);
-            const ssnFull = r.resident_number || '-';
-            const ssnMasked = r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-';
+            // 주민번호 표시: 숫자 6자리 미만이면 "-" 표시
+            const hasValidSSN = r.resident_number && r.resident_number.replace(/[^0-9]/g, '').length >= 6;
+            const ssnFull = hasValidSSN ? r.resident_number : '-';
+            const ssnMasked = hasValidSSN ? r.resident_number.substring(0, 8) + '******' : '-';
             const statusBadge = r.status === '계약종료' ? 'badge-inactive">계약종료' : 'badge-active">계약중';
             const deleteBtn = currentUser && currentUser.role === 'ADMIN' ? '<button onclick="deleteRider(' + r.id + ')" class="btn-danger btn-sm">삭제</button>' : '';
             return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showRiderDetail(' + r.id + ')">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm mr-1">수정</button>' + deleteBtn + '</td></tr>';
