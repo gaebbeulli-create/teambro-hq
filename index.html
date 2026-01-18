@@ -2707,23 +2707,23 @@ async function restoreSession() {
 
 async function loadAllData() {
     const [r, p, s, u, st, cd, ct, ti, jn, emp, pay, plat, advt, recon, bnk, wkly, sp] = await Promise.all([
-        supabaseCall('riders', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('partners', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('sales_reps', 'GET', null, '?order=created_at.desc'),
+        supabaseCall('riders', 'GET', null, '?order=created_at.desc&limit=5000'),
+        supabaseCall('partners', 'GET', null, '?order=created_at.desc&limit=1000'),
+        supabaseCall('sales_reps', 'GET', null, '?order=created_at.desc&limit=1000'),
         supabaseCall('hq_users', 'GET', null, '?order=id.asc'),
-        supabaseCall('settlements', 'GET', null, '?order=created_at.desc'),
+        supabaseCall('settlements', 'GET', null, '?order=created_at.desc&limit=2000'),
         supabaseCall('corporate_cards', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('card_transactions', 'GET', null, '?order=transaction_date.desc&limit=50'),
-        supabaseCall('hq_tax_invoices', 'GET', null, '?order=invoice_date.desc'),
-        supabaseCall('accounting_journals', 'GET', null, '?order=journal_date.desc'),
-        supabaseCall('employees', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('payrolls', 'GET', null, '?order=pay_year.desc,pay_month.desc'),
-        supabaseCall('platform_settlements', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('advance_transfers', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('settlement_reconciliation', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('bank_transactions', 'GET', null, '?order=transaction_date.desc'),
-        supabaseCall('weekly_payouts', 'GET', null, '?order=created_at.desc'),
-        supabaseCall('sales_purchases', 'GET', null, '?order=transaction_date.desc')
+        supabaseCall('card_transactions', 'GET', null, '?order=transaction_date.desc&limit=500'),
+        supabaseCall('hq_tax_invoices', 'GET', null, '?order=invoice_date.desc&limit=1000'),
+        supabaseCall('accounting_journals', 'GET', null, '?order=journal_date.desc&limit=1000'),
+        supabaseCall('employees', 'GET', null, '?order=created_at.desc&limit=500'),
+        supabaseCall('payrolls', 'GET', null, '?order=pay_year.desc,pay_month.desc&limit=1000'),
+        supabaseCall('platform_settlements', 'GET', null, '?order=created_at.desc&limit=1000'),
+        supabaseCall('advance_transfers', 'GET', null, '?order=created_at.desc&limit=1000'),
+        supabaseCall('settlement_reconciliation', 'GET', null, '?order=created_at.desc&limit=1000'),
+        supabaseCall('bank_transactions', 'GET', null, '?order=transaction_date.desc&limit=1000'),
+        supabaseCall('weekly_payouts', 'GET', null, '?order=created_at.desc&limit=1000'),
+        supabaseCall('sales_purchases', 'GET', null, '?order=transaction_date.desc&limit=1000')
     ]);
     riderList = r || [];
     partnerList = p || [];
