@@ -6563,8 +6563,10 @@ async function submitDocUpload(e) {
     
     // 법인 상세에서 업로드한 경우, 해당 법인 상세 다시 열기
     if (entityName && currentEntityId) {
-        showEntityDetail(currentEntityId);
-        setTimeout(() => showEntityDetailTab('docs'), 100);
+        setTimeout(() => {
+            showEntityDetail(currentEntityId);
+            setTimeout(() => showEntityDetailTab('docs'), 100);
+        }, 100);
     }
 }
 
