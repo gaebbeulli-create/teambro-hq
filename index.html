@@ -1721,6 +1721,23 @@
         </div>
     </div>
 
+    <!-- 협력사 상세보기 모달 -->
+    <div id="partnerDetailModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:700px">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-400">🤝 협력사 상세정보</h3>
+                <button onclick="closeModal('partnerDetailModal')" class="text-gray-400 text-2xl">&times;</button>
+            </div>
+            <div id="partnerDetailContent" class="space-y-4">
+                <!-- 내용 동적 생성 -->
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="closeModal('partnerDetailModal')" class="flex-1 btn-secondary">닫기</button>
+                <button id="partnerDetailEditBtn" class="flex-1 btn-primary">수정</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 사용자 모달 -->
     <div id="userModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:500px">
@@ -2744,7 +2761,7 @@ function renderTable(type) {
         if (!partnerList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
         tbody.innerHTML = partnerList.map(p => {
             const cnt = riderList.filter(r => r.partner_id == p.id).length;
-            return '<tr><td class="font-bold">' + p.name + '</td><td>' + (p.code||'-') + '</td><td><span class="badge ' + (p.type==='biz'?'badge-biz">사업자':'badge-nonbiz">비사업자') + '</span></td><td>' + (p.region||'-') + '</td><td>' + (p.rep_name||'-') + '</td><td>' + (p.phone||'-') + '</td><td>' + cnt + '명</td><td><button onclick="editItem(\'partner\',' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePartner(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
+            return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showPartnerDetail(' + p.id + ')">' + p.name + '</td><td>' + (p.code||'-') + '</td><td><span class="badge ' + (p.type==='biz'?'badge-biz">사업자':'badge-nonbiz">비사업자') + '</span></td><td>' + (p.region||'-') + '</td><td>' + (p.rep_name||'-') + '</td><td>' + (p.phone||'-') + '</td><td>' + cnt + '명</td><td><button onclick="editItem(\'partner\',' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePartner(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
         }).join('');
     } else if (type === 'sales') {
         const sf = document.getElementById('salesStatusFilter').value;
@@ -2873,6 +2890,74 @@ function editItem(type, id) {
         toggleSalesBizFields();
         openModal('salesModal');
     }
+}
+
+// 협력사 상세보기
+function showPartnerDetail(id) {
+    const p = partnerList.find(x => x.id === id);
+    if (!p) return;
+    
+    const linkedRiders = riderList.filter(r => r.partner_id == id);
+    const banks = { KB: '국민', SHINHAN: '신한', WOORI: '우리', HANA: '하나', NH: '농협' };
+    
+    let html = `
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">📋 협력사 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-400">협력사명:</span> <span class="font-bold">${p.name || '-'}</span></div>
+                <div><span class="text-gray-400">협력사코드:</span> <span class="font-bold text-blue-400">${p.code || '-'}</span></div>
+                <div><span class="text-gray-400">구분:</span> <span class="badge ${p.type === 'biz' ? 'badge-biz">사업자' : 'badge-nonbiz">비사업자'}</span></div>
+                <div><span class="text-gray-400">배달권역:</span> ${p.region || '-'}</div>
+                <div><span class="text-gray-400">사업자번호:</span> ${p.biz_no || '-'}</div>
+                <div><span class="text-gray-400">업종:</span> ${p.biz_type || '-'}</div>
+                <div class="col-span-2"><span class="text-gray-400">주소:</span> ${p.address || '-'}</div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">👤 운영자 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-400">운영자 이름:</span> <span class="font-bold">${p.rep_name || '-'}</span></div>
+                <div><span class="text-gray-400">운영자 주민번호:</span> ${p.rep_ssn ? p.rep_ssn.substring(0, 8) + '******' : '-'}</div>
+                <div><span class="text-gray-400">연락처:</span> ${p.phone || '-'}</div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">💰 계좌 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-400">은행:</span> ${banks[p.bank] || p.bank || '-'}</div>
+                <div><span class="text-gray-400">계좌번호:</span> ${p.account_no || '-'}</div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">📎 첨부파일</h4>
+            <div class="grid grid-cols-3 gap-3 text-sm">
+                <div>${p.file_bizreg ? '<a href="' + p.file_bizreg + '" target="_blank" class="text-blue-400 hover:underline">📄 사업자등록증</a>' : '<span class="text-gray-500">사업자등록증 없음</span>'}</div>
+                <div>${p.file_id ? '<a href="' + p.file_id + '" target="_blank" class="text-blue-400 hover:underline">🪪 신분증</a>' : '<span class="text-gray-500">신분증 없음</span>'}</div>
+                <div>${p.file_contract ? '<a href="' + p.file_contract + '" target="_blank" class="text-blue-400 hover:underline">📝 계약서</a>' : '<span class="text-gray-500">계약서 없음</span>'}</div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">🏍️ 소속 라이더 (${linkedRiders.length}명)</h4>
+            ${linkedRiders.length > 0 ? 
+                '<div class="flex flex-wrap gap-2">' + linkedRiders.map(r => '<span class="badge badge-active">' + r.name + '</span>').join('') + '</div>' : 
+                '<div class="text-gray-500 text-sm">소속 라이더 없음</div>'
+            }
+        </div>
+        
+        ${p.memo ? `
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">📝 메모</h4>
+            <div class="text-sm">${p.memo}</div>
+        </div>` : ''}
+    `;
+    
+    document.getElementById('partnerDetailContent').innerHTML = html;
+    document.getElementById('partnerDetailEditBtn').onclick = () => { closeModal('partnerDetailModal'); editItem('partner', id); };
+    openModal('partnerDetailModal');
 }
 
 async function deletePartner(id) {
@@ -5265,11 +5350,13 @@ async function loadFunds() {
     const manualData = await supabaseCall('fund_transfers', 'GET', null, '?order=transfer_date.desc');
     if (manualData) fundList = manualData;
     
-    // 브로컴퍼니 현금출납장에서 자동 가져오기
-    const bcCashbook = await supabaseCall('cashbook', 'GET', null, '?order=trans_date.desc&limit=50');
+    // 브로컴퍼니 현금출납장에서 자동 가져오기 (테이블 없으면 무시)
+    let bcCashbook = null;
+    try { bcCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?order=trans_date.desc&limit=50'); } catch(e) {}
     
-    // 브로모터스 현금출납장에서 자동 가져오기
-    const bmCashbook = await supabaseCall('bm_cashbook', 'GET', null, '?order=trans_date.desc&limit=50');
+    // 브로모터스 현금출납장에서 자동 가져오기 (테이블 없으면 무시)
+    let bmCashbook = null;
+    try { bmCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?order=trans_date.desc&limit=50'); } catch(e) {}
     
     // 자동 연동 데이터를 fundList 형식으로 변환해서 합치기
     const autoFunds = [];
@@ -5344,8 +5431,9 @@ function updateFundStats() {
 async function updateSubsidiaryStats() {
     const thisMonth = new Date().toISOString().slice(0, 7);
     
-    // 브로컴퍼니 - 현금출납장에서 이번달 데이터
-    const bcCashbook = await supabaseCall('cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31');
+    // 브로컴퍼니 - 현금출납장에서 이번달 데이터 (테이블 없으면 무시)
+    let bcCashbook = null;
+    try { bcCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31'); } catch(e) {}
     let bcDeposit = 0, bcWithdraw = 0;
     if (bcCashbook && bcCashbook.length) {
         bcDeposit = bcCashbook.reduce((s, c) => s + parseFloat(c.deposit || 0), 0);
@@ -5360,16 +5448,18 @@ async function updateSubsidiaryStats() {
     document.getElementById('bc-settlement').textContent = '₩' + bcWithdraw.toLocaleString();
     document.getElementById('bc-profit').textContent = '₩' + (bcDeposit - bcWithdraw).toLocaleString();
     
-    // 브로모터스 - 현금출납장에서 이번달 데이터
-    const bmCashbook = await supabaseCall('bm_cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31');
+    // 브로모터스 - 현금출납장에서 이번달 데이터 (테이블 없으면 무시)
+    let bmCashbook = null;
+    try { bmCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31'); } catch(e) {}
     let bmDeposit = 0, bmWithdraw = 0;
     if (bmCashbook && bmCashbook.length) {
         bmDeposit = bmCashbook.reduce((s, c) => s + parseFloat(c.deposit || 0), 0);
         bmWithdraw = bmCashbook.reduce((s, c) => s + parseFloat(c.withdrawal || 0), 0);
     }
     
-    // 브로모터스 미수금 (렌탈 연체)
-    const bmArrears = await supabaseCall('bm_contracts', 'GET', null, '?status=eq.active');
+    // 브로모터스 미수금 (렌탈 연체) - 테이블 없으면 무시
+    let bmArrears = null;
+    try { bmArrears = await supabaseCall('contracts', 'GET', null, '?status=eq.active'); } catch(e) {}
     let totalArrears = 0;
     if (bmArrears && bmArrears.length) {
         totalArrears = bmArrears.reduce((s, c) => s + parseFloat(c.arrears_amount || 0), 0);
