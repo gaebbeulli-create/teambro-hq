@@ -1738,6 +1738,24 @@
         </div>
     </div>
 
+    <!-- 라이더 상세보기 모달 -->
+    <div id="riderDetailModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:700px">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-400">🏍️ 라이더 상세정보</h3>
+                <button onclick="closeModal('riderDetailModal')" class="text-gray-400 text-2xl">&times;</button>
+            </div>
+            <div id="riderDetailContent" class="space-y-4">
+                <!-- 내용 동적 생성 -->
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="closeModal('riderDetailModal')" class="flex-1 btn-secondary">닫기</button>
+                <button id="riderDetailEditBtn" class="flex-1 btn-primary">수정</button>
+                <button id="riderDetailDeleteBtn" class="flex-1 btn-danger hidden">삭제</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 사용자 모달 -->
     <div id="userModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:500px">
@@ -2754,7 +2772,8 @@ function renderTable(type) {
             const ssnFull = r.resident_number || '-';
             const ssnMasked = r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-';
             const statusBadge = r.status === '퇴사' ? 'badge-inactive">퇴사' : 'badge-active">근무';
-            return '<tr><td class="font-bold">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+            const deleteBtn = currentUser && currentUser.role === 'MASTER' ? '<button onclick="deleteRider(' + r.id + ')" class="btn-danger btn-sm">삭제</button>' : '';
+            return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showRiderDetail(' + r.id + ')">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm mr-1">수정</button>' + deleteBtn + '</td></tr>';
         }).join('');
     } else if (type === 'partner') {
         const tbody = document.getElementById('partnerTableBody');
@@ -2958,6 +2977,108 @@ function showPartnerDetail(id) {
     document.getElementById('partnerDetailContent').innerHTML = html;
     document.getElementById('partnerDetailEditBtn').onclick = () => { closeModal('partnerDetailModal'); editItem('partner', id); };
     openModal('partnerDetailModal');
+}
+
+// 라이더 상세보기
+function showRiderDetail(id) {
+    const r = riderList.find(x => x.id === id);
+    if (!r) return;
+    
+    const p = partnerList.find(x => x.id == r.partner_id);
+    const banks = { KB: '국민', SHINHAN: '신한', WOORI: '우리', HANA: '하나', NH: '농협', IBK: '기업', KAKAO: '카카오', TOSS: '토스' };
+    
+    let html = `
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">📋 기본 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-400">이름:</span> <span class="font-bold">${r.name || '-'}</span></div>
+                <div><span class="text-gray-400">상태:</span> <span class="badge ${r.status === '퇴사' ? 'badge-inactive">퇴사' : 'badge-active">근무'}</span></div>
+                <div><span class="text-gray-400">주민번호:</span> ${r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-'}</div>
+                <div><span class="text-gray-400">연락처:</span> ${r.phone || '-'}</div>
+                <div><span class="text-gray-400">소속 협력사:</span> <span class="font-bold text-blue-400">${p ? p.name : '-'}</span></div>
+                <div><span class="text-gray-400">과세유형:</span> ${r.tax_type || '-'}</div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">🚀 플랫폼 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-400">배민 ID:</span> <span class="font-bold">${r.baemin_id || '-'}</span></div>
+                <div><span class="text-gray-400">쿠팡 ID:</span> <span class="font-bold">${r.coupang_id || '-'}</span></div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">💰 계좌 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-400">은행:</span> ${banks[r.bank] || r.bank || '-'}</div>
+                <div><span class="text-gray-400">계좌번호:</span> ${r.account_no || '-'}</div>
+                <div><span class="text-gray-400">예금주:</span> ${r.account_holder || r.name || '-'}</div>
+            </div>
+        </div>
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">📎 첨부파일</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>${r.file_contract ? '<a href="' + r.file_contract + '" target="_blank" class="text-blue-400 hover:underline">📝 계약서</a>' : '<span class="text-gray-500">계약서 없음</span>'}</div>
+                <div>${r.file_id ? '<a href="' + r.file_id + '" target="_blank" class="text-blue-400 hover:underline">🪪 신분증</a>' : '<span class="text-gray-500">신분증 없음</span>'}</div>
+            </div>
+        </div>
+        
+        ${r.memo ? `
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-blue-400">📝 메모</h4>
+            <div class="text-sm">${r.memo}</div>
+        </div>` : ''}
+        
+        <div class="p-4 rounded-lg" style="background: var(--bg-secondary)">
+            <h4 class="text-sm font-bold mb-3 text-gray-400">⏱️ 등록 정보</h4>
+            <div class="text-sm text-gray-500">
+                등록일: ${r.created_at ? new Date(r.created_at).toLocaleDateString('ko-KR') : '-'}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('riderDetailContent').innerHTML = html;
+    document.getElementById('riderDetailEditBtn').onclick = () => { closeModal('riderDetailModal'); editItem('rider', id); };
+    
+    // 마스터 권한만 삭제 버튼 표시
+    const deleteBtn = document.getElementById('riderDetailDeleteBtn');
+    if (currentUser && currentUser.role === 'MASTER') {
+        deleteBtn.classList.remove('hidden');
+        deleteBtn.onclick = () => { closeModal('riderDetailModal'); deleteRider(id); };
+    } else {
+        deleteBtn.classList.add('hidden');
+    }
+    
+    openModal('riderDetailModal');
+}
+
+// 라이더 삭제 (마스터 권한만)
+async function deleteRider(id) {
+    if (!currentUser || currentUser.role !== 'MASTER') {
+        showToast('마스터 권한만 삭제할 수 있습니다', 'error');
+        return;
+    }
+    
+    const r = riderList.find(x => x.id === id);
+    if (!r) return;
+    
+    if (!confirm('라이더 "' + r.name + '"을(를) 정말 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다.')) return;
+    
+    try {
+        const result = await supabaseCall('riders', 'DELETE', null, '?id=eq.' + id);
+        if (result !== false) {
+            showToast('라이더 삭제 완료');
+            await loadAllData();
+            loadStats('rider');
+            renderTable('rider');
+            loadDashboard();
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('삭제 실패', 'error');
+    }
 }
 
 async function deletePartner(id) {
