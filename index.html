@@ -1623,7 +1623,7 @@
                 <!-- 🔐 비밀 공간 -->
                 <div id="tab-secret" class="tab-content hidden">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-purple-400">🔐 비밀 공간</h2>
+                        <h2 class="text-2xl font-bold text-purple-400">🔐 Secret Space</h2>
                         <button onclick="lockSecretSpace()" class="btn-secondary btn-sm">🔒 잠그기</button>
                     </div>
                     
@@ -7603,8 +7603,8 @@ function openSecretAccess() {
         <div class="modal-content" style="max-width:400px">
             <div class="text-center mb-6">
                 <div class="text-5xl mb-4">🔐</div>
-                <h3 class="text-xl font-bold text-purple-400">비밀 공간</h3>
-                <p class="text-gray-500 text-sm mt-2">접근 코드를 입력하세요</p>
+                <h3 class="text-xl font-bold text-purple-400">Secret Space</h3>
+                <p class="text-gray-500 text-sm mt-2">Enter access code</p>
             </div>
             <form onsubmit="verifySecretCode(event)">
                 <input type="password" id="secretCodeInput" class="input-field text-center text-2xl tracking-widest" 
@@ -7616,7 +7616,7 @@ function openSecretAccess() {
                 </div>
             </form>
             <div class="text-center mt-4">
-                <button onclick="showSetSecretCode()" class="text-xs text-gray-500 hover:text-purple-400">코드 설정/변경</button>
+                <button onclick="showSetSecretCode()" class="text-xs text-gray-500 hover:text-purple-400">Settings</button>
             </div>
         </div>
     `;
@@ -7679,7 +7679,7 @@ function enterSecretSpace() {
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     document.getElementById('tab-secret').classList.remove('hidden');
-    document.getElementById('pageTitle').textContent = '🔐 비밀 공간';
+    document.getElementById('pageTitle').textContent = '🔐 Secret Space';
     loadSecretData();
     showSecretTab('cashbook');
 }
@@ -7687,7 +7687,7 @@ function enterSecretSpace() {
 function lockSecretSpace() {
     secretUnlocked = false;
     showTab('dashboard');
-    showToast('비밀 공간이 잠겼습니다', 'info');
+    showToast('Secret Space locked', 'info');
 }
 
 // 비밀 탭 전환
