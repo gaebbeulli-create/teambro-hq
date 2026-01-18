@@ -3443,6 +3443,11 @@ function exportToExcel(type) {
 async function uploadExcel(type, input) {
     const file = input.files[0];
     if (!file) return;
+    
+    // 업로드 시작 표시
+    const typeName = type === 'rider' ? '라이더' : type === 'partner' ? '협력사' : '영업자';
+    showToast('📤 ' + typeName + ' 데이터 업로드 중...', 'info');
+    
     const reader = new FileReader();
     reader.onload = async (e) => {
         try {
@@ -3453,6 +3458,7 @@ async function uploadExcel(type, input) {
             const tpl = TEMPLATES[type];
             let count = 0;
             let duplicateCount = 0;
+            const totalRows = rows.length - 1;
             
             // 기존 데이터 가져와서 중복 체크용 Set 생성
             const existingData = type === 'rider' ? riderList : type === 'partner' ? partnerList : salesList;
@@ -3463,6 +3469,11 @@ async function uploadExcel(type, input) {
             const existingSalesCodes = new Set(existingData.map(d => d.sales_code?.trim().toLowerCase()));
             
             for (let i = 1; i < rows.length; i++) {
+                // 진행률 표시 (10건마다)
+                if (i % 10 === 0) {
+                    showToast('📤 업로드 중... ' + i + '/' + totalRows, 'info');
+                }
+                
                 const row = rows[i];
                 if (!row || !row[0]) continue;
                 const data = {};
@@ -3521,9 +3532,9 @@ async function uploadExcel(type, input) {
             }
             
             if (duplicateCount > 0) {
-                showToast(count + '건 등록, ' + duplicateCount + '건 중복 제외', 'info');
+                showToast('✅ ' + count + '건 등록 완료! (' + duplicateCount + '건 중복 제외)', 'success');
             } else {
-                showToast(count + '건 업로드 완료');
+                showToast('✅ ' + count + '건 업로드 완료!', 'success');
             }
             await loadAllData();
             loadStats(type); renderTable(type); loadDashboard();
