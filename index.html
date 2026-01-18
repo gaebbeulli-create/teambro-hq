@@ -496,7 +496,7 @@
                                 <div class="flex justify-between"><span class="text-zinc-500">이번달 정산</span><span class="text-amber-400" id="bc-settlement">₩0</span></div>
                                 <div class="flex justify-between"><span class="text-zinc-500">수익 (수수료)</span><span class="text-emerald-400 font-medium" id="bc-profit">₩0</span></div>
                             </div>
-                            <a href="https://brocompany.broerp.kr" target="_blank" class="block mt-4 text-center text-xs text-blue-400 hover:text-blue-300 transition-colors">ERP 바로가기 →</a>
+                            <a href="https://gaebbeulli-create.github.io/teambro-erp/" target="_blank" class="block mt-4 text-center text-xs text-blue-400 hover:text-blue-300 transition-colors">ERP 바로가기 →</a>
                         </div>
                         
                         <!-- 브로모터스 -->
@@ -510,7 +510,7 @@
                                 <div class="flex justify-between"><span class="text-zinc-500">미수금</span><span class="text-red-400" id="bm-arrears">₩0</span></div>
                                 <div class="flex justify-between"><span class="text-zinc-500">순수익</span><span class="text-emerald-400 font-medium" id="bm-profit">₩0</span></div>
                             </div>
-                            <a href="https://bromotors.broerp.kr" target="_blank" class="block mt-4 text-center text-xs text-purple-400 hover:text-purple-300 transition-colors">ERP 바로가기 →</a>
+                            <a href="https://gaebbeulli-create.github.io/bromotors/" target="_blank" class="block mt-4 text-center text-xs text-purple-400 hover:text-purple-300 transition-colors">ERP 바로가기 →</a>
                         </div>
                         
                         <!-- 그룹 합계 -->
@@ -4848,8 +4848,58 @@ let fundList = [];
 
 // 자금 데이터 로드
 async function loadFunds() {
-    const data = await supabaseCall('fund_transfers', 'GET', null, '?order=transfer_date.desc');
-    if (data) fundList = data;
+    // 기존 수동 등록 자금 내역
+    const manualData = await supabaseCall('fund_transfers', 'GET', null, '?order=transfer_date.desc');
+    if (manualData) fundList = manualData;
+    
+    // 브로컴퍼니 현금출납장에서 자동 가져오기
+    const bcCashbook = await supabaseCall('cashbook', 'GET', null, '?order=trans_date.desc&limit=50');
+    
+    // 브로모터스 현금출납장에서 자동 가져오기
+    const bmCashbook = await supabaseCall('bm_cashbook', 'GET', null, '?order=trans_date.desc&limit=50');
+    
+    // 자동 연동 데이터를 fundList 형식으로 변환해서 합치기
+    const autoFunds = [];
+    
+    // 브로컴퍼니 데이터 변환
+    if (bcCashbook && bcCashbook.length) {
+        bcCashbook.forEach(c => {
+            autoFunds.push({
+                id: 'bc_' + c.id,
+                transfer_date: c.trans_date,
+                subsidiary: 'brocompany',
+                transfer_type: parseFloat(c.deposit || 0) > 0 ? 'in' : 'out',
+                amount: parseFloat(c.deposit || 0) > 0 ? c.deposit : c.withdrawal,
+                purpose: c.description || c.counterparty || '-',
+                status: 'completed',
+                auto_sync: true
+            });
+        });
+    }
+    
+    // 브로모터스 데이터 변환
+    if (bmCashbook && bmCashbook.length) {
+        bmCashbook.forEach(c => {
+            autoFunds.push({
+                id: 'bm_' + c.id,
+                transfer_date: c.trans_date,
+                subsidiary: 'bromotors',
+                transfer_type: parseFloat(c.deposit || 0) > 0 ? 'in' : 'out',
+                amount: parseFloat(c.deposit || 0) > 0 ? c.deposit : c.withdrawal,
+                purpose: c.description || c.counterparty || '-',
+                status: 'completed',
+                auto_sync: true
+            });
+        });
+    }
+    
+    // 수동 + 자동 합치기 (날짜순 정렬)
+    fundList = [...fundList, ...autoFunds].sort((a, b) => {
+        const dateA = a.transfer_date || '';
+        const dateB = b.transfer_date || '';
+        return dateB.localeCompare(dateA);
+    });
+    
     renderFundTable();
     updateFundStats();
     updateSubsidiaryStats();
@@ -4877,26 +4927,51 @@ function updateFundStats() {
     document.getElementById('group-balance').textContent = '₩' + outstanding.toLocaleString();
 }
 
-// 자회사 현황 업데이트 (실제 데이터 연동 필요)
-function updateSubsidiaryStats() {
-    // 브로컴퍼니 - 정산 데이터에서
+// 자회사 현황 업데이트 (실제 현금출납장 데이터 연동)
+async function updateSubsidiaryStats() {
     const thisMonth = new Date().toISOString().slice(0, 7);
+    
+    // 브로컴퍼니 - 현금출납장에서 이번달 데이터
+    const bcCashbook = await supabaseCall('cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31');
+    let bcDeposit = 0, bcWithdraw = 0;
+    if (bcCashbook && bcCashbook.length) {
+        bcDeposit = bcCashbook.reduce((s, c) => s + parseFloat(c.deposit || 0), 0);
+        bcWithdraw = bcCashbook.reduce((s, c) => s + parseFloat(c.withdrawal || 0), 0);
+    }
+    
+    // 브로컴퍼니 정산 데이터
     const bcSettlement = settlementList.filter(s => s.settlement_date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.total_amount || 0), 0);
     const bcFee = settlementList.filter(s => s.settlement_date?.startsWith(thisMonth)).reduce((sum, s) => sum + parseFloat(s.fee_amount || 0), 0);
     
-    document.getElementById('bc-revenue').textContent = '₩' + bcSettlement.toLocaleString();
-    document.getElementById('bc-settlement').textContent = '₩' + (bcSettlement - bcFee).toLocaleString();
-    document.getElementById('bc-profit').textContent = '₩' + bcFee.toLocaleString();
+    document.getElementById('bc-revenue').textContent = '₩' + (bcDeposit || bcSettlement).toLocaleString();
+    document.getElementById('bc-settlement').textContent = '₩' + bcWithdraw.toLocaleString();
+    document.getElementById('bc-profit').textContent = '₩' + (bcDeposit - bcWithdraw).toLocaleString();
     
-    // 브로모터스 - 렌탈 데이터 (별도 DB라면 API 필요)
-    // 임시로 0 표시
-    document.getElementById('bm-revenue').textContent = '₩0';
-    document.getElementById('bm-arrears').textContent = '₩0';
-    document.getElementById('bm-profit').textContent = '₩0';
+    // 브로모터스 - 현금출납장에서 이번달 데이터
+    const bmCashbook = await supabaseCall('bm_cashbook', 'GET', null, '?trans_date=gte.' + thisMonth + '-01&trans_date=lte.' + thisMonth + '-31');
+    let bmDeposit = 0, bmWithdraw = 0;
+    if (bmCashbook && bmCashbook.length) {
+        bmDeposit = bmCashbook.reduce((s, c) => s + parseFloat(c.deposit || 0), 0);
+        bmWithdraw = bmCashbook.reduce((s, c) => s + parseFloat(c.withdrawal || 0), 0);
+    }
+    
+    // 브로모터스 미수금 (렌탈 연체)
+    const bmArrears = await supabaseCall('bm_contracts', 'GET', null, '?status=eq.active');
+    let totalArrears = 0;
+    if (bmArrears && bmArrears.length) {
+        totalArrears = bmArrears.reduce((s, c) => s + parseFloat(c.arrears_amount || 0), 0);
+    }
+    
+    document.getElementById('bm-revenue').textContent = '₩' + bmDeposit.toLocaleString();
+    document.getElementById('bm-arrears').textContent = '₩' + totalArrears.toLocaleString();
+    document.getElementById('bm-profit').textContent = '₩' + (bmDeposit - bmWithdraw).toLocaleString();
     
     // 그룹 합계
-    document.getElementById('group-revenue').textContent = '₩' + bcSettlement.toLocaleString();
-    document.getElementById('group-profit').textContent = '₩' + bcFee.toLocaleString();
+    const totalRevenue = (bcDeposit || bcSettlement) + bmDeposit;
+    const totalProfit = (bcDeposit - bcWithdraw) + (bmDeposit - bmWithdraw);
+    document.getElementById('group-revenue').textContent = '₩' + totalRevenue.toLocaleString();
+    document.getElementById('group-profit').textContent = '₩' + totalProfit.toLocaleString();
+    document.getElementById('group-balance').textContent = '₩' + totalProfit.toLocaleString();
 }
 
 // 자금 테이블 렌더
@@ -4909,25 +4984,27 @@ function renderFundTable() {
     }
     
     const subsidiaryNames = { brocompany: '브로컴퍼니', bromotors: '브로모터스' };
-    const typeNames = { out: '집행', in: '회수' };
+    const typeNames = { out: '출금', in: '입금' };
     const typeColors = { out: 'text-red-400', in: 'text-green-400' };
     const statusBadges = { completed: 'badge-active', pending: 'badge-pending', cancelled: 'badge-error' };
     const statusNames = { completed: '완료', pending: '대기', cancelled: '취소' };
     
-    tbody.innerHTML = fundList.map(f => 
-        '<tr>' +
+    tbody.innerHTML = fundList.slice(0, 20).map(f => {
+        const isAuto = f.auto_sync === true;
+        return '<tr class="' + (isAuto ? 'opacity-80' : '') + '">' +
         '<td>' + (f.transfer_date || '-') + '</td>' +
-        '<td class="font-bold">' + (subsidiaryNames[f.subsidiary] || f.subsidiary || '-') + '</td>' +
+        '<td class="font-bold">' + (subsidiaryNames[f.subsidiary] || f.subsidiary || '-') + (isAuto ? ' <span class="text-xs text-blue-400">🔄</span>' : '') + '</td>' +
         '<td><span class="' + (typeColors[f.transfer_type] || '') + ' font-bold">' + (typeNames[f.transfer_type] || f.transfer_type) + '</span></td>' +
         '<td class="text-right font-bold ' + (typeColors[f.transfer_type] || '') + '">' + (f.transfer_type === 'out' ? '-' : '+') + '₩' + parseInt(f.amount || 0).toLocaleString() + '</td>' +
         '<td class="text-sm">' + (f.purpose || '-') + '</td>' +
         '<td><span class="badge ' + (statusBadges[f.status] || 'badge-pending') + '">' + (statusNames[f.status] || f.status) + '</span></td>' +
         '<td>' +
+        (isAuto ? '<span class="text-xs text-gray-500">자동연동</span>' : 
         '<button onclick="editFund(' + f.id + ')" class="btn-secondary btn-sm mr-1">✏️</button>' +
-        '<button onclick="deleteFund(' + f.id + ')" class="btn-danger btn-sm">🗑️</button>' +
+        '<button onclick="deleteFund(' + f.id + ')" class="btn-danger btn-sm">🗑️</button>') +
         '</td>' +
-        '</tr>'
-    ).join('');
+        '</tr>';
+    }).join('');
 }
 
 // 자금 등록 모달 열기
