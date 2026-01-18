@@ -6551,6 +6551,12 @@ async function submitDocUpload(e) {
     closeModal('docUploadModal');
     renderCorpDocTable();
     document.getElementById('docUploadProgress').classList.add('hidden');
+    
+    // 법인 상세에서 업로드한 경우, 해당 법인 상세 다시 열기
+    if (entityName && currentEntityId) {
+        showEntityDetail(currentEntityId);
+        setTimeout(() => showEntityDetailTab('docs'), 100);
+    }
 }
 
 // 파일 다운로드 (법인서류)
@@ -6559,22 +6565,17 @@ async function downloadCorpDoc(id) {
     if (!doc) return;
     
     try {
-        const { data, error } = await window.supabaseClient.storage
-            .from('corp-documents')
-            .download(doc.file_path);
-        
-        if (error) throw error;
-        
-        const url = URL.createObjectURL(data);
+        // Public URL로 다운로드
+        const url = SUPABASE_URL + '/storage/v1/object/public/corp-documents/' + doc.file_path;
         const a = document.createElement('a');
         a.href = url;
         a.download = doc.file_name;
+        a.target = '_blank';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
         
-        showToast('다운로드 완료');
+        showToast('다운로드 시작');
     } catch (err) {
         console.error('Download error:', err);
         showToast('다운로드 실패', 'error');
@@ -6589,10 +6590,16 @@ async function deleteCorpDoc(id) {
     if (!doc) return;
     
     try {
-        await window.supabaseClient.storage
-            .from('corp-documents')
-            .remove([doc.file_path]);
+        // Storage에서 파일 삭제
+        await fetch(SUPABASE_URL + '/storage/v1/object/corp-documents/' + doc.file_path, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY
+            }
+        });
         
+        // DB에서 레코드 삭제
         await supabaseCall('corp_documents', 'DELETE', null, '?id=eq.' + id);
         
         corpDocList = corpDocList.filter(d => d.id !== id);
