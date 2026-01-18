@@ -657,16 +657,18 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-blue-400" id="rider-total">0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterList('rider','active')"><div class="text-gray-400 text-xs">활성</div><div class="text-xl font-bold text-green-400" id="rider-active">0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer" onclick="filterList('rider','inactive')"><div class="text-gray-400 text-xs">비활성</div><div class="text-xl font-bold text-gray-400" id="rider-inactive">0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">주민번호 미등록</div><div class="text-xl font-bold text-red-400" id="rider-nossn">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-blue-400" onclick="filterRiderList('')"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-blue-400" id="rider-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-green-400" onclick="filterRiderList('계약중')"><div class="text-gray-400 text-xs">계약중</div><div class="text-xl font-bold text-green-400" id="rider-active">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-gray-400" onclick="filterRiderList('계약종료')"><div class="text-gray-400 text-xs">계약종료</div><div class="text-xl font-bold text-gray-400" id="rider-inactive">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-red-400" onclick="filterRiderList('nossn')"><div class="text-gray-400 text-xs">주민번호 미등록</div><div class="text-xl font-bold text-red-400" id="rider-nossn">0</div></div>
                     </div>
                     <div class="glass-card rounded-xl p-3 mb-4">
                         <div class="flex flex-wrap gap-2">
-                            <select id="riderStatusFilter" class="input-field" style="width:100px" onchange="renderTable('rider')"><option value="">전체</option><option value="active">활성</option><option value="inactive">비활성</option></select>
+                            <select id="riderStatusFilter" class="input-field" style="width:120px" onchange="renderTable('rider')"><option value="">전체 상태</option><option value="계약중">계약중</option><option value="계약종료">계약종료</option></select>
                             <select id="riderPartnerFilter" class="input-field" style="width:150px" onchange="renderTable('rider')"><option value="">전체 협력사</option></select>
+                            <select id="riderSsnFilter" class="input-field" style="width:140px" onchange="renderTable('rider')"><option value="">주민번호 전체</option><option value="has">주민번호 있음</option><option value="none">주민번호 없음</option></select>
                             <input type="text" id="riderSearch" class="input-field flex-1" style="min-width:150px" placeholder="검색..." onkeyup="renderTable('rider')">
+                            <button onclick="exportFilteredRiders()" class="btn-secondary btn-sm">📊 필터 다운</button>
                         </div>
                     </div>
                     <div class="glass-card rounded-xl overflow-hidden">
@@ -688,14 +690,22 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-blue-400" id="partner-total">0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">사업자</div><div class="text-xl font-bold text-blue-400" id="partner-biz">0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">비사업자</div><div class="text-xl font-bold text-orange-400" id="partner-nonbiz">0</div></div>
-                        <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">소속 라이더</div><div class="text-xl font-bold text-blue-400" id="partner-riders">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-blue-400" onclick="filterPartnerList('')"><div class="text-gray-400 text-xs">전체</div><div class="text-xl font-bold text-blue-400" id="partner-total">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-blue-400" onclick="filterPartnerList('biz')"><div class="text-gray-400 text-xs">사업자</div><div class="text-xl font-bold text-blue-400" id="partner-biz">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-orange-400" onclick="filterPartnerList('non_biz')"><div class="text-gray-400 text-xs">비사업자</div><div class="text-xl font-bold text-orange-400" id="partner-nonbiz">0</div></div>
+                        <div class="glass-card rounded-xl p-3 text-center cursor-pointer hover:ring-2 hover:ring-green-400" onclick="filterPartnerList('hasRider')"><div class="text-gray-400 text-xs">소속 라이더</div><div class="text-xl font-bold text-green-400" id="partner-riders">0</div></div>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 mb-4">
+                        <div class="flex flex-wrap gap-2">
+                            <select id="partnerTypeFilter" class="input-field" style="width:120px" onchange="renderTable('partner')"><option value="">전체 구분</option><option value="biz">사업자</option><option value="non_biz">비사업자</option></select>
+                            <select id="partnerRiderFilter" class="input-field" style="width:150px" onchange="renderTable('partner')"><option value="">라이더 전체</option><option value="has">라이더 있음</option><option value="none">라이더 없음</option></select>
+                            <input type="text" id="partnerSearch" class="input-field flex-1" style="min-width:150px" placeholder="검색 (협력사명, 코드, 대표자)..." onkeyup="renderTable('partner')">
+                            <button onclick="exportFilteredPartners()" class="btn-secondary btn-sm">📊 필터 다운</button>
+                        </div>
                     </div>
                     <div class="glass-card rounded-xl overflow-hidden">
                         <table class="data-table"><thead><tr><th>협력사명</th><th>코드</th><th>구분</th><th>배달권역</th><th>대표자</th><th>연락처</th><th>라이더수</th><th>관리</th></tr></thead>
-                        <tbody id="partnerTableBody"><tr><td colspan="7" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
+                        <tbody id="partnerTableBody"><tr><td colspan="8" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
                     </div>
                 </div>
 
@@ -2746,9 +2756,9 @@ function loadDashboard() {
 function loadStats(type) {
     if (type === 'rider') {
         document.getElementById('rider-total').textContent = riderList.length;
-        document.getElementById('rider-active').textContent = riderList.filter(r => r.status === 'active').length;
-        document.getElementById('rider-inactive').textContent = riderList.filter(r => r.status === 'inactive').length;
-        document.getElementById('rider-nossn').textContent = riderList.filter(r => !r.ssn).length;
+        document.getElementById('rider-active').textContent = riderList.filter(r => r.status === '계약중' || !r.status).length;
+        document.getElementById('rider-inactive').textContent = riderList.filter(r => r.status === '계약종료').length;
+        document.getElementById('rider-nossn').textContent = riderList.filter(r => !r.resident_number || r.resident_number.trim() === '').length;
     } else if (type === 'partner') {
         document.getElementById('partner-total').textContent = partnerList.length;
         document.getElementById('partner-biz').textContent = partnerList.filter(p => p.type === 'biz').length;
@@ -2773,11 +2783,18 @@ function renderTable(type) {
     if (type === 'rider') {
         const sf = document.getElementById('riderStatusFilter').value;
         const pf = document.getElementById('riderPartnerFilter').value;
+        const ssnf = document.getElementById('riderSsnFilter').value;
         const q = (document.getElementById('riderSearch').value || '').toLowerCase();
         let list = riderList;
         if (sf) list = list.filter(r => r.status === sf);
         if (pf) list = list.filter(r => r.partner_id == pf);
+        if (ssnf === 'has') list = list.filter(r => r.resident_number && r.resident_number.trim() !== '');
+        if (ssnf === 'none') list = list.filter(r => !r.resident_number || r.resident_number.trim() === '');
         if (q) list = list.filter(r => (r.name||'').toLowerCase().includes(q) || (r.phone||'').includes(q));
+        
+        // 필터된 목록 저장 (다운로드용)
+        window.filteredRiderList = list;
+        
         const tbody = document.getElementById('riderTableBody');
         if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
         tbody.innerHTML = list.map(r => {
@@ -2789,9 +2806,21 @@ function renderTable(type) {
             return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showRiderDetail(' + r.id + ')">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm mr-1">수정</button>' + deleteBtn + '</td></tr>';
         }).join('');
     } else if (type === 'partner') {
+        const tf = document.getElementById('partnerTypeFilter')?.value || '';
+        const rf = document.getElementById('partnerRiderFilter')?.value || '';
+        const q = (document.getElementById('partnerSearch')?.value || '').toLowerCase();
+        let list = partnerList;
+        if (tf) list = list.filter(p => p.type === tf);
+        if (rf === 'has') list = list.filter(p => riderList.some(r => r.partner_id == p.id));
+        if (rf === 'none') list = list.filter(p => !riderList.some(r => r.partner_id == p.id));
+        if (q) list = list.filter(p => (p.name||'').toLowerCase().includes(q) || (p.code||'').toLowerCase().includes(q) || (p.rep_name||'').toLowerCase().includes(q));
+        
+        // 필터된 목록 저장 (다운로드용)
+        window.filteredPartnerList = list;
+        
         const tbody = document.getElementById('partnerTableBody');
-        if (!partnerList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
-        tbody.innerHTML = partnerList.map(p => {
+        if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+        tbody.innerHTML = list.map(p => {
             const cnt = riderList.filter(r => r.partner_id == p.id).length;
             return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showPartnerDetail(' + p.id + ')">' + p.name + '</td><td>' + (p.code||'-') + '</td><td><span class="badge ' + (p.type==='biz'?'badge-biz">사업자':'badge-nonbiz">비사업자') + '</span></td><td>' + (p.region||'-') + '</td><td>' + (p.rep_name||'-') + '</td><td>' + (p.phone||'-') + '</td><td>' + cnt + '명</td><td><button onclick="editItem(\'partner\',' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePartner(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
         }).join('');
@@ -2834,6 +2863,69 @@ function filterList(type, status) {
     if (type === 'rider') { document.getElementById('riderStatusFilter').value = status; renderTable('rider'); }
 }
 
+// 협력사 필터 적용
+function filterPartnerList(filter) {
+    document.getElementById('partnerTypeFilter').value = '';
+    document.getElementById('partnerRiderFilter').value = '';
+    document.getElementById('partnerSearch').value = '';
+    
+    if (filter === 'biz') {
+        document.getElementById('partnerTypeFilter').value = 'biz';
+    } else if (filter === 'non_biz') {
+        document.getElementById('partnerTypeFilter').value = 'non_biz';
+    } else if (filter === 'hasRider') {
+        document.getElementById('partnerRiderFilter').value = 'has';
+    }
+    
+    renderTable('partner');
+    showToast(filter ? '필터 적용됨' : '전체 목록', 'info');
+}
+
+// 필터된 협력사 목록 엑셀 다운로드
+function exportFilteredPartners() {
+    const list = window.filteredPartnerList || partnerList;
+    if (!list.length) {
+        showToast('다운로드할 데이터 없음', 'error');
+        return;
+    }
+    
+    const data = list.map(p => {
+        const riderCnt = riderList.filter(r => r.partner_id == p.id).length;
+        return {
+            '협력사명': p.name || '',
+            '협력사코드': p.code || '',
+            '구분': p.type === 'biz' ? '사업자' : '비사업자',
+            '배달권역': p.region || '',
+            '대표자': p.rep_name || '',
+            '대표자주민번호': p.rep_ssn || '',
+            '연락처': p.phone || '',
+            '사업자번호': p.biz_no || '',
+            '업종': p.biz_type || '',
+            '주소': p.address || '',
+            '은행': p.bank || '',
+            '계좌번호': p.account_no || '',
+            '소속라이더수': riderCnt,
+            '메모': p.memo || ''
+        };
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '협력사목록');
+    
+    const tf = document.getElementById('partnerTypeFilter').value;
+    const rf = document.getElementById('partnerRiderFilter').value;
+    let filename = '협력사목록';
+    if (tf === 'biz') filename += '_사업자';
+    if (tf === 'non_biz') filename += '_비사업자';
+    if (rf === 'has') filename += '_라이더있음';
+    if (rf === 'none') filename += '_라이더없음';
+    filename += '_' + new Date().toISOString().slice(0,10) + '.xlsx';
+    
+    XLSX.writeFile(wb, filename);
+    showToast(list.length + '건 다운로드 완료');
+}
+
 function loadPartnerOptions() {
     const opt = '<option value="">전체 협력사</option>' + partnerList.map(p => '<option value="' + p.id + '">' + p.name + '</option>').join('');
     document.getElementById('riderPartnerFilter').innerHTML = opt;
@@ -2844,6 +2936,70 @@ function toggleBizFields() { document.getElementById('partnerBizFields').classLi
 function toggleSalesBizFields() { document.getElementById('salesBizFields').classList.toggle('hidden', document.getElementById('sales-type').value === 'individual'); }
 
 function openRiderModal() { document.getElementById('riderModalTitle').textContent = '🏍️ 라이더 등록'; document.getElementById('riderForm').reset(); document.getElementById('rider-id').value = ''; openModal('riderModal'); }
+
+// 라이더 필터 적용
+function filterRiderList(filter) {
+    // 필터 초기화
+    document.getElementById('riderStatusFilter').value = '';
+    document.getElementById('riderPartnerFilter').value = '';
+    document.getElementById('riderSsnFilter').value = '';
+    document.getElementById('riderSearch').value = '';
+    
+    if (filter === '계약중') {
+        document.getElementById('riderStatusFilter').value = '계약중';
+    } else if (filter === '계약종료') {
+        document.getElementById('riderStatusFilter').value = '계약종료';
+    } else if (filter === 'nossn') {
+        document.getElementById('riderSsnFilter').value = 'none';
+    }
+    // filter === '' 이면 전체 (필터 없음)
+    
+    renderTable('rider');
+    showToast(filter ? '필터 적용됨' : '전체 목록', 'info');
+}
+
+// 필터된 라이더 목록 엑셀 다운로드
+function exportFilteredRiders() {
+    const list = window.filteredRiderList || riderList;
+    if (!list.length) {
+        showToast('다운로드할 데이터 없음', 'error');
+        return;
+    }
+    
+    const data = list.map(r => {
+        const p = partnerList.find(x => x.id == r.partner_id);
+        return {
+            '라이더이름': r.name || '',
+            '주민번호': r.resident_number || '',
+            '연락처': r.phone || '',
+            '주소': r.address || '',
+            '소속협력사': p ? p.name : '',
+            '배민ID': r.baemin_id || '',
+            '쿠팡ID': r.coupang_id || '',
+            '예금주': r.account_holder || '',
+            '계좌번호': r.account_no || '',
+            '세금처리': r.tax_type || '',
+            '상태': r.status || '계약중',
+            '메모': r.memo || ''
+        };
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '라이더목록');
+    
+    // 필터 상태로 파일명 생성
+    const sf = document.getElementById('riderStatusFilter').value;
+    const ssnf = document.getElementById('riderSsnFilter').value;
+    let filename = '라이더목록';
+    if (sf) filename += '_' + sf;
+    if (ssnf === 'none') filename += '_주민번호미등록';
+    if (ssnf === 'has') filename += '_주민번호등록';
+    filename += '_' + new Date().toISOString().slice(0,10) + '.xlsx';
+    
+    XLSX.writeFile(wb, filename);
+    showToast(list.length + '건 다운로드 완료');
+}
 function openPartnerModal() { document.getElementById('partnerModalTitle').textContent = '🤝 협력사 등록'; document.getElementById('partnerForm').reset(); document.getElementById('partner-id').value = ''; document.getElementById('partnerBizFields').classList.add('hidden'); openModal('partnerModal'); }
 function openSalesModal() { document.getElementById('salesModalTitle').textContent = '💼 영업자 등록'; document.getElementById('salesForm').reset(); document.getElementById('sales-id').value = ''; document.getElementById('salesBizFields').classList.add('hidden'); openModal('salesModal'); }
 
