@@ -2765,14 +2765,15 @@ async function enterSystem(system) {
         loadDashboard();
     } else if (system === 'brocompany' || system === 'bromotors') {
         // URL 파라미터로 세션 전달 (다른 도메인이라 localStorage 공유 안됨)
-        const sessionData = btoa(JSON.stringify({
+        // 한글 인코딩을 위해 encodeURIComponent 후 btoa
+        const sessionData = btoa(encodeURIComponent(JSON.stringify({
             userId: currentUser.id,
             username: currentUser.username,
             name: currentUser.name,
             role: currentUser.role,
             timestamp: Date.now()
-        }));
-        window.location.href = 'https://gaebbeulli-create.github.io/teambro-erp/?session=' + encodeURIComponent(sessionData);
+        })));
+        window.location.href = 'https://gaebbeulli-create.github.io/teambro-erp/?session=' + sessionData;
     }
 }
 
