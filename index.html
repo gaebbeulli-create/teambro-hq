@@ -11,50 +11,56 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
         
-        /* 라이트모드 - 따뜻한 오프화이트 */
+        /* 2026 트렌드 - Expressive Minimalism + Soft Spatial */
         :root {
-            --bg-primary: #fafafa;
-            --bg-secondary: #f4f4f5;
-            --bg-tertiary: #e4e4e7;
+            --bg-primary: #fefefe;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #eef1f6;
             --bg-card: #ffffff;
-            --border: #e4e4e7;
-            --border-hover: #d4d4d8;
-            --text-primary: #27272a;
-            --text-secondary: #52525b;
-            --text-muted: #a1a1aa;
-            --accent: #3b82f6;
-            --accent-light: #eff6ff;
-            --success: #22c55e;
-            --success-light: #f0fdf4;
-            --warning: #f59e0b;
-            --warning-light: #fffbeb;
-            --danger: #ef4444;
-            --danger-light: #fef2f2;
-            --sidebar-bg: #ffffff;
-            --header-bg: rgba(250, 250, 250, 0.9);
+            --border: #e8ecf2;
+            --border-hover: #d0d7e2;
+            --text-primary: #1a1f36;
+            --text-secondary: #4a5568;
+            --text-muted: #8492a6;
+            --accent: #635bff;
+            --accent-hover: #5046e5;
+            --accent-light: #f0f0ff;
+            --success: #00d4aa;
+            --success-light: #e6fff9;
+            --warning: #ffb020;
+            --warning-light: #fff8e6;
+            --danger: #ff5a5f;
+            --danger-light: #fff0f0;
+            --sidebar-bg: linear-gradient(180deg, #fefefe 0%, #f8f9fc 100%);
+            --header-bg: rgba(254, 254, 254, 0.85);
+            --card-shadow: 0 2px 8px rgba(26, 31, 54, 0.04), 0 8px 24px rgba(26, 31, 54, 0.06);
+            --card-shadow-hover: 0 4px 12px rgba(26, 31, 54, 0.06), 0 12px 32px rgba(26, 31, 54, 0.1);
         }
         
-        /* 다크모드 - 부드러운 다크그레이 */
+        /* 다크모드 - Soft Dark + Gradient Accent */
         [data-theme="dark"] {
-            --bg-primary: #18181b;
-            --bg-secondary: #1f1f23;
-            --bg-tertiary: #27272a;
-            --bg-card: #1f1f23;
-            --border: #3f3f46;
-            --border-hover: #52525b;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent: #60a5fa;
-            --accent-light: rgba(96, 165, 250, 0.1);
-            --success: #4ade80;
-            --success-light: rgba(74, 222, 128, 0.1);
-            --warning: #fbbf24;
-            --warning-light: rgba(251, 191, 36, 0.1);
-            --danger: #f87171;
-            --danger-light: rgba(248, 113, 113, 0.1);
-            --sidebar-bg: #18181b;
-            --header-bg: rgba(24, 24, 27, 0.9);
+            --bg-primary: #0f0f12;
+            --bg-secondary: #16161d;
+            --bg-tertiary: #1e1e28;
+            --bg-card: #1a1a24;
+            --border: #2a2a3a;
+            --border-hover: #3a3a4d;
+            --text-primary: #f0f2f5;
+            --text-secondary: #9ca3b4;
+            --text-muted: #636b7e;
+            --accent: #817dff;
+            --accent-hover: #9590ff;
+            --accent-light: rgba(129, 125, 255, 0.12);
+            --success: #00e6b8;
+            --success-light: rgba(0, 230, 184, 0.12);
+            --warning: #ffc040;
+            --warning-light: rgba(255, 192, 64, 0.12);
+            --danger: #ff6b6b;
+            --danger-light: rgba(255, 107, 107, 0.12);
+            --sidebar-bg: linear-gradient(180deg, #0f0f12 0%, #16161d 100%);
+            --header-bg: rgba(15, 15, 18, 0.9);
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
+            --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.4);
         }
         
         * { 
@@ -66,29 +72,35 @@
             background: var(--bg-secondary); 
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
-            transition: background 0.3s, color 0.3s;
+            transition: background 0.4s ease, color 0.3s ease;
         }
         
-        /* 카드 - 부드러운 그림자 */
+        /* 카드 - Soft Spatial (부드러운 그림자) */
         .glass-card { 
             background: var(--bg-card);
             border: 1px solid var(--border); 
             border-radius: 16px;
-            transition: all 0.2s ease;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-card:hover { 
             border-color: var(--border-hover);
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
         }
         
-        /* 그라데이션 텍스트 - 부드러운 블루 */
+        /* 그라데이션 텍스트 - Vibrant Gradient */
         .gradient-text {
-            color: var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, #00d4aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-weight: 800;
         }
         
         .hidden { display: none; }
         
-        /* 데이터 테이블 - 시원하고 읽기 편하게 */
+        /* 데이터 테이블 */
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { 
             background: var(--bg-secondary); 
@@ -99,7 +111,7 @@
             color: var(--text-muted); 
             border-bottom: 1px solid var(--border);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
         }
         .data-table td { 
             padding: 16px 18px; 
@@ -108,74 +120,78 @@
             color: var(--text-primary);
             font-weight: 500;
         }
+        .data-table tr { transition: background 0.2s ease; }
         .data-table tr:hover { background: var(--bg-secondary); }
         .data-table tr:last-child td { border-bottom: none; }
         
         /* 인풋 필드 */
         .input-field { 
             background: var(--bg-primary); 
-            border: 1px solid var(--border); 
+            border: 1.5px solid var(--border); 
             color: var(--text-primary); 
             padding: 14px 18px; 
             border-radius: 12px; 
             width: 100%; 
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             font-size: 15px;
             font-weight: 500;
         }
         .input-field:focus { 
             outline: none; 
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-light);
+            box-shadow: 0 0 0 4px var(--accent-light);
         }
         .input-field::placeholder { color: var(--text-muted); }
         
-        /* 버튼 - 블루 포인트 통일 */
+        /* 버튼 - Gradient Accent */
         .btn-primary { 
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
             color: white; 
             font-weight: 600; 
             padding: 14px 28px; 
             border-radius: 12px; 
             cursor: pointer; 
             border: none;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 14px;
+            box-shadow: 0 4px 14px rgba(99, 91, 255, 0.25);
         }
         .btn-primary:hover { 
-            background: #2563eb;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 91, 255, 0.35);
         }
         
         .btn-secondary { 
             background: var(--bg-card); 
-            border: 1px solid var(--border); 
+            border: 1.5px solid var(--border); 
             color: var(--text-primary); 
             padding: 14px 28px; 
             border-radius: 12px; 
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             font-size: 14px;
             font-weight: 600;
         }
         .btn-secondary:hover { 
             border-color: var(--accent);
             color: var(--accent);
+            background: var(--accent-light);
         }
         
         .btn-danger { 
-            background: var(--danger); 
+            background: linear-gradient(135deg, var(--danger) 0%, #e53e3e 100%);
             border: none; 
             color: white; 
             padding: 14px 28px; 
             border-radius: 12px; 
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
             font-weight: 600;
+            box-shadow: 0 4px 14px rgba(255, 90, 95, 0.25);
         }
         .btn-danger:hover { 
-            background: #dc2626;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 90, 95, 0.35);
         }
         
         .btn-sm { padding: 10px 18px; font-size: 13px; }
@@ -184,8 +200,8 @@
         .modal-overlay { 
             position: fixed; 
             inset: 0; 
-            background: rgba(0, 0, 0, 0.5); 
-            backdrop-filter: blur(4px);
+            background: rgba(15, 15, 18, 0.6); 
+            backdrop-filter: blur(8px);
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -195,84 +211,81 @@
         .modal-content { 
             background: var(--bg-card); 
             border: 1px solid var(--border);
-            border-radius: 20px; 
-            padding: 28px; 
+            border-radius: 24px; 
+            padding: 32px; 
             max-width: 600px; 
             width: 100%; 
             max-height: 90vh; 
             overflow-y: auto;
-            animation: modalIn 0.2s ease-out;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+            animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
         
-        /* 배지 - 통일된 색상 */
+        /* 배지 - Soft Color */
         .badge { 
             padding: 6px 12px; 
             border-radius: 8px; 
             font-size: 12px; 
             font-weight: 600;
         }
-        .badge-active { background: #dcfce7; color: #059669; }
-        .badge-inactive { background: #f4f4f5; color: #71717a; }
-        .badge-pending { background: #fef3c7; color: #d97706; }
-        .badge-biz { background: #dbeafe; color: #2563eb; }
-        .badge-info { background: #ede9fe; color: #7c3aed; }
-        .badge-error { background: #fee2e2; color: #dc2626; }
-        .badge-nonbiz { background: #ffedd5; color: #ea580c; }
-        .badge-success { background: #dcfce7; color: #059669; }
+        .badge-active { background: var(--success-light); color: var(--success); }
+        .badge-inactive { background: var(--bg-tertiary); color: var(--text-muted); }
+        .badge-pending { background: var(--warning-light); color: #d69e00; }
+        .badge-biz { background: var(--accent-light); color: var(--accent); }
+        .badge-info { background: #f3e8ff; color: #8b5cf6; }
+        .badge-error { background: var(--danger-light); color: var(--danger); }
+        .badge-nonbiz { background: #fff7ed; color: #ea580c; }
+        .badge-success { background: var(--success-light); color: var(--success); }
         
-        [data-theme="dark"] .badge-active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-        [data-theme="dark"] .badge-inactive { background: #27272a; color: #71717a; }
-        [data-theme="dark"] .badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-        [data-theme="dark"] .badge-biz { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-        [data-theme="dark"] .badge-info { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
-        [data-theme="dark"] .badge-error { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-        [data-theme="dark"] .badge-nonbiz { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
-        [data-theme="dark"] .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        [data-theme="dark"] .badge-pending { color: var(--warning); }
+        [data-theme="dark"] .badge-info { background: rgba(139, 92, 246, 0.12); color: #a78bfa; }
+        [data-theme="dark"] .badge-nonbiz { background: rgba(234, 88, 12, 0.12); color: #fb923c; }
         
-        /* 토스트 */
+        /* 토스트 - Micro Delight Animation */
         .toast { 
             position: fixed; 
             top: 24px; 
             right: 24px; 
-            padding: 14px 22px; 
-            border-radius: 12px; 
+            padding: 16px 24px; 
+            border-radius: 14px; 
             z-index: 200;
             font-weight: 600;
             font-size: 14px;
-            animation: toastIn 0.3s ease;
+            animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
-        .toast-success { background: var(--success); color: white; }
-        .toast-error { background: var(--danger); color: white; }
-        .toast-info { background: var(--accent); color: white; }
+        .toast-success { background: linear-gradient(135deg, var(--success) 0%, #00c49a 100%); color: white; }
+        .toast-error { background: linear-gradient(135deg, var(--danger) 0%, #e53e3e 100%); color: white; }
+        .toast-info { background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%); color: white; }
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         /* 스크롤바 */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         
         @media (max-width: 768px) { 
             .sidebar { display: none !important; } 
             .mobile-nav { display: flex !important; } 
         }
         
-        /* 사이드바 */
+        /* 사이드바 - Expressive Minimalism */
         .menu-group { margin-bottom: 8px; }
         .menu-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             padding: 20px 20px 12px 20px;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
         }
         .sidebar-item {
             display: flex;
@@ -282,22 +295,24 @@
             font-size: 15px;
             color: var(--text-secondary);
             border-radius: 12px;
-            transition: all 0.15s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
             background: transparent;
             border: none;
             cursor: pointer;
             margin: 4px 12px;
-            font-weight: 600;
+            font-weight: 500;
         }
         .sidebar-item:hover {
-            background: var(--bg-secondary);
+            background: var(--bg-tertiary);
             color: var(--text-primary);
+            transform: translateX(4px);
         }
         .sidebar-item.active {
-            background: var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
             color: white;
-            font-weight: 700;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
         }
         .sidebar-item .dot {
             width: 6px;
@@ -310,44 +325,44 @@
             font-size: 20px;
         }
         
-        /* 다크모드 토글 스위치 */
+        /* 다크모드 토글 - Micro Delight */
         .theme-toggle {
             position: relative;
-            width: 52px;
-            height: 28px;
+            width: 56px;
+            height: 30px;
             background: var(--bg-tertiary);
-            border-radius: 14px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1.5px solid var(--border);
         }
         .theme-toggle::after {
             content: '☀️';
             position: absolute;
             top: 3px;
             left: 4px;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             background: var(--bg-card);
             border-radius: 50%;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         [data-theme="dark"] .theme-toggle {
-            background: var(--accent);
-            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            border-color: transparent;
         }
         [data-theme="dark"] .theme-toggle::after {
             content: '🌙';
-            left: 26px;
+            left: 28px;
         }
         
         .glow-purple, .glow-blue, .glow-cyan {
-            box-shadow: none;
+            box-shadow: var(--card-shadow);
         }
         
         /* 텍스트 색상 */
@@ -358,21 +373,21 @@
             color: var(--text-primary) !important;
         }
         
-        /* 포인트 컬러 - 통일된 팔레트 */
+        /* 포인트 컬러 - Vibrant Colors */
         .text-purple-400 { color: #8b5cf6 !important; }
-        .text-blue-400 { color: #3b82f6 !important; }
-        .text-green-400 { color: #10b981 !important; }
-        .text-red-400 { color: #ef4444 !important; }
-        .text-yellow-400 { color: #f59e0b !important; }
+        .text-blue-400 { color: var(--accent) !important; }
+        .text-green-400 { color: var(--success) !important; }
+        .text-red-400 { color: var(--danger) !important; }
+        .text-yellow-400 { color: var(--warning) !important; }
         .text-orange-400 { color: #f97316 !important; }
         .text-pink-400 { color: #ec4899 !important; }
         .text-cyan-400 { color: #06b6d4 !important; }
         
         [data-theme="dark"] .text-purple-400 { color: #a78bfa !important; }
-        [data-theme="dark"] .text-blue-400 { color: #60a5fa !important; }
-        [data-theme="dark"] .text-green-400 { color: #34d399 !important; }
-        [data-theme="dark"] .text-red-400 { color: #f87171 !important; }
-        [data-theme="dark"] .text-yellow-400 { color: #fbbf24 !important; }
+        [data-theme="dark"] .text-blue-400 { color: #817dff !important; }
+        [data-theme="dark"] .text-green-400 { color: #00e6b8 !important; }
+        [data-theme="dark"] .text-red-400 { color: #ff6b6b !important; }
+        [data-theme="dark"] .text-yellow-400 { color: #ffc040 !important; }
         [data-theme="dark"] .text-orange-400 { color: #fb923c !important; }
         [data-theme="dark"] .text-pink-400 { color: #f472b6 !important; }
         [data-theme="dark"] .text-cyan-400 { color: #22d3ee !important; }
@@ -401,11 +416,11 @@
     <!-- 로딩 -->
     <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-secondary)">
         <div class="text-center">
-            <h1 class="text-4xl font-bold mb-6" style="color: var(--text-primary)">TEAM BRO</h1>
+            <h1 class="text-4xl font-bold mb-6 gradient-text">TEAM BRO</h1>
             <div class="flex items-center justify-center gap-2">
-                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent)"></div>
-                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent); opacity: 0.6; animation-delay: 0.15s"></div>
-                <div class="w-2 h-2 rounded-full animate-pulse" style="background: var(--accent); opacity: 0.3; animation-delay: 0.3s"></div>
+                <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: var(--accent)"></div>
+                <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: var(--success); animation-delay: 0.15s"></div>
+                <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: #8b5cf6; animation-delay: 0.3s"></div>
             </div>
         </div>
     </div>
@@ -414,7 +429,8 @@
     <div id="loginPage" class="hidden relative z-10 min-h-screen flex items-center justify-center px-4" style="background: var(--bg-secondary)">
         <div class="w-full max-w-sm">
             <div class="text-center mb-10">
-                <h1 class="text-4xl font-bold mb-2" style="color: var(--text-primary)">TEAM BRO</h1>
+                <div class="w-16 h-16 mx-auto mb-5 rounded-2xl flex items-center justify-center font-bold text-white text-xl" style="background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%); box-shadow: 0 8px 24px rgba(99, 91, 255, 0.3);">TB</div>
+                <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary)">TEAM BRO</h1>
                 <p class="text-sm font-medium" style="color: var(--text-muted)">본사 통합 ERP</p>
             </div>
             <div class="glass-card p-8">
@@ -442,8 +458,8 @@
             <!-- 로고 -->
             <div class="p-6 border-b" style="border-color: var(--border)">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-white text-base" style="background: var(--accent)">TB</div>
-                    <span class="text-xl font-bold" style="color: var(--text-primary)">TeamBro</span>
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-white text-base" style="background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%); box-shadow: 0 4px 12px rgba(99, 91, 255, 0.25);">TB</div>
+                    <span class="text-xl font-bold gradient-text">TeamBro</span>
                 </div>
             </div>
             
@@ -521,7 +537,7 @@
         </aside>
 
         <!-- 상단 헤더 -->
-        <header class="fixed top-0 right-0 z-40 border-b" style="left: 280px; background: var(--header-bg); backdrop-filter: blur(20px); border-color: var(--border);">
+        <header class="fixed top-0 right-0 z-40 border-b" style="left: 280px; background: var(--header-bg); backdrop-filter: blur(16px); border-color: var(--border);">
             <div class="px-8 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleMobileMenu()" class="text-xl md:hidden" style="color: var(--text-secondary)">☰</button>
@@ -530,7 +546,7 @@
                 <div class="flex items-center gap-5">
                     <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드"></div>
                     <span id="headerUserName" class="text-sm font-semibold hidden md:inline" style="color: var(--text-secondary)">관리자</span>
-                    <button onclick="logout()" class="text-sm font-semibold transition-colors hover:opacity-70" style="color: var(--danger)">로그아웃</button>
+                    <button onclick="logout()" class="text-sm font-semibold transition-all hover:opacity-70" style="color: var(--danger)">로그아웃</button>
                 </div>
             </div>
         </header>
