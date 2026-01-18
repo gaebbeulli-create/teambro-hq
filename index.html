@@ -3783,6 +3783,13 @@ async function uploadExcel(type, input) {
                             if (p) data['partner_id'] = p.id;
                         } else if (f === 'withholding_rate') {
                             data[f] = parseFloat(row[idx]) || 0.033;
+                        } else if (f === 'resident_number') {
+                            // 주민번호 자동 포맷팅 (숫자만 있으면 하이픈 추가)
+                            let ssn = String(row[idx]).replace(/[^0-9]/g, '');
+                            if (ssn.length === 13) {
+                                ssn = ssn.substring(0, 6) + '-' + ssn.substring(6);
+                            }
+                            data[f] = ssn;
                         } else {
                             data[f] = row[idx];
                         }
