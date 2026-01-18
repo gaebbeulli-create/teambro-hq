@@ -2726,6 +2726,8 @@ function showSystemSelectPage() {
     
     // 권한에 따라 접근 가능 시스템 표시
     const hqCard = document.getElementById('selectHQ');
+    const bcCard = document.getElementById('selectBC');
+    const bmCard = document.getElementById('selectBM');
     const canAccessHQ = currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER';
     
     if (canAccessHQ) {
@@ -2737,6 +2739,10 @@ function showSystemSelectPage() {
         hqCard.classList.remove('cursor-pointer');
         hqCard.onclick = () => showToast('접근 권한이 없습니다 (ADMIN/MANAGER만 가능)', 'error');
     }
+    
+    // 브로컴퍼니/브로모터스 onclick 설정
+    bcCard.onclick = () => enterSystem('brocompany');
+    bmCard.onclick = () => enterSystem('bromotors');
     
     document.getElementById('systemSelectPage').classList.remove('hidden');
 }
