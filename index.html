@@ -2810,9 +2810,29 @@ async function restoreSession() {
     } catch (e) { return false; }
 }
 
+// 대용량 데이터 페이지네이션 로드 (1000건 제한 우회)
+async function loadAllPaginated(table, orderBy = 'created_at.desc') {
+    let allData = [];
+    let offset = 0;
+    const limit = 1000;
+    
+    while (true) {
+        const data = await supabaseCall(table, 'GET', null, `?order=${orderBy}&limit=${limit}&offset=${offset}`);
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < limit) break; // 마지막 페이지
+        offset += limit;
+    }
+    return allData;
+}
+
 async function loadAllData() {
-    const [r, p, s, u, st, cd, ct, ti, jn, emp, pay, plat, advt, recon, bnk, wkly, sp] = await Promise.all([
-        supabaseCall('riders', 'GET', null, '?order=created_at.desc&limit=5000'),
+    showToast('📊 데이터 로딩 중...', 'info');
+    
+    // 라이더는 페이지네이션으로 전체 로드 (100만건 대응)
+    const ridersPromise = loadAllPaginated('riders', 'created_at.desc');
+    
+    const [p, s, u, st, cd, ct, ti, jn, emp, pay, plat, advt, recon, bnk, wkly, sp] = await Promise.all([
         supabaseCall('partners', 'GET', null, '?order=created_at.desc&limit=1000'),
         supabaseCall('sales_reps', 'GET', null, '?order=created_at.desc&limit=1000'),
         supabaseCall('hq_users', 'GET', null, '?order=id.asc'),
@@ -2830,7 +2850,8 @@ async function loadAllData() {
         supabaseCall('weekly_payouts', 'GET', null, '?order=created_at.desc&limit=1000'),
         supabaseCall('sales_purchases', 'GET', null, '?order=transaction_date.desc&limit=1000')
     ]);
-    riderList = r || [];
+    
+    riderList = await ridersPromise || [];
     partnerList = p || [];
     salesList = s || [];
     userList = u || [];
@@ -2847,6 +2868,8 @@ async function loadAllData() {
     weeklyPayoutList = wkly || [];
     payrollList = pay || [];
     salesPurchaseList = sp || [];
+    
+    showToast('✅ 데이터 로드 완료 (라이더 ' + riderList.length + '명)', 'success');
 }
 
 function loadDashboard() {
@@ -3710,7 +3733,22 @@ async function uploadExcel(type, input) {
     
     // 업로드 시작 표시
     const typeName = type === 'rider' ? '라이더' : type === 'partner' ? '협력사' : '영업자';
-    showToast('📤 ' + typeName + ' 데이터 분석 중...', 'info');
+    showToast('📤 ' + typeName + ' 기존 데이터 확인 중...', 'info');
+    
+    // 중복 체크를 위해 최신 데이터 전체 로드 (페이지네이션)
+    let existingData = [];
+    if (type === 'rider') {
+        existingData = await loadAllPaginated('riders', 'created_at.desc');
+        riderList = existingData; // 전역 변수도 업데이트
+    } else if (type === 'partner') {
+        existingData = await loadAllPaginated('partners', 'created_at.desc');
+        partnerList = existingData;
+    } else if (type === 'sales') {
+        existingData = await loadAllPaginated('sales_reps', 'created_at.desc');
+        salesList = existingData;
+    }
+    
+    showToast('📤 ' + typeName + ' 데이터 분석 중... (기존 ' + existingData.length + '건)', 'info');
     
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -3724,8 +3762,7 @@ async function uploadExcel(type, input) {
             let duplicateCount = 0;
             const totalRows = rows.length - 1;
             
-            // 기존 데이터 가져와서 중복 체크용 Set 생성
-            const existingData = type === 'rider' ? riderList : type === 'partner' ? partnerList : salesList;
+            // 중복 체크용 Set 생성 (전체 데이터 기반)
             const existingNames = new Set(existingData.map(d => d.name?.trim().toLowerCase()));
             const existingPhones = new Set(existingData.map(d => d.phone?.replace(/[^0-9]/g, '')));
             const existingSSNs = new Set(existingData.map(d => d.resident_number?.replace(/[^0-9]/g, '')));
