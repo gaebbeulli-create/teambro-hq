@@ -556,6 +556,8 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드"></div>
+                    <!-- 비밀 공간 버튼 (작은 점으로 숨김) -->
+                    <span onclick="openSecretAccess()" class="cursor-pointer opacity-30 hover:opacity-100 transition-opacity text-xs" title=" ">•</span>
                     <span id="headerUserName" class="text-sm font-medium hidden md:inline" style="color: var(--text-secondary)">관리자</span>
                     <button onclick="logout()" class="text-sm font-medium" style="color: var(--text-muted)">로그아웃</button>
                 </div>
@@ -1617,6 +1619,51 @@
                     <h2 class="text-2xl font-bold mb-6">⚙️ 시스템 설정</h2>
                     <div class="glass-card rounded-xl p-8 text-center"><div class="text-4xl mb-4">⚙️</div><p class="text-gray-400">시스템 설정 기능 준비중</p></div>
                 </div>
+
+                <!-- 🔐 비밀 공간 -->
+                <div id="tab-secret" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-purple-400">🔐 비밀 공간</h2>
+                        <button onclick="lockSecretSpace()" class="btn-secondary btn-sm">🔒 잠그기</button>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-6">이 공간은 오직 당신만 접근할 수 있습니다. 메모, 할일, 개인 데이터를 안전하게 보관하세요.</p>
+                    
+                    <!-- 비밀 메모 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="glass-card rounded-xl p-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-purple-400">📝 비밀 메모</h3>
+                                <button onclick="addSecretMemo()" class="btn-primary btn-sm">+ 메모 추가</button>
+                            </div>
+                            <div id="secretMemoList" class="space-y-3 max-h-96 overflow-y-auto">
+                                <p class="text-gray-500 text-sm text-center py-4">저장된 메모가 없습니다</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 비밀 할일 -->
+                        <div class="glass-card rounded-xl p-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-purple-400">✅ 비밀 할일</h3>
+                                <button onclick="addSecretTodo()" class="btn-primary btn-sm">+ 할일 추가</button>
+                            </div>
+                            <div id="secretTodoList" class="space-y-2 max-h-96 overflow-y-auto">
+                                <p class="text-gray-500 text-sm text-center py-4">등록된 할일이 없습니다</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 비밀 금고 (중요 정보) -->
+                    <div class="glass-card rounded-xl p-5 border border-purple-500/30">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-purple-400">🔑 비밀 금고</h3>
+                            <button onclick="addSecretVault()" class="btn-primary btn-sm">+ 항목 추가</button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">중요한 정보(계정, 비밀번호, 키 등)를 암호화하여 저장합니다.</p>
+                        <div id="secretVaultList" class="space-y-2">
+                            <p class="text-gray-500 text-sm text-center py-4">저장된 항목이 없습니다</p>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -2341,6 +2388,61 @@
             </form>
         </div>
     </div>
+
+    <!-- 대사관리 모달 (수동 대사) -->
+    <div id="reconcileModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:700px">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="reconcileModalTitle" class="text-xl font-bold text-blue-400">🔄 수동 대사 등록</h3>
+                <button onclick="closeModal('reconcileModal')" class="text-gray-400 text-2xl">&times;</button>
+            </div>
+            <form id="reconcileForm" onsubmit="submitReconcile(event)" class="space-y-4">
+                <input type="hidden" id="rec-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">정산주차 *</label><input type="text" id="rec-week" class="input-field" placeholder="2025-W03" required></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">협력사</label><select id="rec-partner" class="input-field"><option value="">선택</option></select></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">플랫폼 입금액</label><input type="number" id="rec-platform" class="input-field" value="0" onchange="calcReconcile()"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">선정산 지급액</label><input type="number" id="rec-advance" class="input-field" value="0" onchange="calcReconcile()"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">차액</label><input type="number" id="rec-diff" class="input-field" readonly></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">수수료수익</label><input type="number" id="rec-fee" class="input-field" value="0"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">상태</label>
+                        <select id="rec-status" class="input-field">
+                            <option value="pending">대기</option>
+                            <option value="matched">완료</option>
+                            <option value="issue">불일치</option>
+                        </select>
+                    </div>
+                </div>
+                <div><label class="block text-sm text-blue-400 mb-1">메모</label><textarea id="rec-memo" class="input-field" rows="2"></textarea></div>
+                <div class="flex gap-2 mt-4">
+                    <button type="button" onclick="closeModal('reconcileModal')" class="flex-1 btn-secondary">취소</button>
+                    <button type="submit" class="flex-1 btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 자동 대사 결과 모달 -->
+    <div id="autoReconcileModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:900px; max-height:80vh; overflow-y:auto;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-400">⚡ 자동 대사 결과</h3>
+                <button onclick="closeModal('autoReconcileModal')" class="text-gray-400 text-2xl">&times;</button>
+            </div>
+            <div id="autoReconcileResult" class="space-y-4">
+                <!-- 결과가 여기에 표시됨 -->
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button type="button" onclick="closeModal('autoReconcileModal')" class="flex-1 btn-secondary">닫기</button>
+                <button type="button" onclick="saveAutoReconcile()" class="flex-1 btn-primary">전체 저장</button>
+            </div>
+        </div>
+    </div>
+
     <div id="weeklyPayoutModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold text-blue-400">📆 주정산 지급 등록</h3><button onclick="closeModal('weeklyPayoutModal')" class="text-gray-400 text-2xl">&times;</button></div>
@@ -5116,7 +5218,23 @@ function editBank(id) {
     openModal('bankModal');
 }
 
-function editReconcile(id) { showToast('대사 상세 모달 준비중', 'info'); }
+function editReconcile(id) { 
+    const r = reconcileList.find(x => x.id === id); 
+    if (!r) return;
+    
+    document.getElementById('reconcileModalTitle').textContent = '🔄 대사 상세/수정';
+    document.getElementById('rec-id').value = r.id;
+    document.getElementById('rec-week').value = r.settlement_week || '';
+    loadReconcilePartnerOptions();
+    document.getElementById('rec-partner').value = r.partner_id || '';
+    document.getElementById('rec-platform').value = r.platform_total || 0;
+    document.getElementById('rec-advance').value = r.advance_total || 0;
+    document.getElementById('rec-diff').value = r.difference_amount || 0;
+    document.getElementById('rec-fee').value = r.fee_income || 0;
+    document.getElementById('rec-status').value = r.status || 'pending';
+    document.getElementById('rec-memo').value = r.memo || '';
+    openModal('reconcileModal');
+}
 
 // 대사관리 삭제
 async function deleteReconcile(id) {
@@ -5128,7 +5246,202 @@ async function deleteReconcile(id) {
         renderReconcileTable();
     } catch (err) { showToast('삭제 실패', 'error'); }
 }
-async function autoReconcile() { showToast('자동 대사 기능 준비중', 'info'); }
+
+// 수동 대사 모달 열기
+function openReconcileModal() {
+    document.getElementById('reconcileModalTitle').textContent = '🔄 수동 대사 등록';
+    document.getElementById('reconcileForm').reset();
+    document.getElementById('rec-id').value = '';
+    loadReconcilePartnerOptions();
+    openModal('reconcileModal');
+}
+
+// 협력사 옵션 로드
+function loadReconcilePartnerOptions() {
+    const sel = document.getElementById('rec-partner');
+    sel.innerHTML = '<option value="">선택</option>' + partnerList.map(p => '<option value="' + p.id + '">' + p.name + '</option>').join('');
+}
+
+// 대사 계산
+function calcReconcile() {
+    const platform = parseFloat(document.getElementById('rec-platform').value) || 0;
+    const advance = parseFloat(document.getElementById('rec-advance').value) || 0;
+    const diff = platform - advance;
+    document.getElementById('rec-diff').value = diff;
+    // 수수료 = 차액 (플랫폼 - 선정산 = 팀브로 수익)
+    document.getElementById('rec-fee').value = diff > 0 ? diff : 0;
+}
+
+// 수동 대사 저장
+async function submitReconcile(e) {
+    e.preventDefault();
+    const id = document.getElementById('rec-id').value;
+    const data = {
+        settlement_week: document.getElementById('rec-week').value,
+        partner_id: document.getElementById('rec-partner').value || null,
+        platform_total: parseFloat(document.getElementById('rec-platform').value) || 0,
+        advance_total: parseFloat(document.getElementById('rec-advance').value) || 0,
+        difference_amount: parseFloat(document.getElementById('rec-diff').value) || 0,
+        fee_income: parseFloat(document.getElementById('rec-fee').value) || 0,
+        status: document.getElementById('rec-status').value,
+        memo: document.getElementById('rec-memo').value || null
+    };
+    
+    try {
+        if (id) {
+            await supabaseCall('settlement_reconciliation', 'PATCH', data, '?id=eq.' + id);
+            const idx = reconcileList.findIndex(x => x.id == id);
+            if (idx >= 0) reconcileList[idx] = { ...reconcileList[idx], ...data };
+            showToast('대사 수정 완료');
+        } else {
+            const r = await supabaseCall('settlement_reconciliation', 'POST', data);
+            if (r && r[0]) reconcileList.unshift(r[0]);
+            showToast('대사 등록 완료');
+        }
+        closeModal('reconcileModal');
+        renderReconcileTable();
+    } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+// 자동 대사 임시 저장용
+let autoReconcileData = [];
+
+// 자동 대사 실행
+async function autoReconcile() {
+    showToast('자동 대사 분석 중...', 'info');
+    
+    // 플랫폼정산 데이터를 주차+협력사별로 그룹핑
+    const platformByWeek = {};
+    platformList.forEach(p => {
+        const key = (p.settlement_week || 'unknown') + '_' + (p.partner_id || 'all');
+        if (!platformByWeek[key]) platformByWeek[key] = { week: p.settlement_week, partner_id: p.partner_id, total: 0, items: [] };
+        platformByWeek[key].total += parseFloat(p.total_amount || 0);
+        platformByWeek[key].items.push(p);
+    });
+    
+    // 선정산 지급 데이터를 주차+협력사별로 그룹핑
+    const advanceByWeek = {};
+    advanceTransferList.forEach(a => {
+        const key = (a.settlement_week || 'unknown') + '_' + (a.partner_id || 'all');
+        if (!advanceByWeek[key]) advanceByWeek[key] = { week: a.settlement_week, partner_id: a.partner_id, total: 0, items: [] };
+        advanceByWeek[key].total += parseFloat(a.total_amount || a.net_amount || 0);
+        advanceByWeek[key].items.push(a);
+    });
+    
+    // 대사 결과 생성
+    autoReconcileData = [];
+    const allKeys = new Set([...Object.keys(platformByWeek), ...Object.keys(advanceByWeek)]);
+    
+    allKeys.forEach(key => {
+        const platform = platformByWeek[key] || { week: key.split('_')[0], partner_id: key.split('_')[1], total: 0, items: [] };
+        const advance = advanceByWeek[key] || { week: key.split('_')[0], partner_id: key.split('_')[1], total: 0, items: [] };
+        
+        // 이미 대사된 건은 제외
+        const existingRec = reconcileList.find(r => 
+            r.settlement_week === platform.week && 
+            (r.partner_id == platform.partner_id || (!r.partner_id && !platform.partner_id))
+        );
+        if (existingRec) return;
+        
+        const diff = platform.total - advance.total;
+        const status = Math.abs(diff) < 100 ? 'matched' : (diff > 0 ? 'pending' : 'issue');
+        
+        autoReconcileData.push({
+            settlement_week: platform.week,
+            partner_id: platform.partner_id !== 'all' ? platform.partner_id : null,
+            platform_total: platform.total,
+            advance_total: advance.total,
+            difference_amount: diff,
+            fee_income: diff > 0 ? diff : 0,
+            status: status,
+            platform_items: platform.items,
+            advance_items: advance.items
+        });
+    });
+    
+    if (!autoReconcileData.length) {
+        showToast('대사할 새로운 데이터가 없습니다', 'info');
+        return;
+    }
+    
+    // 결과 표시
+    const resultHtml = autoReconcileData.map((r, idx) => {
+        const partner = partnerList.find(p => p.id == r.partner_id);
+        const statusBadge = r.status === 'matched' ? 'badge-active' : (r.status === 'issue' ? 'badge-error' : 'badge-pending');
+        const statusText = r.status === 'matched' ? '✅ 일치' : (r.status === 'issue' ? '⚠️ 불일치' : '⏳ 확인필요');
+        const diffColor = r.difference_amount >= 0 ? 'text-blue-400' : 'text-red-400';
+        
+        return `
+        <div class="glass-card p-4 border-l-4 ${r.status === 'matched' ? 'border-green-500' : (r.status === 'issue' ? 'border-red-500' : 'border-yellow-500')}">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="rec-check-${idx}" checked class="w-5 h-5">
+                    <span class="font-bold text-blue-400">${r.settlement_week || '-'}</span>
+                    <span class="text-gray-400">${partner ? partner.name : '전체'}</span>
+                </div>
+                <span class="badge ${statusBadge}">${statusText}</span>
+            </div>
+            <div class="grid grid-cols-4 gap-4 text-sm">
+                <div><span class="text-gray-500">플랫폼입금:</span><br><span class="font-bold text-blue-400">₩${parseInt(r.platform_total).toLocaleString()}</span></div>
+                <div><span class="text-gray-500">선정산지급:</span><br><span class="font-bold text-red-400">₩${parseInt(r.advance_total).toLocaleString()}</span></div>
+                <div><span class="text-gray-500">차액:</span><br><span class="font-bold ${diffColor}">₩${parseInt(r.difference_amount).toLocaleString()}</span></div>
+                <div><span class="text-gray-500">수수료수익:</span><br><span class="font-bold text-green-400">₩${parseInt(r.fee_income).toLocaleString()}</span></div>
+            </div>
+        </div>`;
+    }).join('');
+    
+    document.getElementById('autoReconcileResult').innerHTML = `
+        <div class="mb-4 p-3 bg-blue-900/30 rounded-lg">
+            <p class="text-sm"><span class="font-bold text-blue-400">${autoReconcileData.length}건</span>의 대사 결과가 생성되었습니다.</p>
+            <p class="text-xs text-gray-400 mt-1">체크박스로 저장할 항목을 선택하세요.</p>
+        </div>
+        ${resultHtml}
+    `;
+    
+    openModal('autoReconcileModal');
+}
+
+// 자동 대사 결과 저장
+async function saveAutoReconcile() {
+    const toSave = autoReconcileData.filter((r, idx) => {
+        const checkbox = document.getElementById('rec-check-' + idx);
+        return checkbox && checkbox.checked;
+    });
+    
+    if (!toSave.length) {
+        showToast('저장할 항목을 선택해주세요', 'error');
+        return;
+    }
+    
+    showToast('저장 중...', 'info');
+    let saved = 0;
+    
+    for (const r of toSave) {
+        const data = {
+            settlement_week: r.settlement_week,
+            partner_id: r.partner_id,
+            platform_total: r.platform_total,
+            advance_total: r.advance_total,
+            difference_amount: r.difference_amount,
+            fee_income: r.fee_income,
+            status: r.status
+        };
+        
+        try {
+            const result = await supabaseCall('settlement_reconciliation', 'POST', data);
+            if (result && result[0]) {
+                reconcileList.unshift(result[0]);
+                saved++;
+            }
+        } catch (err) {
+            console.log('대사 저장 실패:', err);
+        }
+    }
+    
+    closeModal('autoReconcileModal');
+    renderReconcileTable();
+    showToast(saved + '건 대사 저장 완료');
+}
 
 // ==================== 주정산 지급 ====================
 function renderWeeklyPayoutTable() {
@@ -6234,40 +6547,73 @@ function updateFundStats() {
 async function updateSubsidiaryStats() {
     const thisMonth = new Date().toISOString().slice(0, 7);
     
-    // 브로컴퍼니 - 플랫폼 정산 데이터에서 이번달
-    const bcPlatform = platformList.filter(p => p.settlement_date?.startsWith(thisMonth));
-    const bcRevenue = bcPlatform.reduce((s, p) => s + parseFloat(p.total_amount || 0), 0);
-    const bcSettlement = bcPlatform.reduce((s, p) => s + parseFloat(p.rider_payout || 0), 0);
-    const bcProfit = bcRevenue - bcSettlement;
-    
-    document.getElementById('bc-revenue').textContent = '₩' + bcRevenue.toLocaleString();
-    document.getElementById('bc-settlement').textContent = '₩' + bcSettlement.toLocaleString();
-    document.getElementById('bc-profit').textContent = '₩' + bcProfit.toLocaleString();
-    
-    // 브로모터스 - 은행 거래 데이터에서 렌탈 관련 (category가 rental인 것)
-    const bmBank = bankList.filter(b => b.transaction_date?.startsWith(thisMonth));
-    const bmRevenue = bmBank.filter(b => b.type === 'deposit').reduce((s, b) => s + parseFloat(b.amount || 0), 0);
-    const bmWithdraw = bmBank.filter(b => b.type === 'withdraw').reduce((s, b) => s + parseFloat(b.amount || 0), 0);
-    
-    // 미수금 - 선정산 중 미회수
-    const bmArrears = advanceTransferList.filter(a => a.status === 'pending').reduce((s, a) => s + parseFloat(a.amount || 0), 0);
-    
-    document.getElementById('bm-revenue').textContent = '₩' + bmRevenue.toLocaleString();
-    document.getElementById('bm-arrears').textContent = '₩' + bmArrears.toLocaleString();
-    document.getElementById('bm-profit').textContent = '₩' + (bmRevenue - bmWithdraw).toLocaleString();
-    
-    // 그룹 합계
-    const totalRevenue = bcRevenue + bmRevenue;
-    const totalProfit = bcProfit + (bmRevenue - bmWithdraw);
-    const totalBalance = bankList.reduce((s, b) => {
-        if (b.type === 'deposit') return s + parseFloat(b.amount || 0);
-        if (b.type === 'withdraw') return s - parseFloat(b.amount || 0);
-        return s;
-    }, 0);
-    
-    document.getElementById('group-revenue').textContent = '₩' + totalRevenue.toLocaleString();
-    document.getElementById('group-profit').textContent = '₩' + totalProfit.toLocaleString();
-    document.getElementById('group-balance').textContent = '₩' + totalBalance.toLocaleString();
+    try {
+        // 브로컴퍼니 - bro_cashbook 테이블에서 데이터 가져오기
+        const bcCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?order=date.desc&limit=500');
+        const bcThisMonth = (bcCashbook || []).filter(c => c.date?.startsWith(thisMonth));
+        const bcRevenue = bcThisMonth.filter(c => c.type === 'income' || c.type === '수입').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+        const bcExpense = bcThisMonth.filter(c => c.type === 'expense' || c.type === '지출').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+        const bcProfit = bcRevenue - bcExpense;
+        
+        // 브로컴퍼니 정산 데이터 (riders 테이블의 정산 관련)
+        const bcSettlement = bcThisMonth.filter(c => (c.category || '').includes('정산') || (c.memo || '').includes('정산')).reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+        
+        document.getElementById('bc-revenue').textContent = '₩' + bcRevenue.toLocaleString();
+        document.getElementById('bc-settlement').textContent = '₩' + bcSettlement.toLocaleString();
+        document.getElementById('bc-profit').textContent = '₩' + bcProfit.toLocaleString();
+        
+        // 브로모터스 - ledger 테이블 (렌탈 ERP)에서 데이터 가져오기
+        const bmLedger = await supabaseCall('ledger', 'GET', null, '?order=date.desc&limit=500');
+        const bmThisMonth = (bmLedger || []).filter(l => l.date?.startsWith(thisMonth));
+        const bmRevenue = bmThisMonth.filter(l => l.type === 'income' || l.type === '수입').reduce((s, l) => s + parseFloat(l.amount || 0), 0);
+        const bmExpense = bmThisMonth.filter(l => l.type === 'expense' || l.type === '지출').reduce((s, l) => s + parseFloat(l.amount || 0), 0);
+        
+        // 브로모터스 미수금 - contracts 테이블에서 연체 금액
+        const bmContracts = await supabaseCall('contracts', 'GET', null, '?status=eq.active');
+        const bmArrears = (bmContracts || []).reduce((s, c) => s + parseFloat(c.arrears_amount || c.overdue_amount || 0), 0);
+        
+        document.getElementById('bm-revenue').textContent = '₩' + bmRevenue.toLocaleString();
+        document.getElementById('bm-arrears').textContent = '₩' + bmArrears.toLocaleString();
+        document.getElementById('bm-profit').textContent = '₩' + (bmRevenue - bmExpense).toLocaleString();
+        
+        // 그룹 합계
+        const totalRevenue = bcRevenue + bmRevenue;
+        const totalProfit = bcProfit + (bmRevenue - bmExpense);
+        
+        // 전체 자금 잔액 계산
+        const allBcCashbook = bcCashbook || [];
+        const bcBalance = allBcCashbook.reduce((s, c) => {
+            if (c.type === 'income' || c.type === '수입') return s + parseFloat(c.amount || 0);
+            if (c.type === 'expense' || c.type === '지출') return s - parseFloat(c.amount || 0);
+            return s;
+        }, 0);
+        
+        const allBmLedger = bmLedger || [];
+        const bmBalance = allBmLedger.reduce((s, l) => {
+            if (l.type === 'income' || l.type === '수입') return s + parseFloat(l.amount || 0);
+            if (l.type === 'expense' || l.type === '지출') return s - parseFloat(l.amount || 0);
+            return s;
+        }, 0);
+        
+        const totalBalance = bcBalance + bmBalance;
+        
+        document.getElementById('group-revenue').textContent = '₩' + totalRevenue.toLocaleString();
+        document.getElementById('group-profit').textContent = '₩' + totalProfit.toLocaleString();
+        document.getElementById('group-balance').textContent = '₩' + totalBalance.toLocaleString();
+        
+    } catch (err) {
+        console.log('그룹사 데이터 로드 실패:', err);
+        // 에러 시 기존 로컬 데이터로 폴백
+        document.getElementById('bc-revenue').textContent = '₩0';
+        document.getElementById('bc-settlement').textContent = '₩0';
+        document.getElementById('bc-profit').textContent = '₩0';
+        document.getElementById('bm-revenue').textContent = '₩0';
+        document.getElementById('bm-arrears').textContent = '₩0';
+        document.getElementById('bm-profit').textContent = '₩0';
+        document.getElementById('group-revenue').textContent = '₩0';
+        document.getElementById('group-profit').textContent = '₩0';
+        document.getElementById('group-balance').textContent = '₩0';
+    }
 }
 
 // 자금 테이블 렌더
@@ -7147,6 +7493,279 @@ async function deleteTaxDoc(id) {
         console.error('Delete error:', err);
         showToast('삭제 실패', 'error');
     }
+}
+
+// ==================== 🔐 비밀 공간 ====================
+const SECRET_KEY = 'teambro_secret_';
+let secretUnlocked = false;
+
+// 비밀 공간 접근
+function openSecretAccess() {
+    const modal = document.createElement('div');
+    modal.id = 'secretAccessModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:400px">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🔐</div>
+                <h3 class="text-xl font-bold text-purple-400">비밀 공간</h3>
+                <p class="text-gray-500 text-sm mt-2">접근 코드를 입력하세요</p>
+            </div>
+            <form onsubmit="verifySecretCode(event)">
+                <input type="password" id="secretCodeInput" class="input-field text-center text-2xl tracking-widest" 
+                       placeholder="••••••" maxlength="20" autocomplete="off" autofocus>
+                <div id="secretCodeError" class="text-red-400 text-sm text-center mt-2 hidden">잘못된 코드입니다</div>
+                <div class="flex gap-2 mt-6">
+                    <button type="button" onclick="closeSecretModal()" class="flex-1 btn-secondary">취소</button>
+                    <button type="submit" class="flex-1 btn-primary" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">입장</button>
+                </div>
+            </form>
+            <div class="text-center mt-4">
+                <button onclick="showSetSecretCode()" class="text-xs text-gray-500 hover:text-purple-400">코드 설정/변경</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('secretCodeInput').focus();
+}
+
+function closeSecretModal() {
+    const modal = document.getElementById('secretAccessModal');
+    if (modal) modal.remove();
+}
+
+function verifySecretCode(e) {
+    e.preventDefault();
+    const input = document.getElementById('secretCodeInput').value;
+    const storedCode = localStorage.getItem(SECRET_KEY + 'code');
+    
+    // 코드가 없으면 첫 설정
+    if (!storedCode) {
+        if (input.length >= 4) {
+            localStorage.setItem(SECRET_KEY + 'code', btoa(input));
+            secretUnlocked = true;
+            closeSecretModal();
+            enterSecretSpace();
+            showToast('비밀 코드가 설정되었습니다', 'info');
+        } else {
+            document.getElementById('secretCodeError').textContent = '4자리 이상 입력하세요';
+            document.getElementById('secretCodeError').classList.remove('hidden');
+        }
+        return;
+    }
+    
+    // 코드 검증
+    if (btoa(input) === storedCode) {
+        secretUnlocked = true;
+        closeSecretModal();
+        enterSecretSpace();
+    } else {
+        document.getElementById('secretCodeError').textContent = '잘못된 코드입니다';
+        document.getElementById('secretCodeError').classList.remove('hidden');
+        document.getElementById('secretCodeInput').value = '';
+    }
+}
+
+function showSetSecretCode() {
+    const currentCode = prompt('현재 코드 입력 (처음이면 빈칸):');
+    const storedCode = localStorage.getItem(SECRET_KEY + 'code');
+    
+    if (storedCode && btoa(currentCode || '') !== storedCode) {
+        showToast('현재 코드가 틀렸습니다', 'error');
+        return;
+    }
+    
+    const newCode = prompt('새 코드 입력 (4자리 이상):');
+    if (newCode && newCode.length >= 4) {
+        localStorage.setItem(SECRET_KEY + 'code', btoa(newCode));
+        showToast('코드가 변경되었습니다', 'info');
+    }
+}
+
+function enterSecretSpace() {
+    // 사이드바에 임시로 비밀탭 활성화 표시 안함 (숨김)
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById('tab-secret').classList.remove('hidden');
+    document.getElementById('pageTitle').textContent = '🔐 비밀 공간';
+    
+    // 데이터 로드
+    loadSecretData();
+}
+
+function lockSecretSpace() {
+    secretUnlocked = false;
+    sessionStorage.removeItem(SECRET_KEY + 'session');
+    showTab('dashboard');
+    showToast('비밀 공간이 잠겼습니다', 'info');
+}
+
+// 비밀 데이터 로드
+function loadSecretData() {
+    renderSecretMemos();
+    renderSecretTodos();
+    renderSecretVault();
+}
+
+// 비밀 메모
+function getSecretMemos() {
+    const data = localStorage.getItem(SECRET_KEY + 'memos');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveSecretMemos(memos) {
+    localStorage.setItem(SECRET_KEY + 'memos', JSON.stringify(memos));
+}
+
+function renderSecretMemos() {
+    const memos = getSecretMemos();
+    const container = document.getElementById('secretMemoList');
+    if (!memos.length) {
+        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">저장된 메모가 없습니다</p>';
+        return;
+    }
+    container.innerHTML = memos.map((m, i) => `
+        <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-xs text-gray-500">${m.date}</span>
+                <button onclick="deleteSecretMemo(${i})" class="text-red-400 text-xs hover:text-red-300">삭제</button>
+            </div>
+            <p class="text-sm text-gray-300 whitespace-pre-wrap">${m.content}</p>
+        </div>
+    `).join('');
+}
+
+function addSecretMemo() {
+    const content = prompt('메모 내용:');
+    if (!content) return;
+    const memos = getSecretMemos();
+    memos.unshift({ content, date: new Date().toLocaleString('ko-KR') });
+    saveSecretMemos(memos);
+    renderSecretMemos();
+    showToast('메모 저장됨');
+}
+
+function deleteSecretMemo(index) {
+    if (!confirm('삭제하시겠습니까?')) return;
+    const memos = getSecretMemos();
+    memos.splice(index, 1);
+    saveSecretMemos(memos);
+    renderSecretMemos();
+}
+
+// 비밀 할일
+function getSecretTodos() {
+    const data = localStorage.getItem(SECRET_KEY + 'todos');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveSecretTodos(todos) {
+    localStorage.setItem(SECRET_KEY + 'todos', JSON.stringify(todos));
+}
+
+function renderSecretTodos() {
+    const todos = getSecretTodos();
+    const container = document.getElementById('secretTodoList');
+    if (!todos.length) {
+        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">등록된 할일이 없습니다</p>';
+        return;
+    }
+    container.innerHTML = todos.map((t, i) => `
+        <div class="flex items-center gap-3 p-2 rounded-lg ${t.done ? 'bg-green-500/10' : 'bg-purple-500/10'}">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleSecretTodo(${i})" class="w-4 h-4 accent-purple-500">
+            <span class="flex-1 text-sm ${t.done ? 'line-through text-gray-500' : 'text-gray-300'}">${t.text}</span>
+            <button onclick="deleteSecretTodo(${i})" class="text-red-400 text-xs hover:text-red-300">✕</button>
+        </div>
+    `).join('');
+}
+
+function addSecretTodo() {
+    const text = prompt('할일 내용:');
+    if (!text) return;
+    const todos = getSecretTodos();
+    todos.unshift({ text, done: false, date: new Date().toISOString() });
+    saveSecretTodos(todos);
+    renderSecretTodos();
+    showToast('할일 추가됨');
+}
+
+function toggleSecretTodo(index) {
+    const todos = getSecretTodos();
+    todos[index].done = !todos[index].done;
+    saveSecretTodos(todos);
+    renderSecretTodos();
+}
+
+function deleteSecretTodo(index) {
+    const todos = getSecretTodos();
+    todos.splice(index, 1);
+    saveSecretTodos(todos);
+    renderSecretTodos();
+}
+
+// 비밀 금고
+function getSecretVault() {
+    const data = localStorage.getItem(SECRET_KEY + 'vault');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveSecretVault(vault) {
+    localStorage.setItem(SECRET_KEY + 'vault', JSON.stringify(vault));
+}
+
+function renderSecretVault() {
+    const vault = getSecretVault();
+    const container = document.getElementById('secretVaultList');
+    if (!vault.length) {
+        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">저장된 항목이 없습니다</p>';
+        return;
+    }
+    container.innerHTML = vault.map((v, i) => `
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div class="text-2xl">${v.icon || '🔑'}</div>
+            <div class="flex-1">
+                <div class="font-bold text-purple-400">${v.title}</div>
+                <div class="text-xs text-gray-500">${v.username || ''}</div>
+            </div>
+            <button onclick="showVaultItem(${i})" class="btn-secondary btn-sm">보기</button>
+            <button onclick="deleteVaultItem(${i})" class="text-red-400 text-sm hover:text-red-300">✕</button>
+        </div>
+    `).join('');
+}
+
+function addSecretVault() {
+    const title = prompt('항목 이름 (예: 네이버 계정):');
+    if (!title) return;
+    const username = prompt('아이디/이메일:');
+    const password = prompt('비밀번호/값:');
+    const memo = prompt('메모 (선택):');
+    
+    const vault = getSecretVault();
+    vault.unshift({ 
+        title, 
+        username: username || '', 
+        password: password || '', 
+        memo: memo || '',
+        icon: '🔑',
+        date: new Date().toISOString()
+    });
+    saveSecretVault(vault);
+    renderSecretVault();
+    showToast('금고에 저장됨');
+}
+
+function showVaultItem(index) {
+    const vault = getSecretVault();
+    const v = vault[index];
+    alert(`📌 ${v.title}\n\n👤 아이디: ${v.username || '-'}\n🔑 비밀번호: ${v.password || '-'}\n📝 메모: ${v.memo || '-'}`);
+}
+
+function deleteVaultItem(index) {
+    if (!confirm('삭제하시겠습니까?')) return;
+    const vault = getSecretVault();
+    vault.splice(index, 1);
+    saveSecretVault(vault);
+    renderSecretVault();
 }
 </script>
 </body>
