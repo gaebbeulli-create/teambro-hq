@@ -251,9 +251,66 @@
         ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         
+        /* 모바일 최적화 */
         @media (max-width: 768px) { 
             .sidebar { display: none !important; } 
-            .mobile-nav { display: flex !important; } 
+            .mobile-nav { display: flex !important; }
+            
+            /* 메인 컨텐츠 패딩 조정 */
+            main { padding: 16px !important; padding-top: 80px !important; padding-bottom: 80px !important; }
+            
+            /* 헤더 조정 */
+            header { left: 0 !important; }
+            
+            /* 폰트 크기 조정 */
+            h2 { font-size: 1.25rem !important; }
+            h3 { font-size: 1rem !important; }
+            
+            /* 카드/통계 박스 */
+            .glass-card { padding: 12px !important; }
+            .glass-card .text-2xl { font-size: 1.1rem !important; }
+            .glass-card .text-xl { font-size: 1rem !important; }
+            .glass-card .text-xs { font-size: 10px !important; }
+            
+            /* 테이블 모바일 */
+            .data-table { font-size: 11px !important; }
+            .data-table th, .data-table td { padding: 8px 6px !important; white-space: nowrap; }
+            .overflow-x-auto { margin: 0 -12px; padding: 0 12px; }
+            
+            /* 버튼 */
+            .btn-sm { padding: 6px 10px !important; font-size: 11px !important; }
+            .btn-primary, .btn-secondary { padding: 10px 16px !important; }
+            
+            /* 입력 필드 */
+            .input-field { padding: 10px 12px !important; font-size: 14px !important; }
+            
+            /* 모달 */
+            .modal-content { margin: 10px !important; max-height: 90vh !important; overflow-y: auto !important; }
+            
+            /* 그리드 간격 */
+            .gap-4 { gap: 12px !important; }
+            .gap-6 { gap: 16px !important; }
+            .mb-6 { margin-bottom: 16px !important; }
+            .mb-8 { margin-bottom: 20px !important; }
+            
+            /* 그룹사 현황 카드 */
+            .border-l-4 { border-left-width: 3px !important; }
+            
+            /* 비밀 공간 탭 */
+            .secret-tab-content .data-table { font-size: 10px !important; }
+            
+            /* 필터 영역 */
+            .flex-wrap { gap: 8px !important; }
+            select.input-field { min-width: 100px !important; }
+        }
+        
+        /* 아주 작은 화면 (375px 이하) */
+        @media (max-width: 375px) {
+            main { padding: 10px !important; }
+            .glass-card { padding: 10px !important; }
+            .data-table { font-size: 10px !important; }
+            .data-table th, .data-table td { padding: 6px 4px !important; }
+            h2 { font-size: 1.1rem !important; }
         }
         
         /* 사이드바 */
@@ -564,12 +621,61 @@
             </div>
         </header>
 
-        <!-- 모바일 네비게이션 -->
-        <div class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-lg border-t border-white/5 z-40">
-            <button onclick="showTab('dashboard')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-blue-400 transition-colors">📊<br>대시보드</button>
-            <button onclick="showTab('riders')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-blue-400 transition-colors">🏍️<br>라이더</button>
-            <button onclick="showTab('partners')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-blue-400 transition-colors">🤝<br>협력사</button>
-            <button onclick="showTab('entities')" class="flex-1 py-3 text-center text-xs text-zinc-500 hover:text-blue-400 transition-colors">🏢<br>법인</button>
+        <!-- 모바일 네비게이션 (하단 고정) -->
+        <div class="mobile-nav hidden fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-lg border-t border-white/5 z-40 safe-area-bottom">
+            <button onclick="showTab('dashboard')" id="mob-dashboard" class="flex-1 py-2 text-center text-[10px] text-zinc-500 hover:text-blue-400 transition-colors">📊<br>대시보드</button>
+            <button onclick="showTab('riders')" id="mob-riders" class="flex-1 py-2 text-center text-[10px] text-zinc-500 hover:text-blue-400 transition-colors">🏍️<br>라이더</button>
+            <button onclick="showTab('partners')" id="mob-partners" class="flex-1 py-2 text-center text-[10px] text-zinc-500 hover:text-blue-400 transition-colors">🤝<br>협력사</button>
+            <button onclick="showTab('bank')" id="mob-bank" class="flex-1 py-2 text-center text-[10px] text-zinc-500 hover:text-blue-400 transition-colors">💰<br>출납장</button>
+            <button onclick="toggleMobileFullMenu()" id="mob-more" class="flex-1 py-2 text-center text-[10px] text-zinc-500 hover:text-blue-400 transition-colors">☰<br>더보기</button>
+        </div>
+        
+        <!-- 모바일 전체 메뉴 (슬라이드업) -->
+        <div id="mobileFullMenu" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-black/70" onclick="toggleMobileFullMenu()"></div>
+            <div class="absolute bottom-0 left-0 right-0 bg-zinc-900 rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto">
+                <div class="w-12 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+                <h3 class="text-lg font-bold text-white mb-4">전체 메뉴</h3>
+                
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <button onclick="showTab('dashboard');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">📊</div><div class="text-[10px] text-gray-400">대시보드</div>
+                    </button>
+                    <button onclick="showTab('riders');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">🏍️</div><div class="text-[10px] text-gray-400">라이더</div>
+                    </button>
+                    <button onclick="showTab('partners');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">🤝</div><div class="text-[10px] text-gray-400">협력사</div>
+                    </button>
+                    <button onclick="showTab('sales');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">💼</div><div class="text-[10px] text-gray-400">영업자</div>
+                    </button>
+                    <button onclick="showTab('entities');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">🏢</div><div class="text-[10px] text-gray-400">법인</div>
+                    </button>
+                    <button onclick="showTab('bank');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">💰</div><div class="text-[10px] text-gray-400">출납장</div>
+                    </button>
+                    <button onclick="showTab('accounting');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">📒</div><div class="text-[10px] text-gray-400">매입매출</div>
+                    </button>
+                    <button onclick="showTab('taxinvoice');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">🧾</div><div class="text-[10px] text-gray-400">세금계산</div>
+                    </button>
+                    <button onclick="showTab('employees');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">👥</div><div class="text-[10px] text-gray-400">직원</div>
+                    </button>
+                    <button onclick="showTab('cards');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">💳</div><div class="text-[10px] text-gray-400">법인카드</div>
+                    </button>
+                    <button onclick="showTab('users');toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-800 text-center">
+                        <div class="text-2xl mb-1">⚙️</div><div class="text-[10px] text-gray-400">사용자</div>
+                    </button>
+                    <button onclick="toggleMobileFullMenu()" class="p-3 rounded-xl bg-zinc-700 text-center">
+                        <div class="text-2xl mb-1">✕</div><div class="text-[10px] text-gray-400">닫기</div>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- 메인 컨텐츠 -->
@@ -2863,11 +2969,39 @@ function toggleSidebar() {
     }
 }
 
+// 모바일 전체 메뉴 토글
+function toggleMobileFullMenu() {
+    const menu = document.getElementById('mobileFullMenu');
+    if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    } else {
+        menu.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+// 모바일 하단 네비 활성화 표시
+function updateMobileNav(tab) {
+    document.querySelectorAll('.mobile-nav button').forEach(btn => {
+        btn.classList.remove('text-blue-400');
+        btn.classList.add('text-zinc-500');
+    });
+    const mobBtn = document.getElementById('mob-' + tab);
+    if (mobBtn) {
+        mobBtn.classList.remove('text-zinc-500');
+        mobBtn.classList.add('text-blue-400');
+    }
+}
+
 function showTab(tab) {
     console.log('showTab called:', tab);
     
     // 현재 탭 상태 저장
     sessionStorage.setItem('teambro_current_tab', tab);
+    
+    // 모바일 네비 활성화
+    updateMobileNav(tab);
     
     // 사이드바 아이템 active 처리
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
@@ -6643,62 +6777,66 @@ async function updateSubsidiaryStats() {
     const thisMonth = new Date().toISOString().slice(0, 7);
     
     try {
-        // 브로컴퍼니 - bro_cashbook 테이블에서 데이터 가져오기
-        const bcCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?order=date.desc&limit=500');
-        const bcThisMonth = (bcCashbook || []).filter(c => c.date?.startsWith(thisMonth));
-        const bcRevenue = bcThisMonth.filter(c => c.type === 'income' || c.type === '수입').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
-        const bcExpense = bcThisMonth.filter(c => c.type === 'expense' || c.type === '지출').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
-        const bcProfit = bcRevenue - bcExpense;
+        // ============ 브로모터스 (구 브로컴퍼니) - bro_cashbook 테이블 ============
+        const bcCashbook = await supabaseCall('bro_cashbook', 'GET', null, '?order=date.desc&limit=1000');
+        const bcThisMonth = (bcCashbook || []).filter(c => (c.date || '').startsWith(thisMonth));
         
-        // 브로컴퍼니 정산 데이터 (riders 테이블의 정산 관련)
-        const bcSettlement = bcThisMonth.filter(c => (c.category || '').includes('정산') || (c.memo || '').includes('정산')).reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+        // 이번달 수금 (수입)
+        const bcRevenue = bcThisMonth.filter(c => c.type === 'income').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+        // 이번달 정산 (지출 중 정산 관련)
+        const bcSettlement = bcThisMonth.filter(c => c.type === 'expense').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+        // 수익 (수수료)
+        const bcProfit = bcRevenue - bcSettlement;
         
         document.getElementById('bc-revenue').textContent = '₩' + bcRevenue.toLocaleString();
         document.getElementById('bc-settlement').textContent = '₩' + bcSettlement.toLocaleString();
         document.getElementById('bc-profit').textContent = '₩' + bcProfit.toLocaleString();
         
-        // 브로모터스 - ledger 테이블 (렌탈 ERP)에서 데이터 가져오기
-        const bmLedger = await supabaseCall('ledger', 'GET', null, '?order=date.desc&limit=500');
-        const bmThisMonth = (bmLedger || []).filter(l => l.date?.startsWith(thisMonth));
+        // ============ 리스&렌탈 (구 브로모터스) - ledger + contracts 테이블 ============
+        const bmLedger = await supabaseCall('ledger', 'GET', null, '?order=date.desc&limit=1000');
+        const bmThisMonth = (bmLedger || []).filter(l => (l.date || '').startsWith(thisMonth));
+        
+        // 이번달 렌탈수익
         const bmRevenue = bmThisMonth.filter(l => l.type === 'income' || l.type === '수입').reduce((s, l) => s + parseFloat(l.amount || 0), 0);
         const bmExpense = bmThisMonth.filter(l => l.type === 'expense' || l.type === '지출').reduce((s, l) => s + parseFloat(l.amount || 0), 0);
         
-        // 브로모터스 미수금 - contracts 테이블에서 연체 금액
-        const bmContracts = await supabaseCall('contracts', 'GET', null, '?status=eq.active');
-        const bmArrears = (bmContracts || []).reduce((s, c) => s + parseFloat(c.arrears_amount || c.overdue_amount || 0), 0);
+        // 미수금 - contracts 테이블에서 arrears 합계
+        const bmContracts = await supabaseCall('contracts', 'GET', null, '?select=arrears');
+        const bmArrears = (bmContracts || []).reduce((s, c) => s + parseFloat(c.arrears || 0), 0);
+        
+        // 순수익
+        const bmProfit = bmRevenue - bmExpense;
         
         document.getElementById('bm-revenue').textContent = '₩' + bmRevenue.toLocaleString();
         document.getElementById('bm-arrears').textContent = '₩' + bmArrears.toLocaleString();
-        document.getElementById('bm-profit').textContent = '₩' + (bmRevenue - bmExpense).toLocaleString();
+        document.getElementById('bm-profit').textContent = '₩' + bmProfit.toLocaleString();
         
-        // 그룹 합계
+        // ============ 그룹 합계 ============
         const totalRevenue = bcRevenue + bmRevenue;
-        const totalProfit = bcProfit + (bmRevenue - bmExpense);
+        const totalProfit = bcProfit + bmProfit;
         
-        // 전체 자금 잔액 계산
-        const allBcCashbook = bcCashbook || [];
-        const bcBalance = allBcCashbook.reduce((s, c) => {
-            if (c.type === 'income' || c.type === '수입') return s + parseFloat(c.amount || 0);
-            if (c.type === 'expense' || c.type === '지출') return s - parseFloat(c.amount || 0);
+        // 전체 자금 잔액
+        const bcBalance = (bcCashbook || []).reduce((s, c) => {
+            if (c.type === 'income') return s + parseFloat(c.amount || 0);
+            if (c.type === 'expense') return s - parseFloat(c.amount || 0);
             return s;
         }, 0);
         
-        const allBmLedger = bmLedger || [];
-        const bmBalance = allBmLedger.reduce((s, l) => {
+        const bmBalance = (bmLedger || []).reduce((s, l) => {
             if (l.type === 'income' || l.type === '수입') return s + parseFloat(l.amount || 0);
             if (l.type === 'expense' || l.type === '지출') return s - parseFloat(l.amount || 0);
             return s;
         }, 0);
         
-        const totalBalance = bcBalance + bmBalance;
-        
         document.getElementById('group-revenue').textContent = '₩' + totalRevenue.toLocaleString();
         document.getElementById('group-profit').textContent = '₩' + totalProfit.toLocaleString();
-        document.getElementById('group-balance').textContent = '₩' + totalBalance.toLocaleString();
+        document.getElementById('group-balance').textContent = '₩' + (bcBalance + bmBalance).toLocaleString();
+        
+        console.log('그룹사 데이터 로드 완료:', { bcRevenue, bcSettlement, bmRevenue, bmArrears });
         
     } catch (err) {
-        console.log('그룹사 데이터 로드 실패:', err);
-        // 에러 시 기존 로컬 데이터로 폴백
+        console.error('그룹사 데이터 로드 실패:', err);
+        // 에러 시 0으로 표시
         document.getElementById('bc-revenue').textContent = '₩0';
         document.getElementById('bc-settlement').textContent = '₩0';
         document.getElementById('bc-profit').textContent = '₩0';
