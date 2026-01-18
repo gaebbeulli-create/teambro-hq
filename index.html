@@ -130,11 +130,11 @@
         }
         .input-field::placeholder { color: var(--text-muted); }
         
-        /* 버튼 - 블루 포인트 */
+        /* 버튼 - 블루 포인트 통일 */
         .btn-primary { 
             background: var(--accent);
             color: white; 
-            font-weight: 700; 
+            font-weight: 600; 
             padding: 14px 28px; 
             border-radius: 12px; 
             cursor: pointer; 
@@ -143,12 +143,12 @@
             font-size: 14px;
         }
         .btn-primary:hover { 
-            opacity: 0.9;
+            background: #2563eb;
             transform: translateY(-1px);
         }
         
         .btn-secondary { 
-            background: var(--bg-secondary); 
+            background: var(--bg-card); 
             border: 1px solid var(--border); 
             color: var(--text-primary); 
             padding: 14px 28px; 
@@ -159,21 +159,24 @@
             font-weight: 600;
         }
         .btn-secondary:hover { 
-            border-color: var(--border-hover);
-            background: var(--bg-tertiary);
+            border-color: var(--accent);
+            color: var(--accent);
         }
         
         .btn-danger { 
-            background: var(--danger-light); 
+            background: var(--danger); 
             border: none; 
-            color: var(--danger); 
+            color: white; 
             padding: 14px 28px; 
             border-radius: 12px; 
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
         }
-        .btn-danger:hover { opacity: 0.85; }
+        .btn-danger:hover { 
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
         
         .btn-sm { padding: 10px 18px; font-size: 13px; }
         
@@ -205,25 +208,30 @@
             to { opacity: 1; transform: scale(1); }
         }
         
-        /* 배지 - 부드러운 컬러 */
+        /* 배지 - 통일된 색상 */
         .badge { 
-            padding: 5px 12px; 
+            padding: 6px 12px; 
             border-radius: 8px; 
             font-size: 12px; 
             font-weight: 600;
         }
-        .badge-active { background: var(--success-light); color: var(--success); }
-        .badge-inactive { background: var(--bg-tertiary); color: var(--text-muted); }
-        .badge-pending { background: var(--warning-light); color: #b45309; }
-        .badge-biz { background: var(--accent-light); color: var(--accent); }
-        .badge-info { background: #f5f3ff; color: #7c3aed; }
-        .badge-error { background: var(--danger-light); color: var(--danger); }
-        .badge-nonbiz { background: #fff7ed; color: #c2410c; }
-        .badge-success { background: var(--success-light); color: var(--success); }
+        .badge-active { background: #dcfce7; color: #059669; }
+        .badge-inactive { background: #f4f4f5; color: #71717a; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-biz { background: #dbeafe; color: #2563eb; }
+        .badge-info { background: #ede9fe; color: #7c3aed; }
+        .badge-error { background: #fee2e2; color: #dc2626; }
+        .badge-nonbiz { background: #ffedd5; color: #ea580c; }
+        .badge-success { background: #dcfce7; color: #059669; }
         
-        [data-theme="dark"] .badge-pending { color: var(--warning); }
-        [data-theme="dark"] .badge-info { background: rgba(124, 58, 237, 0.1); color: #a78bfa; }
-        [data-theme="dark"] .badge-nonbiz { background: rgba(194, 65, 12, 0.1); color: #fb923c; }
+        [data-theme="dark"] .badge-active { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        [data-theme="dark"] .badge-inactive { background: #27272a; color: #71717a; }
+        [data-theme="dark"] .badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        [data-theme="dark"] .badge-biz { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        [data-theme="dark"] .badge-info { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+        [data-theme="dark"] .badge-error { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        [data-theme="dark"] .badge-nonbiz { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+        [data-theme="dark"] .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         
         /* 토스트 */
         .toast { 
@@ -257,49 +265,49 @@
         }
         
         /* 사이드바 */
-        .menu-group { margin-bottom: 6px; }
+        .menu-group { margin-bottom: 8px; }
         .menu-title {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-muted);
-            padding: 18px 18px 10px 18px;
+            padding: 20px 20px 12px 20px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
         .sidebar-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 18px;
-            font-size: 14px;
+            gap: 14px;
+            padding: 14px 20px;
+            font-size: 15px;
             color: var(--text-secondary);
-            border-radius: 10px;
+            border-radius: 12px;
             transition: all 0.15s;
             text-align: left;
             background: transparent;
             border: none;
             cursor: pointer;
-            margin: 3px 10px;
-            font-weight: 500;
+            margin: 4px 12px;
+            font-weight: 600;
         }
         .sidebar-item:hover {
             background: var(--bg-secondary);
             color: var(--text-primary);
         }
         .sidebar-item.active {
-            background: var(--accent-light);
-            color: var(--accent);
-            font-weight: 600;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
         }
         .sidebar-item .dot {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: currentColor;
-            opacity: 0.6;
+            opacity: 0.7;
         }
         .sidebar-item .sidebar-icon {
-            font-size: 17px;
+            font-size: 20px;
         }
         
         /* 다크모드 토글 스위치 */
@@ -350,18 +358,24 @@
             color: var(--text-primary) !important;
         }
         
-        /* 포인트 컬러 텍스트 */
+        /* 포인트 컬러 - 통일된 팔레트 */
         .text-purple-400 { color: #8b5cf6 !important; }
-        .text-blue-400 { color: var(--accent) !important; }
-        .text-green-400 { color: var(--success) !important; }
-        .text-red-400 { color: var(--danger) !important; }
-        .text-yellow-400 { color: #eab308 !important; }
+        .text-blue-400 { color: #3b82f6 !important; }
+        .text-green-400 { color: #10b981 !important; }
+        .text-red-400 { color: #ef4444 !important; }
+        .text-yellow-400 { color: #f59e0b !important; }
         .text-orange-400 { color: #f97316 !important; }
         .text-pink-400 { color: #ec4899 !important; }
         .text-cyan-400 { color: #06b6d4 !important; }
         
         [data-theme="dark"] .text-purple-400 { color: #a78bfa !important; }
-        [data-theme="dark"] .text-yellow-400 { color: #facc15 !important; }
+        [data-theme="dark"] .text-blue-400 { color: #60a5fa !important; }
+        [data-theme="dark"] .text-green-400 { color: #34d399 !important; }
+        [data-theme="dark"] .text-red-400 { color: #f87171 !important; }
+        [data-theme="dark"] .text-yellow-400 { color: #fbbf24 !important; }
+        [data-theme="dark"] .text-orange-400 { color: #fb923c !important; }
+        [data-theme="dark"] .text-pink-400 { color: #f472b6 !important; }
+        [data-theme="dark"] .text-cyan-400 { color: #22d3ee !important; }
         
         /* 숫자 크기 */
         .text-xl { font-size: 1.35rem !important; font-weight: 700 !important; }
@@ -424,12 +438,12 @@
     <!-- 메인 -->
     <div id="mainSystem" class="hidden">
         <!-- 사이드바 -->
-        <aside class="sidebar fixed left-0 top-0 h-screen border-r hidden md:block" style="width: 260px; background: var(--sidebar-bg); border-color: var(--border); overflow-y:auto; z-index: 50;">
+        <aside class="sidebar fixed left-0 top-0 h-screen border-r hidden md:block" style="width: 280px; background: var(--sidebar-bg); border-color: var(--border); overflow-y:auto; z-index: 50;">
             <!-- 로고 -->
-            <div class="p-5 border-b" style="border-color: var(--border)">
+            <div class="p-6 border-b" style="border-color: var(--border)">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm" style="background: var(--accent)">TB</div>
-                    <span class="text-lg font-bold" style="color: var(--text-primary)">TeamBro</span>
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-white text-base" style="background: var(--accent)">TB</div>
+                    <span class="text-xl font-bold" style="color: var(--text-primary)">TeamBro</span>
                 </div>
             </div>
             
@@ -507,16 +521,16 @@
         </aside>
 
         <!-- 상단 헤더 -->
-        <header class="fixed top-0 right-0 z-40 border-b" style="left: 260px; background: var(--header-bg); backdrop-filter: blur(20px); border-color: var(--border);">
-            <div class="px-6 py-4 flex items-center justify-between">
+        <header class="fixed top-0 right-0 z-40 border-b" style="left: 280px; background: var(--header-bg); backdrop-filter: blur(20px); border-color: var(--border);">
+            <div class="px-8 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleMobileMenu()" class="text-xl md:hidden" style="color: var(--text-secondary)">☰</button>
-                    <h2 id="pageTitle" class="text-lg font-bold" style="color: var(--text-primary)">대시보드</h2>
+                    <h2 id="pageTitle" class="text-xl font-bold" style="color: var(--text-primary)">대시보드</h2>
                 </div>
                 <div class="flex items-center gap-5">
                     <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드"></div>
-                    <span id="headerUserName" class="text-sm font-medium hidden md:inline" style="color: var(--text-secondary)">관리자</span>
-                    <button onclick="logout()" class="text-sm font-medium transition-colors hover:opacity-70" style="color: var(--text-muted)">로그아웃</button>
+                    <span id="headerUserName" class="text-sm font-semibold hidden md:inline" style="color: var(--text-secondary)">관리자</span>
+                    <button onclick="logout()" class="text-sm font-semibold transition-colors hover:opacity-70" style="color: var(--danger)">로그아웃</button>
                 </div>
             </div>
         </header>
@@ -2446,7 +2460,7 @@ async function handleLogin(e) {
         document.getElementById('mainSystem').classList.remove('hidden');
         // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '260px';
+            document.getElementById('mainContent').style.marginLeft = '280px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
@@ -2477,7 +2491,7 @@ async function restoreSession() {
         document.getElementById('mainSystem').classList.remove('hidden');
         // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '260px';
+            document.getElementById('mainContent').style.marginLeft = '280px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
