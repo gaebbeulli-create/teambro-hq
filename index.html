@@ -669,8 +669,8 @@
                         </div>
                     </div>
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <table class="data-table"><thead><tr><th>이름</th><th>주민번호</th><th>협력사</th><th>플랫폼ID</th><th>세금처리</th><th>상태</th><th>관리</th></tr></thead>
-                        <tbody id="riderTableBody"><tr><td colspan="7" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
+                        <table class="data-table"><thead><tr><th>이름</th><th>주민번호</th><th>협력사</th><th>배민ID</th><th>쿠팡ID</th><th>세금처리</th><th>상태</th><th>관리</th></tr></thead>
+                        <tbody id="riderTableBody"><tr><td colspan="8" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
                     </div>
                 </div>
 
@@ -693,7 +693,7 @@
                         <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">소속 라이더</div><div class="text-xl font-bold text-blue-400" id="partner-riders">0</div></div>
                     </div>
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <table class="data-table"><thead><tr><th>협력사명</th><th>코드</th><th>구분</th><th>대표자</th><th>연락처</th><th>라이더수</th><th>관리</th></tr></thead>
+                        <table class="data-table"><thead><tr><th>협력사명</th><th>코드</th><th>구분</th><th>배달권역</th><th>대표자</th><th>연락처</th><th>라이더수</th><th>관리</th></tr></thead>
                         <tbody id="partnerTableBody"><tr><td colspan="7" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
                     </div>
                 </div>
@@ -1554,26 +1554,55 @@
 
     <!-- 라이더 모달 -->
     <div id="riderModal" class="modal-overlay hidden">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width:650px">
             <div class="flex justify-between items-center mb-4"><h3 id="riderModalTitle" class="text-xl font-bold text-blue-400">🏍️ 라이더 등록</h3><button onclick="closeModal('riderModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="riderForm" onsubmit="submitForm('rider',event)" class="space-y-4">
                 <input type="hidden" id="rider-id">
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">라이더이름 <span class="text-red-400">*</span></label><input type="text" id="rider-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">주민번호</label><input type="text" id="rider-ssn" class="input-field" placeholder="000000-0000000" maxlength="14" oninput="formatSSN(this)"></div>
+                
+                <!-- 라이더 기본정보 -->
+                <div class="p-3 rounded-lg" style="background: var(--bg-secondary)">
+                    <h4 class="text-sm font-bold mb-3" style="color: var(--text-primary)">📋 라이더 정보</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm text-blue-400 mb-1">라이더이름 <span class="text-red-400">*</span></label><input type="text" id="rider-name" class="input-field" required></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">주민번호</label><input type="text" id="rider-ssn" class="input-field" placeholder="000000-0000000" maxlength="14" oninput="formatSSN(this)"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">소속협력사</label><select id="rider-partner" class="input-field"><option value="">선택안함</option></select></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">세금처리</label><select id="rider-tax-type" class="input-field"><option value="">선택</option><option value="원천징수">원천징수</option><option value="과세지출">과세지출</option></select></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">배민 ID</label><input type="text" id="rider-baemin-id" class="input-field" placeholder="배민 라이더 ID"></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">쿠팡 ID</label><input type="text" id="rider-coupang-id" class="input-field" placeholder="쿠팡 라이더 ID"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">예금주</label><input type="text" id="rider-account-holder" class="input-field"></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">계좌번호</label><input type="text" id="rider-account-no" class="input-field"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="근무">근무</option><option value="퇴사">퇴사</option></select></div>
+                        <div></div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">소속협력사</label><select id="rider-partner" class="input-field"><option value="">선택안함</option></select></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">플랫폼ID (배민/쿠팡)</label><input type="text" id="rider-platform-id" class="input-field" placeholder="배민ID 또는 쿠팡ID"></div>
+                
+                <!-- 첨부파일 -->
+                <div class="p-3 rounded-lg" style="background: var(--bg-secondary)">
+                    <h4 class="text-sm font-bold mb-3" style="color: var(--text-primary)">📎 첨부파일</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm w-28" style="color: var(--text-secondary)">근로계약서</label>
+                            <input type="file" id="rider-file-contract" class="input-field text-sm flex-1" accept=".pdf,.jpg,.jpeg,.png" onchange="showFileSelected(this, 'rider-file-contract-status')">
+                            <span id="rider-file-contract-status" class="text-xs text-green-400 hidden">✓ 선택됨</span>
+                            <a id="rider-file-contract-link" href="#" target="_blank" class="text-xs text-blue-400 hidden">📥 보기</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm w-28" style="color: var(--text-secondary)">신분증</label>
+                            <input type="file" id="rider-file-id" class="input-field text-sm flex-1" accept=".pdf,.jpg,.jpeg,.png" onchange="showFileSelected(this, 'rider-file-id-status')">
+                            <span id="rider-file-id-status" class="text-xs text-green-400 hidden">✓ 선택됨</span>
+                            <a id="rider-file-id-link" href="#" target="_blank" class="text-xs text-blue-400 hidden">📥 보기</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">예금주</label><input type="text" id="rider-account-holder" class="input-field"></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">계좌번호</label><input type="text" id="rider-account-no" class="input-field"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">세금처리</label><select id="rider-tax-type" class="input-field"><option value="">선택</option><option value="원천징수">원천징수</option><option value="과세지출">과세지출</option></select></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="근무">근무</option><option value="퇴사">퇴사</option></select></div>
-                </div>
+                
                 <div><label class="block text-sm text-blue-400 mb-1">메모</label><textarea id="rider-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('riderModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
@@ -1582,31 +1611,71 @@
 
     <!-- 협력사 모달 -->
     <div id="partnerModal" class="modal-overlay hidden">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width:700px">
             <div class="flex justify-between items-center mb-4"><h3 id="partnerModalTitle" class="text-xl font-bold text-blue-400">🤝 협력사 등록</h3><button onclick="closeModal('partnerModal')" class="text-gray-400 text-2xl">&times;</button></div>
             <form id="partnerForm" onsubmit="submitForm('partner',event)" class="space-y-4">
                 <input type="hidden" id="partner-id">
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">협력사명 *</label><input type="text" id="partner-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">협력사코드 *</label><input type="text" id="partner-code" class="input-field" required></div>
+                
+                <!-- 협력사 기본정보 -->
+                <div class="p-3 rounded-lg" style="background: var(--bg-secondary)">
+                    <h4 class="text-sm font-bold mb-3" style="color: var(--text-primary)">📋 협력사 정보</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm text-blue-400 mb-1">협력사명 *</label><input type="text" id="partner-name" class="input-field" required></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">협력사코드 *</label><input type="text" id="partner-code" class="input-field" required></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">구분</label><select id="partner-type" class="input-field" onchange="toggleBizFields()"><option value="non_biz">비사업자</option><option value="biz">사업자</option></select></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">배달권역</label><input type="text" id="partner-region" class="input-field" placeholder="예: 강남, 서초, 송파"></div>
+                    </div>
+                    <div id="partnerBizFields" class="hidden grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">사업자번호</label><input type="text" id="partner-bizno" class="input-field" placeholder="000-00-00000" maxlength="12" oninput="formatBizNo(this)"></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">업종</label><input type="text" id="partner-biztype" class="input-field"></div>
+                    </div>
+                    <div class="mt-3"><label class="block text-sm text-blue-400 mb-1">주소</label><input type="text" id="partner-address" class="input-field"></div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">은행</label><select id="partner-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option></select></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">계좌번호</label><input type="text" id="partner-accountno" class="input-field"></div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">구분</label><select id="partner-type" class="input-field" onchange="toggleBizFields()"><option value="non_biz">비사업자</option><option value="biz">사업자</option></select></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">대표자명</label><input type="text" id="partner-rep" class="input-field"></div>
+                
+                <!-- 운영자 정보 -->
+                <div class="p-3 rounded-lg" style="background: var(--bg-secondary)">
+                    <h4 class="text-sm font-bold mb-3" style="color: var(--text-primary)">👤 운영자 정보</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm text-blue-400 mb-1">운영자 이름</label><input type="text" id="partner-rep" class="input-field"></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">운영자 주민번호</label><input type="text" id="partner-rep-ssn" class="input-field" placeholder="000000-0000000" maxlength="14" oninput="formatSSN(this)"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div><label class="block text-sm text-blue-400 mb-1">연락처</label><input type="tel" id="partner-phone" class="input-field" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
+                        <div></div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">연락처</label><input type="tel" id="partner-phone" class="input-field"></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">이메일</label><input type="email" id="partner-email" class="input-field"></div>
+                
+                <!-- 첨부파일 -->
+                <div class="p-3 rounded-lg" style="background: var(--bg-secondary)">
+                    <h4 class="text-sm font-bold mb-3" style="color: var(--text-primary)">📎 첨부파일</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm w-28" style="color: var(--text-secondary)">사업자등록증</label>
+                            <input type="file" id="partner-file-bizreg" class="input-field text-sm flex-1" accept=".pdf,.jpg,.jpeg,.png" onchange="showFileSelected(this, 'partner-file-bizreg-status')">
+                            <span id="partner-file-bizreg-status" class="text-xs text-green-400 hidden">✓ 선택됨</span>
+                            <a id="partner-file-bizreg-link" href="#" target="_blank" class="text-xs text-blue-400 hidden">📥 보기</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm w-28" style="color: var(--text-secondary)">사업주 신분증</label>
+                            <input type="file" id="partner-file-id" class="input-field text-sm flex-1" accept=".pdf,.jpg,.jpeg,.png" onchange="showFileSelected(this, 'partner-file-id-status')">
+                            <span id="partner-file-id-status" class="text-xs text-green-400 hidden">✓ 선택됨</span>
+                            <a id="partner-file-id-link" href="#" target="_blank" class="text-xs text-blue-400 hidden">📥 보기</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm w-28" style="color: var(--text-secondary)">협력사 계약서</label>
+                            <input type="file" id="partner-file-contract" class="input-field text-sm flex-1" accept=".pdf,.jpg,.jpeg,.png" onchange="showFileSelected(this, 'partner-file-contract-status')">
+                            <span id="partner-file-contract-status" class="text-xs text-green-400 hidden">✓ 선택됨</span>
+                            <a id="partner-file-contract-link" href="#" target="_blank" class="text-xs text-blue-400 hidden">📥 보기</a>
+                        </div>
+                    </div>
                 </div>
-                <div id="partnerBizFields" class="hidden grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">사업자번호</label><input type="text" id="partner-bizno" class="input-field"></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">업종</label><input type="text" id="partner-biztype" class="input-field"></div>
-                </div>
-                <div><label class="block text-sm text-blue-400 mb-1">주소</label><input type="text" id="partner-address" class="input-field"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">은행</label><select id="partner-bank" class="input-field"><option value="">선택</option><option value="KB">국민</option><option value="SHINHAN">신한</option><option value="WOORI">우리</option><option value="HANA">하나</option><option value="NH">농협</option></select></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">계좌번호</label><input type="text" id="partner-accountno" class="input-field"></div>
-                </div>
+                
                 <div><label class="block text-sm text-blue-400 mb-1">메모</label><textarea id="partner-memo" class="input-field" rows="2"></textarea></div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('partnerModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
             </form>
@@ -1625,14 +1694,14 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="block text-sm text-blue-400 mb-1">이름 *</label><input type="text" id="sales-name" class="input-field" required></div>
-                    <div><label class="block text-sm text-blue-400 mb-1">연락처</label><input type="tel" id="sales-phone" class="input-field"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">연락처</label><input type="tel" id="sales-phone" class="input-field" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="block text-sm text-blue-400 mb-1">이메일</label><input type="email" id="sales-email" class="input-field"></div>
                     <div><label class="block text-sm text-blue-400 mb-1">지역</label><input type="text" id="sales-region" class="input-field"></div>
                 </div>
                 <div id="salesBizFields" class="hidden grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">사업자번호</label><input type="text" id="sales-bizno" class="input-field"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">사업자번호</label><input type="text" id="sales-bizno" class="input-field" placeholder="000-00-00000" maxlength="12" oninput="formatBizNo(this)"></div>
                     <div><label class="block text-sm text-blue-400 mb-1">대표자명</label><input type="text" id="sales-repname" class="input-field"></div>
                 </div>
                 <div><label class="block text-sm text-blue-400 mb-1">주소</label><input type="text" id="sales-address" class="input-field"></div>
@@ -1965,7 +2034,7 @@
                         <div><label class="block text-sm text-gray-400 mb-1">상태</label><select id="entity-status" class="input-field"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
-                        <div><label class="block text-sm text-gray-400 mb-1">사업자등록번호</label><input type="text" id="entity-bizno" class="input-field" placeholder="000-00-00000"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">사업자등록번호</label><input type="text" id="entity-bizno" class="input-field" placeholder="000-00-00000" maxlength="12" oninput="formatBizNo(this)"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">법인등록번호</label><input type="text" id="entity-corpno" class="input-field" placeholder="000000-0000000"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
@@ -1974,7 +2043,7 @@
                     </div>
                     <div class="mt-3"><label class="block text-sm text-gray-400 mb-1">사업장 주소</label><input type="text" id="entity-address" class="input-field" placeholder="서울시 강남구..."></div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
-                        <div><label class="block text-sm text-gray-400 mb-1">대표 전화</label><input type="text" id="entity-phone" class="input-field" placeholder="02-0000-0000"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">대표 전화</label><input type="text" id="entity-phone" class="input-field" placeholder="02-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">설립일</label><input type="date" id="entity-founddate" class="input-field"></div>
                     </div>
                 </div>
@@ -1984,10 +2053,10 @@
                     <h4 class="text-blue-400 font-bold mb-3">👤 대표자 정보</h4>
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="block text-sm text-gray-400 mb-1">대표자명</label><input type="text" id="entity-ceoname" class="input-field" placeholder="홍길동"></div>
-                        <div><label class="block text-sm text-gray-400 mb-1">대표자 연락처</label><input type="text" id="entity-ceophone" class="input-field" placeholder="010-0000-0000"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">대표자 연락처</label><input type="text" id="entity-ceophone" class="input-field" placeholder="010-0000-0000" maxlength="13" oninput="formatPhone(this)"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
-                        <div><label class="block text-sm text-gray-400 mb-1">대표자 주민번호</label><input type="text" id="entity-ceoresidentno" class="input-field" placeholder="000000-0000000"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">대표자 주민번호</label><input type="text" id="entity-ceoresidentno" class="input-field" placeholder="000000-0000000" maxlength="14" oninput="formatSSN(this)"></div>
                         <div><label class="block text-sm text-gray-400 mb-1">대표자 이메일</label><input type="email" id="entity-ceoemail" class="input-field" placeholder="ceo@example.com"></div>
                     </div>
                     <div class="mt-3"><label class="block text-sm text-gray-400 mb-1">대표자 주소</label><input type="text" id="entity-ceoaddress" class="input-field" placeholder="서울시..."></div>
@@ -2218,7 +2287,7 @@
                 </div>
                 <div><label class="block text-sm text-blue-400 mb-1">거래처명 *</label><input type="text" id="inv-vendor" class="input-field" required placeholder="거래처명"></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">사업자번호</label><input type="text" id="inv-bizno" class="input-field" placeholder="123-45-67890"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">사업자번호</label><input type="text" id="inv-bizno" class="input-field" placeholder="000-00-00000" maxlength="12" oninput="formatBizNo(this)"></div>
                     <div><label class="block text-sm text-blue-400 mb-1">대표자명</label><input type="text" id="inv-ceo" class="input-field"></div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
@@ -2319,10 +2388,41 @@ async function supabaseCall(table, method, body = null, query = '') {
         const options = { method, headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': method === 'POST' ? 'return=representation' : '' } };
         if (body) options.body = JSON.stringify(body);
         const res = await fetch(SUPABASE_URL + '/rest/v1/' + table + query, options);
-        if (!res.ok) throw new Error('API Error: ' + res.status);
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error('API Error:', res.status, errText);
+            throw new Error('API Error: ' + res.status + ' - ' + errText);
+        }
         const text = await res.text();
         return text ? JSON.parse(text) : null;
     } catch (e) { console.error('Supabase Error:', e); return null; }
+}
+
+// 파일 업로드 함수
+async function uploadFileToStorage(file, folder, filename) {
+    try {
+        const ext = file.name.split('.').pop();
+        const path = folder + '/' + filename + '_' + Date.now() + '.' + ext;
+        const res = await fetch(SUPABASE_URL + '/storage/v1/object/documents/' + path, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                'Content-Type': file.type
+            },
+            body: file
+        });
+        if (!res.ok) {
+            const err = await res.text();
+            console.error('Storage Error:', err);
+            return null;
+        }
+        // Public URL 반환
+        return SUPABASE_URL + '/storage/v1/object/public/documents/' + path;
+    } catch (e) {
+        console.error('Upload Error:', e);
+        return null;
+    }
 }
 
 function showToast(msg, type = 'success') {
@@ -2346,13 +2446,54 @@ function toggleSSN(el) {
     }
 }
 
-// 주민번호 하이픈 자동 입력
+// 주민번호 하이픈 자동 입력 (000000-0000000)
 function formatSSN(input) {
-    let value = input.value.replace(/[^0-9]/g, ''); // 숫자만
+    let value = input.value.replace(/[^0-9]/g, '');
     if (value.length > 6) {
         value = value.substring(0, 6) + '-' + value.substring(6, 13);
     }
     input.value = value;
+}
+
+// 전화번호 하이픈 자동 입력 (010-0000-0000 또는 02-0000-0000)
+function formatPhone(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.startsWith('02')) {
+        if (value.length > 2 && value.length <= 6) {
+            value = value.substring(0, 2) + '-' + value.substring(2);
+        } else if (value.length > 6) {
+            value = value.substring(0, 2) + '-' + value.substring(2, 6) + '-' + value.substring(6, 10);
+        }
+    } else {
+        if (value.length > 3 && value.length <= 7) {
+            value = value.substring(0, 3) + '-' + value.substring(3);
+        } else if (value.length > 7) {
+            value = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+        }
+    }
+    input.value = value;
+}
+
+// 사업자번호 하이픈 자동 입력 (000-00-00000)
+function formatBizNo(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.length > 3 && value.length <= 5) {
+        value = value.substring(0, 3) + '-' + value.substring(3);
+    } else if (value.length > 5) {
+        value = value.substring(0, 3) + '-' + value.substring(3, 5) + '-' + value.substring(5, 10);
+    }
+    input.value = value;
+}
+
+// 파일 선택 시 상태 표시
+function showFileSelected(input, statusId) {
+    const status = document.getElementById(statusId);
+    if (input.files && input.files[0]) {
+        status.classList.remove('hidden');
+        status.textContent = '✓ ' + input.files[0].name.substring(0, 15) + (input.files[0].name.length > 15 ? '...' : '');
+    } else {
+        status.classList.add('hidden');
+    }
 }
 
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -2590,20 +2731,20 @@ function renderTable(type) {
         if (pf) list = list.filter(r => r.partner_id == pf);
         if (q) list = list.filter(r => (r.name||'').toLowerCase().includes(q) || (r.phone||'').includes(q));
         const tbody = document.getElementById('riderTableBody');
-        if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+        if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
         tbody.innerHTML = list.map(r => {
             const p = partnerList.find(x => x.id == r.partner_id);
             const ssnFull = r.resident_number || '-';
             const ssnMasked = r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-';
             const statusBadge = r.status === '퇴사' ? 'badge-inactive">퇴사' : 'badge-active">근무';
-            return '<tr><td class="font-bold">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.platform_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+            return '<tr><td class="font-bold">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
         }).join('');
     } else if (type === 'partner') {
         const tbody = document.getElementById('partnerTableBody');
         if (!partnerList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
         tbody.innerHTML = partnerList.map(p => {
             const cnt = riderList.filter(r => r.partner_id == p.id).length;
-            return '<tr><td class="font-bold">' + p.name + '</td><td>' + (p.code||'-') + '</td><td><span class="badge ' + (p.type==='biz'?'badge-biz">사업자':'badge-nonbiz">비사업자') + '</span></td><td>' + (p.rep_name||'-') + '</td><td>' + (p.phone||'-') + '</td><td>' + cnt + '명</td><td><button onclick="editItem(\'partner\',' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePartner(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
+            return '<tr><td class="font-bold">' + p.name + '</td><td>' + (p.code||'-') + '</td><td><span class="badge ' + (p.type==='biz'?'badge-biz">사업자':'badge-nonbiz">비사업자') + '</span></td><td>' + (p.region||'-') + '</td><td>' + (p.rep_name||'-') + '</td><td>' + (p.phone||'-') + '</td><td>' + cnt + '명</td><td><button onclick="editItem(\'partner\',' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePartner(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
         }).join('');
     } else if (type === 'sales') {
         const sf = document.getElementById('salesStatusFilter').value;
@@ -2665,12 +2806,20 @@ function editItem(type, id) {
         document.getElementById('rider-name').value = r.name || '';
         document.getElementById('rider-ssn').value = r.resident_number || '';
         document.getElementById('rider-partner').value = r.partner_id || '';
-        document.getElementById('rider-platform-id').value = r.platform_id || '';
+        document.getElementById('rider-baemin-id').value = r.baemin_id || '';
+        document.getElementById('rider-coupang-id').value = r.coupang_id || '';
         document.getElementById('rider-account-holder').value = r.account_holder || '';
         document.getElementById('rider-account-no').value = r.account_no || '';
         document.getElementById('rider-tax-type').value = r.tax_type || '';
         document.getElementById('rider-status').value = r.status || '근무';
         document.getElementById('rider-memo').value = r.memo || '';
+        // 파일 링크 표시
+        document.getElementById('rider-file-contract-status').classList.add('hidden');
+        document.getElementById('rider-file-id-status').classList.add('hidden');
+        const contractLink = document.getElementById('rider-file-contract-link');
+        const idLink = document.getElementById('rider-file-id-link');
+        if (r.file_contract) { contractLink.href = r.file_contract; contractLink.classList.remove('hidden'); } else { contractLink.classList.add('hidden'); }
+        if (r.file_id) { idLink.href = r.file_id; idLink.classList.remove('hidden'); } else { idLink.classList.add('hidden'); }
         openModal('riderModal');
     } else if (type === 'partner') {
         const p = partnerList.find(x => x.id === id); if (!p) return;
@@ -2679,15 +2828,26 @@ function editItem(type, id) {
         document.getElementById('partner-name').value = p.name || '';
         document.getElementById('partner-code').value = p.code || '';
         document.getElementById('partner-type').value = p.type || 'non_biz';
+        document.getElementById('partner-region').value = p.region || '';
         document.getElementById('partner-rep').value = p.rep_name || '';
+        document.getElementById('partner-rep-ssn').value = p.rep_ssn || '';
         document.getElementById('partner-phone').value = p.phone || '';
-        document.getElementById('partner-email').value = p.email || '';
         document.getElementById('partner-bizno').value = p.biz_no || '';
         document.getElementById('partner-biztype').value = p.biz_type || '';
         document.getElementById('partner-address').value = p.address || '';
         document.getElementById('partner-bank').value = p.bank || '';
         document.getElementById('partner-accountno').value = p.account_no || '';
         document.getElementById('partner-memo').value = p.memo || '';
+        // 파일 링크 표시
+        document.getElementById('partner-file-bizreg-status').classList.add('hidden');
+        document.getElementById('partner-file-id-status').classList.add('hidden');
+        document.getElementById('partner-file-contract-status').classList.add('hidden');
+        const bizregLink = document.getElementById('partner-file-bizreg-link');
+        const idLink = document.getElementById('partner-file-id-link');
+        const contractLink = document.getElementById('partner-file-contract-link');
+        if (p.file_bizreg) { bizregLink.href = p.file_bizreg; bizregLink.classList.remove('hidden'); } else { bizregLink.classList.add('hidden'); }
+        if (p.file_id) { idLink.href = p.file_id; idLink.classList.remove('hidden'); } else { idLink.classList.add('hidden'); }
+        if (p.file_contract) { contractLink.href = p.file_contract; contractLink.classList.remove('hidden'); } else { contractLink.classList.add('hidden'); }
         toggleBizFields();
         openModal('partnerModal');
     } else if (type === 'sales') {
@@ -2763,17 +2923,45 @@ async function submitForm(type, e) {
             name: document.getElementById('rider-name').value, 
             resident_number: ssn, 
             partner_id: document.getElementById('rider-partner').value || null, 
-            platform_id: document.getElementById('rider-platform-id').value || null,
+            baemin_id: document.getElementById('rider-baemin-id').value || null,
+            coupang_id: document.getElementById('rider-coupang-id').value || null,
             account_holder: document.getElementById('rider-account-holder').value || null, 
             account_no: document.getElementById('rider-account-no').value || null, 
             tax_type: document.getElementById('rider-tax-type').value || null, 
             status: document.getElementById('rider-status').value, 
             memo: document.getElementById('rider-memo').value || null 
         };
+        // 파일 업로드 처리
+        const contractFile = document.getElementById('rider-file-contract').files[0];
+        const idFile = document.getElementById('rider-file-id').files[0];
+        if (contractFile) {
+            const url = await uploadFileToStorage(contractFile, 'riders', 'contract_' + (data.name || 'rider'));
+            if (url) data.file_contract = url;
+        }
+        if (idFile) {
+            const url = await uploadFileToStorage(idFile, 'riders', 'id_' + (data.name || 'rider'));
+            if (url) data.file_id = url;
+        }
         table = 'riders'; list = riderList;
     } else if (type === 'partner') {
         id = document.getElementById('partner-id').value;
-        data = { name: document.getElementById('partner-name').value, code: document.getElementById('partner-code').value, type: document.getElementById('partner-type').value, rep_name: document.getElementById('partner-rep').value || null, phone: document.getElementById('partner-phone').value || null, email: document.getElementById('partner-email').value || null, biz_no: document.getElementById('partner-bizno').value || null, biz_type: document.getElementById('partner-biztype').value || null, address: document.getElementById('partner-address').value || null, bank: document.getElementById('partner-bank').value || null, account_no: document.getElementById('partner-accountno').value || null, memo: document.getElementById('partner-memo').value || null };
+        data = { name: document.getElementById('partner-name').value, code: document.getElementById('partner-code').value, type: document.getElementById('partner-type').value, region: document.getElementById('partner-region').value || null, rep_name: document.getElementById('partner-rep').value || null, rep_ssn: document.getElementById('partner-rep-ssn').value || null, phone: document.getElementById('partner-phone').value || null, biz_no: document.getElementById('partner-bizno').value || null, biz_type: document.getElementById('partner-biztype').value || null, address: document.getElementById('partner-address').value || null, bank: document.getElementById('partner-bank').value || null, account_no: document.getElementById('partner-accountno').value || null, memo: document.getElementById('partner-memo').value || null };
+        // 파일 업로드 처리
+        const bizregFile = document.getElementById('partner-file-bizreg').files[0];
+        const idFile = document.getElementById('partner-file-id').files[0];
+        const contractFile = document.getElementById('partner-file-contract').files[0];
+        if (bizregFile) {
+            const url = await uploadFileToStorage(bizregFile, 'partners', 'bizreg_' + (data.code || 'partner'));
+            if (url) data.file_bizreg = url;
+        }
+        if (idFile) {
+            const url = await uploadFileToStorage(idFile, 'partners', 'id_' + (data.code || 'partner'));
+            if (url) data.file_id = url;
+        }
+        if (contractFile) {
+            const url = await uploadFileToStorage(contractFile, 'partners', 'contract_' + (data.code || 'partner'));
+            if (url) data.file_contract = url;
+        }
         table = 'partners'; list = partnerList;
     } else if (type === 'sales') {
         id = document.getElementById('sales-id').value;
@@ -2951,8 +3139,8 @@ async function submitUser(e) {
 
 // 엑셀 기능
 const TEMPLATES = {
-    rider: { filename: '라이더_양식.xlsx', headers: ['라이더이름*','주민번호','소속협력사','플랫폼ID(배민/쿠팡)','예금주','계좌번호','세금처리(원천징수/과세지출)','상태(근무/퇴사)','메모'], fields: ['name','resident_number','partner_code','platform_id','account_holder','account_no','tax_type','status','memo'], sample: ['홍길동','900101-1234567','DP123','baemin123','홍길동','1234567890','원천징수','근무','메모'] },
-    partner: { filename: '협력사_양식.xlsx', headers: ['협력사명*','협력사코드*','구분','대표자','연락처','이메일','사업자번호','업종','주소','은행','계좌번호','메모'], fields: ['name','code','type','rep_name','phone','email','biz_no','biz_type','address','bank','account_no','memo'], sample: ['배민팀브로','DP123','biz','김대표','02-1234-5678','test@test.com','123-45-67890','운송업','서울','KB','1234567890','메모'] },
+    rider: { filename: '라이더_양식.xlsx', headers: ['라이더이름*','주민번호','소속협력사','배민ID','쿠팡ID','예금주','계좌번호','세금처리(원천징수/과세지출)','상태(근무/퇴사)','메모'], fields: ['name','resident_number','partner_code','baemin_id','coupang_id','account_holder','account_no','tax_type','status','memo'], sample: ['홍길동','900101-1234567','DP123','baemin123','coupang456','홍길동','1234567890','원천징수','근무','메모'] },
+    partner: { filename: '협력사_양식.xlsx', headers: ['협력사명*','협력사코드*','구분(biz/non_biz)','배달권역','운영자이름','운영자주민번호','연락처','사업자번호','업종','주소','은행','계좌번호','메모'], fields: ['name','code','type','region','rep_name','rep_ssn','phone','biz_no','biz_type','address','bank','account_no','memo'], sample: ['배민팀브로','DP123','biz','강남,서초','김운영','850101-1234567','02-1234-5678','123-45-67890','운송업','서울','KB','1234567890','메모'] },
     sales: { filename: '영업자_양식.xlsx', headers: ['영업자코드*','이름*','유형','연락처','이메일','지역','주소','사업자번호','대표자명','은행','예금주','계좌번호','원천징수율','지급주기','상태','메모'], fields: ['sales_code','name','sales_type','phone','email','region','address','biz_no','rep_name','bank_name','bank_holder','bank_account','withholding_rate','payout_cycle','status','memo'], sample: ['SB-0001','김영업','individual','010-1234-5678','sales@test.com','서울','서울시','','','KB','김영업','1234567890','0.033','monthly','active','메모'] },
     taxinvoice: { filename: '세금계산서_양식.xlsx', headers: ['유형(매입/매출)*','발행일*','거래처*','사업자번호','대표자','공급가액*','부가세','합계','지급상태','품목','메모'], sample: ['매입','2025-01-15','(주)테스트','123-45-67890','김대표','1000000','100000','1100000','미지급','물품대','메모'] },
     journal: { filename: '분개장_양식.xlsx', headers: ['일자*','분개번호','차변계정','차변금액*','대변계정','대변금액*','적요*','상태','메모'], sample: ['2025-01-15','JNL-001','102-보통예금','1000000','401-매출','1000000','매출대금 입금','생성','메모'] }
@@ -2970,12 +3158,12 @@ function downloadTemplate(type) {
 function exportToExcel(type) {
     let data, filename, headers;
     if (type === 'rider') {
-        headers = ['라이더이름','주민번호','소속협력사','플랫폼ID','예금주','계좌번호','세금처리','상태','메모'];
-        data = riderList.map(r => { const p = partnerList.find(x => x.id == r.partner_id); return [r.name, r.resident_number||'', p?p.name:'', r.platform_id||'', r.account_holder||'', r.account_no||'', r.tax_type||'', r.status||'', r.memo||'']; });
+        headers = ['라이더이름','주민번호','소속협력사','배민ID','쿠팡ID','예금주','계좌번호','세금처리','상태','메모'];
+        data = riderList.map(r => { const p = partnerList.find(x => x.id == r.partner_id); return [r.name, r.resident_number||'', p?p.name:'', r.baemin_id||'', r.coupang_id||'', r.account_holder||'', r.account_no||'', r.tax_type||'', r.status||'', r.memo||'']; });
         filename = '라이더목록.xlsx';
     } else if (type === 'partner') {
-        headers = ['협력사명','코드','구분','대표자','연락처','이메일','사업자번호','업종','주소','은행','계좌번호','메모'];
-        data = partnerList.map(p => [p.name, p.code, p.type, p.rep_name, p.phone, p.email, p.biz_no, p.biz_type, p.address, p.bank, p.account_no, p.memo]);
+        headers = ['협력사명','코드','구분','배달권역','운영자이름','운영자주민번호','연락처','사업자번호','업종','주소','은행','계좌번호','메모'];
+        data = partnerList.map(p => [p.name, p.code, p.type, p.region||'', p.rep_name||'', p.rep_ssn||'', p.phone||'', p.biz_no||'', p.biz_type||'', p.address||'', p.bank||'', p.account_no||'', p.memo||'']);
         filename = '협력사목록.xlsx';
     } else if (type === 'sales') {
         headers = ['코드','이름','유형','연락처','이메일','지역','주소','은행','예금주','계좌번호','원천징수율','지급주기','상태','메모'];
@@ -3405,31 +3593,39 @@ async function uploadTaxInvoiceExcel(input) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
     reader.onload = async (e) => {
-        const wb = XLSX.read(e.target.result, { type: 'binary' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-        if (rows.length < 2) { showToast('데이터가 없습니다', 'error'); return; }
-        let count = 0;
-        for (let i = 1; i < rows.length; i++) {
-            const r = rows[i]; if (!r[2]) continue;
-            const data = {
-                invoice_type: r[0] === '매입' ? 'purchase' : 'sales',
-                invoice_date: r[1],
-                partner_name: r[2],
-                biz_no: r[3] || null,
-                ceo_name: r[4] || null,
-                supply_amount: parseFloat(r[5]) || 0,
-                vat_amount: parseFloat(r[6]) || 0,
-                total_amount: parseFloat(r[7]) || 0,
-                payment_status: r[8] === '지급완료' ? 'paid' : 'unpaid',
-                item_name: r[9] || null,
-                memo: r[10] || null
-            };
-            const res = await supabaseCall('hq_tax_invoices', 'POST', data);
-            if (res && res[0]) { taxInvoiceList.unshift(res[0]); count++; }
+        try {
+            const wb = XLSX.read(e.target.result, { type: 'binary' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+            if (rows.length < 2) { showToast('데이터가 없습니다', 'error'); return; }
+            let count = 0, errorCount = 0;
+            for (let i = 1; i < rows.length; i++) {
+                const r = rows[i]; if (!r[2]) continue;
+                const data = {
+                    invoice_type: (r[0] || '').includes('매입') ? 'purchase' : 'sales',
+                    invoice_date: r[1] ? String(r[1]).substring(0, 10) : new Date().toISOString().split('T')[0],
+                    partner_name: r[2],
+                    biz_no: r[3] || null,
+                    ceo_name: r[4] || null,
+                    supply_amount: parseFloat(r[5]) || 0,
+                    vat_amount: parseFloat(r[6]) || 0,
+                    total_amount: parseFloat(r[7]) || (parseFloat(r[5]) || 0) + (parseFloat(r[6]) || 0),
+                    payment_status: (r[8] || '').includes('완료') ? 'paid' : 'unpaid',
+                    item_name: r[9] || null,
+                    memo: r[10] || null
+                };
+                console.log('업로드 데이터:', data);
+                const res = await supabaseCall('hq_tax_invoices', 'POST', data);
+                if (res && res[0]) { taxInvoiceList.unshift(res[0]); count++; }
+                else { errorCount++; console.error('업로드 실패:', r); }
+            }
+            if (count > 0) showToast(count + '건 업로드 완료');
+            if (errorCount > 0) showToast(errorCount + '건 실패 (콘솔 확인)', 'error');
+            renderTaxInvoiceTable();
+        } catch (err) {
+            console.error('엑셀 파싱 에러:', err);
+            showToast('엑셀 파일 오류: ' + err.message, 'error');
         }
-        showToast(count + '건 업로드 완료');
-        renderTaxInvoiceTable();
     };
     reader.readAsBinaryString(input.files[0]);
     input.value = '';
