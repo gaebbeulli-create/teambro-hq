@@ -783,12 +783,30 @@
                 <!-- 사용자 관리 -->
                 <div id="tab-users" class="tab-content hidden">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold">👥 사용자 관리</h2>
+                        <h2 class="text-2xl font-bold">👥 사용자 관리 (통합)</h2>
                         <button onclick="openUserModal()" class="btn-primary btn-sm">+ 사용자 등록</button>
                     </div>
+                    <p class="text-gray-400 text-sm mb-4">팀브로 HQ, 브로컴퍼니, 브로모터스 등 모든 시스템의 사용자를 통합 관리합니다.</p>
+                    <div class="glass-card rounded-xl p-3 mb-4">
+                        <div class="flex flex-wrap gap-2">
+                            <select id="userSystemFilter" class="input-field" style="width:150px" onchange="renderUserTable()">
+                                <option value="">전체 시스템</option>
+                                <option value="hq">팀브로 HQ</option>
+                                <option value="brocompany">브로컴퍼니</option>
+                                <option value="bromotors">브로모터스</option>
+                            </select>
+                            <select id="userRoleFilter" class="input-field" style="width:120px" onchange="renderUserTable()">
+                                <option value="">전체 권한</option>
+                                <option value="ADMIN">관리자</option>
+                                <option value="MANAGER">매니저</option>
+                                <option value="STAFF">직원</option>
+                            </select>
+                            <input type="text" id="userSearch" class="input-field flex-1" style="min-width:150px" placeholder="이름/아이디 검색..." onkeyup="renderUserTable()">
+                        </div>
+                    </div>
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <table class="data-table"><thead><tr><th>이름</th><th>아이디</th><th>권한</th><th>상태</th><th>관리</th></tr></thead>
-                        <tbody id="userTableBody"><tr><td colspan="5" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
+                        <table class="data-table"><thead><tr><th>이름</th><th>아이디</th><th>소속</th><th>권한</th><th>상태</th><th>관리</th></tr></thead>
+                        <tbody id="userTableBody"><tr><td colspan="6" class="text-center py-8 text-gray-500">로딩중...</td></tr></tbody></table>
                     </div>
                 </div>
 
@@ -1820,9 +1838,10 @@
                     <div><label class="block text-sm text-blue-400 mb-1">이름 *</label><input type="text" id="user-name" class="input-field" required></div>
                     <div><label class="block text-sm text-blue-400 mb-1">아이디 *</label><input type="text" id="user-username" class="input-field" required></div>
                 </div>
-                <div><label class="block text-sm text-blue-400 mb-1">비밀번호</label><input type="password" id="user-password" class="input-field"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-sm text-blue-400 mb-1">권한</label><select id="user-role" class="input-field"><option value="VIEWER">뷰어 (조회만)</option><option value="STAFF">직원 (조회/등록)</option><option value="MANAGER">매니저 (등록/수정)</option><option value="ADMIN">최고관리자 (모든권한)</option></select></div>
+                <div><label class="block text-sm text-blue-400 mb-1">비밀번호</label><input type="password" id="user-password" class="input-field" placeholder="수정 시 빈칸이면 유지"></div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">소속 시스템</label><select id="user-system" class="input-field"><option value="hq">팀브로 HQ</option><option value="brocompany">브로컴퍼니</option><option value="bromotors">브로모터스</option><option value="all">전체</option></select></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">권한</label><select id="user-role" class="input-field"><option value="VIEWER">뷰어</option><option value="STAFF">직원</option><option value="MANAGER">매니저</option><option value="ADMIN">관리자</option></select></div>
                     <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="user-status" class="input-field"><option value="true">활성</option><option value="false">비활성</option></select></div>
                 </div>
                 <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('userModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
@@ -2442,6 +2461,41 @@
         </div>
     </div>
 
+    <!-- 직원 등록/수정 모달 -->
+    <div id="employeeModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:600px">
+            <div class="flex justify-between items-center mb-4"><h3 id="employeeModalTitle" class="text-xl font-bold text-blue-400">👤 직원 등록</h3><button onclick="closeModal('employeeModal')" class="text-gray-400 text-2xl">&times;</button></div>
+            <form id="employeeForm" onsubmit="submitEmployee(event)" class="space-y-4">
+                <input type="hidden" id="emp-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">사번</label><input type="text" id="emp-no" class="input-field" placeholder="EMP-001"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">이름 *</label><input type="text" id="emp-name" class="input-field" required></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">고용형태</label><select id="emp-type" class="input-field"><option value="regular">정규직</option><option value="contract">계약직</option><option value="parttime">파트타임</option></select></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">부서</label><input type="text" id="emp-dept" class="input-field" placeholder="경영지원팀"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">직급</label><input type="text" id="emp-position" class="input-field" placeholder="대리"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">입사일</label><input type="date" id="emp-joindate" class="input-field"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">연락처</label><input type="text" id="emp-phone" class="input-field" placeholder="010-0000-0000"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">이메일</label><input type="email" id="emp-email" class="input-field"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-sm text-blue-400 mb-1">기본급</label><input type="number" id="emp-salary" class="input-field" value="0"></div>
+                    <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="emp-status" class="input-field"><option value="active">재직</option><option value="inactive">퇴직</option></select></div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="flex items-center gap-2"><input type="checkbox" id="emp-insurance" class="w-4 h-4"> 4대보험 가입</label>
+                </div>
+                <div><label class="block text-sm text-blue-400 mb-1">메모</label><textarea id="emp-memo" class="input-field" rows="2"></textarea></div>
+                <div class="flex gap-2 mt-4"><button type="button" onclick="closeModal('employeeModal')" class="flex-1 btn-secondary">취소</button><button type="submit" class="flex-1 btn-primary">저장</button></div>
+            </form>
+        </div>
+    </div>
+
 <script>
 const SUPABASE_URL = 'https://jizaefuhiikpkcxolibc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppemFlZnVoaWlrcGtjeG9saWJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMDM3MDIsImV4cCI6MjA4MzY3OTcwMn0.WXFNYvSl1n9pp0yZpD8ndNZdEHvL53wtDzrJz9Y_ssg';
@@ -2615,6 +2669,9 @@ function toggleSidebar() {
 function showTab(tab) {
     console.log('showTab called:', tab);
     
+    // 현재 탭 상태 저장
+    sessionStorage.setItem('teambro_current_tab', tab);
+    
     // 사이드바 아이템 active 처리
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById('nav-' + tab);
@@ -2762,7 +2819,14 @@ async function enterSystem(system) {
             document.getElementById('mainContent').style.marginLeft = '260px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
-        loadDashboard();
+        
+        // 저장된 탭 복원 또는 대시보드
+        const savedTab = sessionStorage.getItem('teambro_current_tab');
+        if (savedTab) {
+            showTab(savedTab);
+        } else {
+            loadDashboard();
+        }
     } else if (system === 'brocompany' || system === 'bromotors') {
         // URL 파라미터로 세션 전달 (다른 도메인이라 localStorage 공유 안됨)
         // 한글 인코딩을 위해 encodeURIComponent 후 btoa
@@ -2804,8 +2868,20 @@ async function restoreSession() {
         if (!users || !users.length || !users[0].is_active) return false;
         currentUser = users[0];
         
-        // 세션 복원 시 시스템 선택 화면으로
-        showSystemSelectPage();
+        // 저장된 탭이 있으면 바로 HQ로 진입
+        const savedTab = sessionStorage.getItem('teambro_current_tab');
+        if (savedTab && (currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER')) {
+            await loadAllData();
+            document.getElementById('mainSystem').classList.remove('hidden');
+            if (window.innerWidth >= 768) {
+                document.getElementById('mainContent').style.marginLeft = '260px';
+            }
+            document.getElementById('headerUserName').textContent = currentUser.name;
+            showTab(savedTab);
+        } else {
+            // 탭 저장 없으면 시스템 선택 화면으로
+            showSystemSelectPage();
+        }
         return true;
     } catch (e) { return false; }
 }
@@ -3655,12 +3731,33 @@ async function submitSettlement(e) {
 
 // 사용자 관리
 function renderUserTable() {
+    const systemFilter = document.getElementById('userSystemFilter')?.value || '';
+    const roleFilter = document.getElementById('userRoleFilter')?.value || '';
+    const searchFilter = (document.getElementById('userSearch')?.value || '').toLowerCase();
+    
+    let filtered = userList.filter(u => {
+        if (systemFilter && u.system_type !== systemFilter && u.system_type !== 'all') return false;
+        if (roleFilter && u.role !== roleFilter) return false;
+        if (searchFilter && !(u.name || '').toLowerCase().includes(searchFilter) && !(u.username || '').toLowerCase().includes(searchFilter)) return false;
+        return true;
+    });
+    
     const tbody = document.getElementById('userTableBody');
-    if (!userList.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
-    tbody.innerHTML = userList.map(u => '<tr><td class="font-bold">' + u.name + '</td><td>' + u.username + '</td><td><span class="badge ' + (u.role==='ADMIN'?'badge-active':'badge-inactive') + '">' + u.role + '</span></td><td><span class="badge ' + (u.is_active?'badge-active">활성':'badge-inactive">비활성') + '</span></td><td><button onclick="editUser(' + u.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    
+    const systemNames = { hq: '팀브로 HQ', brocompany: '브로컴퍼니', bromotors: '브로모터스', all: '전체' };
+    const roleClass = { ADMIN: 'badge-error', MANAGER: 'badge-info', STAFF: 'badge-active', VIEWER: 'badge-pending' };
+    
+    tbody.innerHTML = filtered.map(u => '<tr><td class="font-bold">' + u.name + '</td><td>' + u.username + '</td><td><span class="badge badge-info">' + (systemNames[u.system_type] || '팀브로 HQ') + '</span></td><td><span class="badge ' + (roleClass[u.role] || 'badge-inactive') + '">' + u.role + '</span></td><td><span class="badge ' + (u.is_active?'badge-active">활성':'badge-inactive">비활성') + '</span></td><td><button onclick="editUser(' + u.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteUser(' + u.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>').join('');
 }
 
-function openUserModal() { document.getElementById('userModalTitle').textContent = '👤 사용자 등록'; document.getElementById('userForm').reset(); document.getElementById('user-id').value = ''; openModal('userModal'); }
+function openUserModal() { 
+    document.getElementById('userModalTitle').textContent = '👤 사용자 등록'; 
+    document.getElementById('userForm').reset(); 
+    document.getElementById('user-id').value = ''; 
+    document.getElementById('user-system').value = 'hq';
+    openModal('userModal'); 
+}
 
 function editUser(id) {
     const u = userList.find(x => x.id === id); if (!u) return;
@@ -3669,6 +3766,7 @@ function editUser(id) {
     document.getElementById('user-name').value = u.name || '';
     document.getElementById('user-username').value = u.username || '';
     document.getElementById('user-password').value = '';
+    document.getElementById('user-system').value = u.system_type || 'hq';
     document.getElementById('user-role').value = u.role || 'STAFF';
     document.getElementById('user-status').value = u.is_active ? 'true' : 'false';
     openModal('userModal');
@@ -3677,7 +3775,13 @@ function editUser(id) {
 async function submitUser(e) {
     e.preventDefault();
     const id = document.getElementById('user-id').value;
-    const data = { name: document.getElementById('user-name').value, username: document.getElementById('user-username').value, role: document.getElementById('user-role').value, is_active: document.getElementById('user-status').value === 'true' };
+    const data = { 
+        name: document.getElementById('user-name').value, 
+        username: document.getElementById('user-username').value, 
+        system_type: document.getElementById('user-system').value,
+        role: document.getElementById('user-role').value, 
+        is_active: document.getElementById('user-status').value === 'true' 
+    };
     const pw = document.getElementById('user-password').value;
     if (pw) data.password_hash = pw;
     try {
@@ -3695,6 +3799,17 @@ async function submitUser(e) {
         closeModal('userModal');
         renderUserTable();
     } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+// 사용자 삭제
+async function deleteUser(id) {
+    if (!confirm('이 사용자를 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('hq_users', 'DELETE', null, '?id=eq.' + id);
+        userList = userList.filter(u => u.id !== id);
+        showToast('사용자 삭제 완료');
+        renderUserTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
 }
 
 // 엑셀 기능
@@ -4108,12 +4223,12 @@ function renderTaxInvoiceTable() {
     if (search) list = list.filter(t => (t.partner_name || '').toLowerCase().includes(search));
     
     const tbody = document.getElementById('taxInvoiceTableBody');
-    if (!list.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     const types = { purchase: '매입', sales: '매출' };
     const payStatus = { unpaid: '미지급', paid: '지급완료' };
     tbody.innerHTML = list.map(t => {
         const syncBadge = t.synced_to_ledger ? '<span class="badge badge-active text-xs">연동</span>' : '<span class="badge badge-pending text-xs">미연동</span>';
-        return '<tr><td><span class="badge ' + (t.invoice_type === 'purchase' ? 'badge-error' : 'badge-info') + '">' + (types[t.invoice_type] || t.invoice_type) + '</span></td><td>' + t.invoice_date + '</td><td class="font-bold">' + (t.partner_name || '-') + '</td><td class="text-right">₩' + parseInt(t.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(t.vat_amount || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(t.total_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (t.payment_status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (payStatus[t.payment_status] || '미지급') + '</span></td><td>' + syncBadge + '</td><td><button onclick="editTaxInvoice(' + t.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+        return '<tr><td><span class="badge ' + (t.invoice_type === 'purchase' ? 'badge-error' : 'badge-info') + '">' + (types[t.invoice_type] || t.invoice_type) + '</span></td><td>' + t.invoice_date + '</td><td class="font-bold">' + (t.partner_name || '-') + '</td><td class="text-right">₩' + parseInt(t.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(t.vat_amount || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(t.total_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (t.payment_status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (payStatus[t.payment_status] || '미지급') + '</span></td><td>' + syncBadge + '</td><td><button onclick="editTaxInvoice(' + t.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteTaxInvoice(' + t.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
     }).join('');
 }
 
@@ -4184,6 +4299,17 @@ async function submitTaxInvoice(e) {
     } catch (err) { showToast('저장 실패', 'error'); }
 }
 
+// 세금계산서 삭제
+async function deleteTaxInvoice(id) {
+    if (!confirm('이 세금계산서를 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('hq_tax_invoices', 'DELETE', null, '?id=eq.' + id);
+        taxInvoiceList = taxInvoiceList.filter(t => t.id !== id);
+        showToast('세금계산서 삭제 완료');
+        renderTaxInvoiceTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
+}
+
 // 세금계산서 엑셀
 function exportTaxInvoiceExcel() {
     const headers = ['유형','발행일','거래처','사업자번호','대표자','공급가액','부가세','합계','지급상태','품목','메모'];
@@ -4248,7 +4374,7 @@ function renderJournalTable() {
     if (!journalList.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     const statuses = { created: '생성', confirmed: '확정', cancelled: '취소' };
     const statusClass = { created: 'badge-pending', confirmed: 'badge-active', cancelled: 'badge-inactive' };
-    tbody.innerHTML = journalList.map(j => '<tr><td>' + j.journal_date + '</td><td class="font-bold text-blue-400">' + (j.journal_no || '-') + '</td><td>' + (j.debit_account || '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(j.debit_amount || 0).toLocaleString() + '</td><td>' + (j.credit_account || '-') + '</td><td class="text-right text-red-400">₩' + parseInt(j.credit_amount || 0).toLocaleString() + '</td><td class="text-xs">' + (j.description || '-') + '</td><td><span class="badge ' + (statusClass[j.status] || 'badge-pending') + '">' + (statuses[j.status] || j.status) + '</span></td><td><button onclick="editJournal(' + j.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    tbody.innerHTML = journalList.map(j => '<tr><td>' + j.journal_date + '</td><td class="font-bold text-blue-400">' + (j.journal_no || '-') + '</td><td>' + (j.debit_account || '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(j.debit_amount || 0).toLocaleString() + '</td><td>' + (j.credit_account || '-') + '</td><td class="text-right text-red-400">₩' + parseInt(j.credit_amount || 0).toLocaleString() + '</td><td class="text-xs">' + (j.description || '-') + '</td><td><span class="badge ' + (statusClass[j.status] || 'badge-pending') + '">' + (statuses[j.status] || j.status) + '</span></td><td><button onclick="editJournal(' + j.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteJournal(' + j.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>').join('');
 }
 
 function openJournalModal() {
@@ -4306,6 +4432,18 @@ async function submitJournal(e) {
         closeModal('journalModal');
         renderJournalTable();
     } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+// 분개 삭제
+async function deleteJournal(id) {
+    if (!confirm('이 분개를 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('accounting_journals', 'DELETE', null, '?id=eq.' + id);
+        journalList = journalList.filter(j => j.id !== id);
+        showToast('분개 삭제 완료');
+        renderJournalTable();
+        renderJournalTable2();
+    } catch (err) { showToast('삭제 실패', 'error'); }
 }
 
 // 분개 엑셀
@@ -4397,10 +4535,88 @@ function renderPayrollTable() {
     }).join('');
 }
 
-function openEmployeeModal() { showToast('직원 등록 모달 준비중', 'info'); }
-function editEmployee(id) { showToast('직원 수정 모달 준비중', 'info'); }
+function openEmployeeModal() {
+    document.getElementById('employeeModalTitle').textContent = '👤 직원 등록';
+    document.getElementById('employeeForm').reset();
+    document.getElementById('emp-id').value = '';
+    document.getElementById('emp-no').value = 'EMP-' + Date.now().toString().slice(-6);
+    openModal('employeeModal');
+}
+
+function editEmployee(id) {
+    const e = employeeList.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('employeeModalTitle').textContent = '👤 직원 수정';
+    document.getElementById('emp-id').value = e.id;
+    document.getElementById('emp-no').value = e.employee_no || '';
+    document.getElementById('emp-name').value = e.name || '';
+    document.getElementById('emp-type').value = e.employee_type || 'regular';
+    document.getElementById('emp-dept').value = e.department || '';
+    document.getElementById('emp-position').value = e.position || '';
+    document.getElementById('emp-joindate').value = e.join_date || '';
+    document.getElementById('emp-phone').value = e.phone || '';
+    document.getElementById('emp-email').value = e.email || '';
+    document.getElementById('emp-salary').value = e.base_salary || 0;
+    document.getElementById('emp-status').value = e.status || 'active';
+    document.getElementById('emp-insurance').checked = e.has_insurance || false;
+    document.getElementById('emp-memo').value = e.memo || '';
+    openModal('employeeModal');
+}
+
+async function submitEmployee(e) {
+    e.preventDefault();
+    const id = document.getElementById('emp-id').value;
+    const data = {
+        employee_no: document.getElementById('emp-no').value,
+        name: document.getElementById('emp-name').value,
+        employee_type: document.getElementById('emp-type').value,
+        department: document.getElementById('emp-dept').value || null,
+        position: document.getElementById('emp-position').value || null,
+        join_date: document.getElementById('emp-joindate').value || null,
+        phone: document.getElementById('emp-phone').value || null,
+        email: document.getElementById('emp-email').value || null,
+        base_salary: parseFloat(document.getElementById('emp-salary').value) || 0,
+        status: document.getElementById('emp-status').value,
+        has_insurance: document.getElementById('emp-insurance').checked,
+        memo: document.getElementById('emp-memo').value || null
+    };
+    try {
+        if (id) {
+            await supabaseCall('employees', 'PATCH', data, '?id=eq.' + id);
+            const idx = employeeList.findIndex(x => x.id == id);
+            if (idx >= 0) employeeList[idx] = { ...employeeList[idx], ...data };
+            showToast('직원 정보 수정 완료');
+        } else {
+            const r = await supabaseCall('employees', 'POST', data);
+            if (r && r[0]) employeeList.unshift(r[0]);
+            showToast('직원 등록 완료');
+        }
+        closeModal('employeeModal');
+        renderEmployeeTable2();
+    } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+async function deleteEmployee(id) {
+    if (!confirm('이 직원을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('employees', 'DELETE', null, '?id=eq.' + id);
+        employeeList = employeeList.filter(e => e.id !== id);
+        showToast('직원 삭제 완료');
+        renderEmployeeTable2();
+    } catch (err) { showToast('삭제 실패', 'error'); }
+}
 function openPayrollModal() { showToast('급여 등록 모달 준비중', 'info'); }
 function editPayroll(id) { showToast('급여 수정 모달 준비중', 'info'); }
+
+async function deletePayroll(id) {
+    if (!confirm('이 급여 내역을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('payrolls', 'DELETE', null, '?id=eq.' + id);
+        payrollList = payrollList.filter(p => p.id !== id);
+        showToast('급여 내역 삭제 완료');
+        renderPayrollTable2();
+    } catch (err) { showToast('삭제 실패', 'error'); }
+}
 
 // 근로계약서 업로드
 let selectedContractFile = null;
@@ -4499,8 +4715,8 @@ function renderPlatformTable() {
     
     const platforms = { baemin: '배민', coupang: '쿠팡', yogiyo: '요기요' };
     const tbody = document.getElementById('platformTableBody');
-    if (!platformList.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
-    tbody.innerHTML = platformList.map(p => '<tr><td class="font-bold text-blue-400">' + p.settlement_week + '</td><td>' + (platforms[p.platform] || p.platform) + '</td><td class="text-xs">' + (p.work_start_date || '') + '<br>~' + (p.work_end_date || '') + '</td><td class="text-right">' + parseInt(p.delivery_count || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.vat_amount || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(p.total_amount || 0).toLocaleString() + '</td><td>' + (p.expected_date || '-') + '</td><td><button onclick="editPlatform(' + p.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    if (!platformList.length) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    tbody.innerHTML = platformList.map(p => '<tr><td class="font-bold text-blue-400">' + p.settlement_week + '</td><td>' + (platforms[p.platform] || p.platform) + '</td><td class="text-xs">' + (p.work_start_date || '') + '<br>~' + (p.work_end_date || '') + '</td><td class="text-right">' + parseInt(p.delivery_count || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(p.vat_amount || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(p.total_amount || 0).toLocaleString() + '</td><td>' + (p.expected_date || '-') + '</td><td><button onclick="editPlatform(' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePlatform(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>').join('');
 }
 
 function renderSettAdvanceTable() {
@@ -4529,8 +4745,8 @@ function renderSettAdvanceTable() {
     }
     
     const tbody = document.getElementById('settAdvanceTableBody');
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
-    tbody.innerHTML = filtered.map(a => { const pt = partnerList.find(x => x.id == a.partner_id); return '<tr><td>' + a.transfer_date + '</td><td class="font-bold">' + (pt ? pt.name : '-') + '</td><td>' + (a.settlement_week || '-') + '</td><td class="text-right">₩' + parseInt(a.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(a.vat_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(a.total_amount || 0).toLocaleString() + '</td><td class="text-right text-yellow-400">₩' + parseInt(a.fee_amount || 0).toLocaleString() + '</td><td class="text-right font-bold text-red-400">₩' + parseInt(a.net_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (a.status === 'transferred' ? 'badge-active' : 'badge-pending') + '">' + (a.status === 'transferred' ? '지급완료' : '대기') + '</span></td><td><button onclick="editSettAdvance(' + a.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>'; }).join('');
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    tbody.innerHTML = filtered.map(a => { const pt = partnerList.find(x => x.id == a.partner_id); return '<tr><td>' + a.transfer_date + '</td><td class="font-bold">' + (pt ? pt.name : '-') + '</td><td>' + (a.settlement_week || '-') + '</td><td class="text-right">₩' + parseInt(a.supply_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(a.vat_amount || 0).toLocaleString() + '</td><td class="text-right">₩' + parseInt(a.total_amount || 0).toLocaleString() + '</td><td class="text-right text-yellow-400">₩' + parseInt(a.fee_amount || 0).toLocaleString() + '</td><td class="text-right font-bold text-red-400">₩' + parseInt(a.net_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (a.status === 'transferred' ? 'badge-active' : 'badge-pending') + '">' + (a.status === 'transferred' ? '지급완료' : '대기') + '</span></td><td><button onclick="editSettAdvance(' + a.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteSettAdvance(' + a.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>'; }).join('');
 }
 
 // 플랫폼 정산 → 선정산 지급 연동
@@ -4591,10 +4807,10 @@ function renderReconcileTable() {
     document.getElementById('rec-issue').textContent = reconcileList.filter(r => r.status === 'issue').length + '건';
     
     const tbody = document.getElementById('reconcileTableBody');
-    if (!reconcileList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    if (!reconcileList.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     const statuses = { pending: '대기', matched: '완료', issue: '불일치' };
     const statusClass = { pending: 'badge-pending', matched: 'badge-active', issue: 'badge-error' };
-    tbody.innerHTML = reconcileList.map(r => { const pt = partnerList.find(x => x.id == r.partner_id); return '<tr><td class="font-bold text-blue-400">' + r.settlement_week + '</td><td>' + (pt ? pt.name : '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(r.platform_total || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(r.advance_total || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(r.difference_amount || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(r.fee_income || 0).toLocaleString() + '</td><td><span class="badge ' + (statusClass[r.status] || 'badge-pending') + '">' + (statuses[r.status] || r.status) + '</span></td><td><button onclick="editReconcile(' + r.id + ')" class="btn-secondary btn-sm">상세</button></td></tr>'; }).join('');
+    tbody.innerHTML = reconcileList.map(r => { const pt = partnerList.find(x => x.id == r.partner_id); return '<tr><td class="font-bold text-blue-400">' + r.settlement_week + '</td><td>' + (pt ? pt.name : '-') + '</td><td class="text-right text-blue-400">₩' + parseInt(r.platform_total || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(r.advance_total || 0).toLocaleString() + '</td><td class="text-right font-bold">₩' + parseInt(r.difference_amount || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(r.fee_income || 0).toLocaleString() + '</td><td><span class="badge ' + (statusClass[r.status] || 'badge-pending') + '">' + (statuses[r.status] || r.status) + '</span></td><td><button onclick="editReconcile(' + r.id + ')" class="btn-secondary btn-sm mr-1">상세</button><button onclick="deleteReconcile(' + r.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>'; }).join('');
 }
 
 function renderCashbookTable() {
@@ -4648,7 +4864,7 @@ function renderCashbookTable() {
             '<td class="text-right font-bold">₩' + parseInt(b._balance || 0).toLocaleString() + '</td>' +
             '<td class="text-xs">' + (b.description || '-') + '</td>' +
             '<td>' + linkBadge + '</td>' +
-            '<td><button onclick="editCashbook(' + b.id + ')" class="btn-secondary btn-sm">수정</button></td>' +
+            '<td><button onclick="editCashbook(' + b.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteCashbook(' + b.id + ')" class="btn-danger btn-sm">삭제</button></td>' +
             '</tr>';
     }).join('');
 }
@@ -4749,6 +4965,17 @@ async function submitPlatform(e) {
     } catch (err) { showToast('저장 실패', 'error'); }
 }
 
+// 플랫폼정산 삭제
+async function deletePlatform(id) {
+    if (!confirm('이 플랫폼정산 항목을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('platform_settlements', 'DELETE', null, '?id=eq.' + id);
+        platformList = platformList.filter(p => p.id !== id);
+        showToast('삭제 완료');
+        renderPlatformTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
+}
+
 async function submitSettAdvance(e) {
     e.preventDefault();
     const id = document.getElementById('settadv-id').value;
@@ -4771,6 +4998,17 @@ async function submitSettAdvance(e) {
         closeModal('settAdvanceModal');
         renderSettAdvanceTable();
     } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+// 선정산지급 삭제
+async function deleteSettAdvance(id) {
+    if (!confirm('이 선정산 지급 항목을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('advance_transfers', 'DELETE', null, '?id=eq.' + id);
+        advanceTransferList = advanceTransferList.filter(a => a.id !== id);
+        showToast('삭제 완료');
+        renderSettAdvanceTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
 }
 
 async function submitCashbook(e) {
@@ -4803,6 +5041,17 @@ async function submitCashbook(e) {
 }
 
 async function submitBank(e) { return submitCashbook(e); }
+
+// 현금출납장 삭제
+async function deleteCashbook(id) {
+    if (!confirm('이 현금출납 항목을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('bank_transactions', 'DELETE', null, '?id=eq.' + id);
+        bankList = bankList.filter(b => b.id !== id);
+        showToast('삭제 완료');
+        renderCashbookTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
+}
 
 function editCashbook(id) {
     const b = bankList.find(x => x.id === id); if (!b) return;
@@ -4868,6 +5117,17 @@ function editBank(id) {
 }
 
 function editReconcile(id) { showToast('대사 상세 모달 준비중', 'info'); }
+
+// 대사관리 삭제
+async function deleteReconcile(id) {
+    if (!confirm('이 대사 항목을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('settlement_reconciliation', 'DELETE', null, '?id=eq.' + id);
+        reconcileList = reconcileList.filter(r => r.id !== id);
+        showToast('삭제 완료');
+        renderReconcileTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
+}
 async function autoReconcile() { showToast('자동 대사 기능 준비중', 'info'); }
 
 // ==================== 주정산 지급 ====================
@@ -4891,11 +5151,11 @@ function renderWeeklyPayoutTable() {
     });
     
     const tbody = document.getElementById('weeklyPayoutTableBody');
-    if (!list.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     tbody.innerHTML = list.map(w => {
         const rider = riderList.find(r => r.id == w.rider_id);
         const partner = partnerList.find(p => p.id == w.partner_id);
-        return '<tr><td class="font-bold text-blue-400">' + (w.settlement_week || '-') + '</td><td>' + (rider?.name || '-') + '</td><td>' + (partner?.name || '-') + '</td><td class="text-right">' + parseInt(w.delivery_count || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(w.delivery_revenue || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(w.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-blue-400">₩' + parseInt(w.net_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (w.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (w.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editWeeklyPayout(' + w.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+        return '<tr><td class="font-bold text-blue-400">' + (w.settlement_week || '-') + '</td><td>' + (rider?.name || '-') + '</td><td>' + (partner?.name || '-') + '</td><td class="text-right">' + parseInt(w.delivery_count || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(w.delivery_revenue || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(w.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-blue-400">₩' + parseInt(w.net_amount || 0).toLocaleString() + '</td><td><span class="badge ' + (w.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (w.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editWeeklyPayout(' + w.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteWeeklyPayout(' + w.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
     }).join('');
 }
 
@@ -4951,6 +5211,17 @@ async function submitWeeklyPayout(e) {
         closeModal('weeklyPayoutModal');
         renderWeeklyPayoutTable();
     } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+// 주간지급 삭제
+async function deleteWeeklyPayout(id) {
+    if (!confirm('이 주간지급 항목을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('weekly_payouts', 'DELETE', null, '?id=eq.' + id);
+        weeklyPayoutList = weeklyPayoutList.filter(w => w.id !== id);
+        showToast('삭제 완료');
+        renderWeeklyPayoutTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
 }
 
 function editWeeklyPayout(id) {
@@ -5245,7 +5516,7 @@ function renderSalesPurchaseTable() {
             '<td class="text-right font-bold ' + (isSales ? 'text-blue-400' : 'text-red-400') + '">₩' + parseInt(sp.total_amount || 0).toLocaleString() + '</td>' +
             '<td>' + taxBadge + '</td>' +
             '<td>' + linkBadge + '</td>' +
-            '<td><button onclick="editSalesPurchase(' + sp.id + ')" class="btn-secondary btn-sm">수정</button></td>' +
+            '<td><button onclick="editSalesPurchase(' + sp.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteSalesPurchase(' + sp.id + ')" class="btn-danger btn-sm">삭제</button></td>' +
             '</tr>';
     }).join('');
 }
@@ -5324,6 +5595,17 @@ async function submitSalesPurchase(e) {
         closeModal('salesPurchaseModal');
         renderSalesPurchaseTable();
     } catch (err) { showToast('저장 실패', 'error'); }
+}
+
+// 매입매출 삭제
+async function deleteSalesPurchase(id) {
+    if (!confirm('이 매입매출 항목을 삭제하시겠습니까?')) return;
+    try {
+        await supabaseCall('sales_purchases', 'DELETE', null, '?id=eq.' + id);
+        salesPurchaseList = salesPurchaseList.filter(sp => sp.id !== id);
+        showToast('삭제 완료');
+        renderSalesPurchaseTable();
+    } catch (err) { showToast('삭제 실패', 'error'); }
 }
 
 function editSalesPurchase(id) {
@@ -5755,7 +6037,7 @@ function renderJournalTable2() {
     if (!list.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     
     const getAccName = (code) => { if (!code) return '-'; const c = code.split('-')[0]; return ACCOUNT_CODES[c]?.name || code; };
-    tbody.innerHTML = list.map(j => '<tr><td>' + j.journal_date + '</td><td class="font-mono text-xs">' + (j.journal_no || '-') + '</td><td>' + getAccName(j.debit_account) + '</td><td class="text-right text-blue-400">₩' + parseInt(j.debit_amount || 0).toLocaleString() + '</td><td>' + getAccName(j.credit_account) + '</td><td class="text-right text-red-400">₩' + parseInt(j.credit_amount || 0).toLocaleString() + '</td><td class="text-xs">' + (j.description || '-') + '</td><td><span class="badge ' + (j.status === 'confirmed' ? 'badge-active' : 'badge-pending') + '">' + (j.status === 'confirmed' ? '확정' : '생성') + '</span></td><td><button onclick="editJournal(' + j.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    tbody.innerHTML = list.map(j => '<tr><td>' + j.journal_date + '</td><td class="font-mono text-xs">' + (j.journal_no || '-') + '</td><td>' + getAccName(j.debit_account) + '</td><td class="text-right text-blue-400">₩' + parseInt(j.debit_amount || 0).toLocaleString() + '</td><td>' + getAccName(j.credit_account) + '</td><td class="text-right text-red-400">₩' + parseInt(j.credit_amount || 0).toLocaleString() + '</td><td class="text-xs">' + (j.description || '-') + '</td><td><span class="badge ' + (j.status === 'confirmed' ? 'badge-active' : 'badge-pending') + '">' + (j.status === 'confirmed' ? '확정' : '생성') + '</span></td><td><button onclick="editJournal(' + j.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteJournal(' + j.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>').join('');
 }
 
 // 카드 사용내역
@@ -5788,7 +6070,7 @@ function renderEmployeeTable2() {
     if (!employeeList.length) { tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">데이터 없음</td></tr>'; return; }
     
     const types = { regular: '정규직', contract: '계약직', parttime: '파트타임' };
-    tbody.innerHTML = employeeList.map(e => '<tr><td class="font-mono">' + (e.employee_no || '-') + '</td><td class="font-bold">' + e.name + '</td><td><span class="badge badge-info">' + (types[e.employee_type] || e.employee_type) + '</span></td><td>' + (e.department || '-') + '</td><td class="text-right">₩' + parseInt(e.base_salary || 0).toLocaleString() + '</td><td>' + (e.has_insurance ? '✅' : '❌') + '</td><td><span class="badge ' + (e.status === 'active' ? 'badge-active' : 'badge-inactive') + '">' + (e.status === 'active' ? '재직' : '퇴직') + '</span></td><td><button onclick="editEmployee(' + e.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>').join('');
+    tbody.innerHTML = employeeList.map(e => '<tr><td class="font-mono">' + (e.employee_no || '-') + '</td><td class="font-bold">' + e.name + '</td><td><span class="badge badge-info">' + (types[e.employee_type] || e.employee_type) + '</span></td><td>' + (e.department || '-') + '</td><td class="text-right">₩' + parseInt(e.base_salary || 0).toLocaleString() + '</td><td>' + (e.has_insurance ? '✅' : '❌') + '</td><td><span class="badge ' + (e.status === 'active' ? 'badge-active' : 'badge-inactive') + '">' + (e.status === 'active' ? '재직' : '퇴직') + '</span></td><td><button onclick="editEmployee(' + e.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deleteEmployee(' + e.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>').join('');
 }
 
 // 급여 관리 (독립탭)
@@ -5806,7 +6088,7 @@ function renderPayrollTable2() {
     
     tbody.innerHTML = payrollList.map(p => {
         const emp = employeeList.find(e => e.id == p.employee_id);
-        return '<tr><td>' + p.pay_year + '-' + String(p.pay_month).padStart(2, '0') + '</td><td class="font-bold">' + (emp?.name || '-') + '</td><td class="text-right">₩' + parseInt(p.base_salary || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(p.total_allowance || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(p.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-blue-400">₩' + parseInt(p.net_salary || 0).toLocaleString() + '</td><td><span class="badge ' + (p.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (p.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editPayroll(' + p.id + ')" class="btn-secondary btn-sm">수정</button></td></tr>';
+        return '<tr><td>' + p.pay_year + '-' + String(p.pay_month).padStart(2, '0') + '</td><td class="font-bold">' + (emp?.name || '-') + '</td><td class="text-right">₩' + parseInt(p.base_salary || 0).toLocaleString() + '</td><td class="text-right text-blue-400">₩' + parseInt(p.total_allowance || 0).toLocaleString() + '</td><td class="text-right text-red-400">₩' + parseInt(p.total_deduction || 0).toLocaleString() + '</td><td class="text-right font-bold text-blue-400">₩' + parseInt(p.net_salary || 0).toLocaleString() + '</td><td><span class="badge ' + (p.status === 'paid' ? 'badge-active' : 'badge-pending') + '">' + (p.status === 'paid' ? '지급완료' : '대기') + '</span></td><td><button onclick="editPayroll(' + p.id + ')" class="btn-secondary btn-sm mr-1">수정</button><button onclick="deletePayroll(' + p.id + ')" class="btn-danger btn-sm">삭제</button></td></tr>';
     }).join('');
 }
 
@@ -6563,10 +6845,11 @@ async function submitDocUpload(e) {
     
     // 법인 상세에서 업로드한 경우, 해당 법인 상세 다시 열기
     if (entityName && currentEntityId) {
+        const entityId = currentEntityId;
         setTimeout(() => {
-            showEntityDetail(currentEntityId);
+            openEntityDetail(entityId);
             setTimeout(() => showEntityDetailTab('docs'), 100);
-        }, 100);
+        }, 200);
     }
 }
 
