@@ -1626,41 +1626,136 @@
                         <h2 class="text-2xl font-bold text-purple-400">🔐 비밀 공간</h2>
                         <button onclick="lockSecretSpace()" class="btn-secondary btn-sm">🔒 잠그기</button>
                     </div>
-                    <p class="text-gray-400 text-sm mb-6">이 공간은 오직 당신만 접근할 수 있습니다. 메모, 할일, 개인 데이터를 안전하게 보관하세요.</p>
                     
-                    <!-- 비밀 메모 -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="glass-card rounded-xl p-5">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-purple-400">📝 비밀 메모</h3>
-                                <button onclick="addSecretMemo()" class="btn-primary btn-sm">+ 메모 추가</button>
-                            </div>
-                            <div id="secretMemoList" class="space-y-3 max-h-96 overflow-y-auto">
-                                <p class="text-gray-500 text-sm text-center py-4">저장된 메모가 없습니다</p>
-                            </div>
+                    <!-- 비밀 메뉴 탭 -->
+                    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                        <button onclick="showSecretTab('cashbook')" id="secret-tab-cashbook" class="px-4 py-2 rounded-lg font-bold text-sm bg-purple-500/20 text-purple-400 border border-purple-500/50">💰 금전출납부</button>
+                        <button onclick="showSecretTab('ilsu')" id="secret-tab-ilsu" class="px-4 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-gray-400 hover:bg-purple-500/10">📅 일수장부</button>
+                        <button onclick="showSecretTab('loan')" id="secret-tab-loan" class="px-4 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-gray-400 hover:bg-purple-500/10">🏦 대출장부</button>
+                        <button onclick="showSecretTab('vault')" id="secret-tab-vault" class="px-4 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-gray-400 hover:bg-purple-500/10">🔑 비밀금고</button>
+                        <button onclick="showSecretTab('bigdata')" id="secret-tab-bigdata" class="px-4 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-gray-400 hover:bg-purple-500/10">📊 My BigData</button>
+                    </div>
+                    
+                    <!-- 💰 금전출납부 -->
+                    <div id="secret-content-cashbook" class="secret-tab-content">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 수입</div><div class="text-xl font-bold text-green-400" id="scb-income">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 지출</div><div class="text-xl font-bold text-red-400" id="scb-expense">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">잔액</div><div class="text-xl font-bold text-purple-400" id="scb-balance">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">이번달</div><div class="text-xl font-bold text-blue-400" id="scb-month">₩0</div></div>
                         </div>
-                        
-                        <!-- 비밀 할일 -->
                         <div class="glass-card rounded-xl p-5">
                             <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-purple-400">✅ 비밀 할일</h3>
-                                <button onclick="addSecretTodo()" class="btn-primary btn-sm">+ 할일 추가</button>
+                                <h3 class="font-bold text-purple-400">💰 금전출납부</h3>
+                                <button onclick="openSecretCashbookModal()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 내역 추가</button>
                             </div>
-                            <div id="secretTodoList" class="space-y-2 max-h-96 overflow-y-auto">
-                                <p class="text-gray-500 text-sm text-center py-4">등록된 할일이 없습니다</p>
+                            <div class="overflow-x-auto">
+                                <table class="data-table"><thead><tr><th>날짜</th><th>구분</th><th>내용</th><th>금액</th><th>잔액</th><th>관리</th></tr></thead>
+                                <tbody id="secretCashbookBody"><tr><td colspan="6" class="text-center py-8 text-gray-500">데이터 없음</td></tr></tbody></table>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- 비밀 금고 (중요 정보) -->
-                    <div class="glass-card rounded-xl p-5 border border-purple-500/30">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-purple-400">🔑 비밀 금고</h3>
-                            <button onclick="addSecretVault()" class="btn-primary btn-sm">+ 항목 추가</button>
+                    <!-- 📅 일수장부 -->
+                    <div id="secret-content-ilsu" class="secret-tab-content hidden">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 원금</div><div class="text-xl font-bold text-blue-400" id="ilsu-principal">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">받을 이자</div><div class="text-xl font-bold text-green-400" id="ilsu-interest">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">회수완료</div><div class="text-xl font-bold text-purple-400" id="ilsu-collected">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">진행중</div><div class="text-xl font-bold text-yellow-400" id="ilsu-active">0건</div></div>
                         </div>
-                        <p class="text-xs text-gray-500 mb-4">중요한 정보(계정, 비밀번호, 키 등)를 암호화하여 저장합니다.</p>
-                        <div id="secretVaultList" class="space-y-2">
-                            <p class="text-gray-500 text-sm text-center py-4">저장된 항목이 없습니다</p>
+                        <div class="glass-card rounded-xl p-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-purple-400">📅 일수장부 (일일 상환)</h3>
+                                <button onclick="openIlsuModal()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 일수 등록</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="data-table"><thead><tr><th>이름</th><th>원금</th><th>일이자</th><th>시작일</th><th>기간</th><th>회수액</th><th>잔액</th><th>상태</th><th>관리</th></tr></thead>
+                                <tbody id="ilsuTableBody"><tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr></tbody></table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 🏦 대출장부 -->
+                    <div id="secret-content-loan" class="secret-tab-content hidden">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">총 대출금</div><div class="text-xl font-bold text-blue-400" id="loan-total">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">받을 이자</div><div class="text-xl font-bold text-green-400" id="loan-interest">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">상환완료</div><div class="text-xl font-bold text-purple-400" id="loan-paid">₩0</div></div>
+                            <div class="glass-card rounded-xl p-3 text-center"><div class="text-gray-400 text-xs">진행중</div><div class="text-xl font-bold text-yellow-400" id="loan-active">0건</div></div>
+                        </div>
+                        <div class="glass-card rounded-xl p-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-purple-400">🏦 대출장부</h3>
+                                <button onclick="openLoanModal()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 대출 등록</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="data-table"><thead><tr><th>이름</th><th>대출금</th><th>이율(%)</th><th>대출일</th><th>만기일</th><th>상환액</th><th>잔액</th><th>상태</th><th>관리</th></tr></thead>
+                                <tbody id="loanTableBody"><tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr></tbody></table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 🔑 비밀금고 -->
+                    <div id="secret-content-vault" class="secret-tab-content hidden">
+                        <div class="glass-card rounded-xl p-5 border border-purple-500/30">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-purple-400">🔑 비밀금고</h3>
+                                <button onclick="addSecretVault()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 항목 추가</button>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-4">계정, 비밀번호, 중요 정보를 안전하게 저장합니다.</p>
+                            <div id="secretVaultList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                <p class="text-gray-500 text-sm text-center py-4 col-span-full">저장된 항목이 없습니다</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 📊 My BigData -->
+                    <div id="secret-content-bigdata" class="secret-tab-content hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- 메모 -->
+                            <div class="glass-card rounded-xl p-5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-purple-400">📝 비밀 메모</h3>
+                                    <button onclick="addSecretMemo()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 메모</button>
+                                </div>
+                                <div id="secretMemoList" class="space-y-3 max-h-80 overflow-y-auto">
+                                    <p class="text-gray-500 text-sm text-center py-4">저장된 메모가 없습니다</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 할일 -->
+                            <div class="glass-card rounded-xl p-5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-purple-400">✅ 비밀 할일</h3>
+                                    <button onclick="addSecretTodo()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 할일</button>
+                                </div>
+                                <div id="secretTodoList" class="space-y-2 max-h-80 overflow-y-auto">
+                                    <p class="text-gray-500 text-sm text-center py-4">등록된 할일이 없습니다</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 연락처 -->
+                            <div class="glass-card rounded-xl p-5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-purple-400">📞 비밀 연락처</h3>
+                                    <button onclick="addSecretContact()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 연락처</button>
+                                </div>
+                                <div id="secretContactList" class="space-y-2 max-h-80 overflow-y-auto">
+                                    <p class="text-gray-500 text-sm text-center py-4">저장된 연락처가 없습니다</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 일정 -->
+                            <div class="glass-card rounded-xl p-5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-purple-400">📆 비밀 일정</h3>
+                                    <button onclick="addSecretSchedule()" class="btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">+ 일정</button>
+                                </div>
+                                <div id="secretScheduleList" class="space-y-2 max-h-80 overflow-y-auto">
+                                    <p class="text-gray-500 text-sm text-center py-4">등록된 일정이 없습니다</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -7539,7 +7634,6 @@ function verifySecretCode(e) {
     const input = document.getElementById('secretCodeInput').value;
     const storedCode = localStorage.getItem(SECRET_KEY + 'code');
     
-    // 코드가 없으면 첫 설정
     if (!storedCode) {
         if (input.length >= 4) {
             localStorage.setItem(SECRET_KEY + 'code', btoa(input));
@@ -7554,7 +7648,6 @@ function verifySecretCode(e) {
         return;
     }
     
-    // 코드 검증
     if (btoa(input) === storedCode) {
         secretUnlocked = true;
         closeSecretModal();
@@ -7583,127 +7676,322 @@ function showSetSecretCode() {
 }
 
 function enterSecretSpace() {
-    // 사이드바에 임시로 비밀탭 활성화 표시 안함 (숨김)
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     document.getElementById('tab-secret').classList.remove('hidden');
     document.getElementById('pageTitle').textContent = '🔐 비밀 공간';
-    
-    // 데이터 로드
     loadSecretData();
+    showSecretTab('cashbook');
 }
 
 function lockSecretSpace() {
     secretUnlocked = false;
-    sessionStorage.removeItem(SECRET_KEY + 'session');
     showTab('dashboard');
     showToast('비밀 공간이 잠겼습니다', 'info');
 }
 
-// 비밀 데이터 로드
+// 비밀 탭 전환
+function showSecretTab(tab) {
+    document.querySelectorAll('.secret-tab-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('[id^="secret-tab-"]').forEach(b => {
+        b.classList.remove('bg-purple-500/20', 'text-purple-400', 'border', 'border-purple-500/50');
+        b.classList.add('bg-zinc-800', 'text-gray-400');
+    });
+    
+    const content = document.getElementById('secret-content-' + tab);
+    const btn = document.getElementById('secret-tab-' + tab);
+    if (content) content.classList.remove('hidden');
+    if (btn) {
+        btn.classList.remove('bg-zinc-800', 'text-gray-400');
+        btn.classList.add('bg-purple-500/20', 'text-purple-400', 'border', 'border-purple-500/50');
+    }
+    
+    // 각 탭별 데이터 로드
+    if (tab === 'cashbook') renderSecretCashbook();
+    if (tab === 'ilsu') renderIlsuTable();
+    if (tab === 'loan') renderLoanTable();
+    if (tab === 'vault') renderSecretVault();
+    if (tab === 'bigdata') { renderSecretMemos(); renderSecretTodos(); renderSecretContacts(); renderSecretSchedules(); }
+}
+
 function loadSecretData() {
-    renderSecretMemos();
-    renderSecretTodos();
-    renderSecretVault();
+    renderSecretCashbook();
 }
 
-// 비밀 메모
-function getSecretMemos() {
-    const data = localStorage.getItem(SECRET_KEY + 'memos');
+// ==================== 💰 금전출납부 ====================
+function getSecretCashbook() {
+    const data = localStorage.getItem(SECRET_KEY + 'cashbook');
     return data ? JSON.parse(data) : [];
 }
 
-function saveSecretMemos(memos) {
-    localStorage.setItem(SECRET_KEY + 'memos', JSON.stringify(memos));
+function saveSecretCashbook(list) {
+    localStorage.setItem(SECRET_KEY + 'cashbook', JSON.stringify(list));
 }
 
-function renderSecretMemos() {
-    const memos = getSecretMemos();
-    const container = document.getElementById('secretMemoList');
-    if (!memos.length) {
-        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">저장된 메모가 없습니다</p>';
+function renderSecretCashbook() {
+    const list = getSecretCashbook();
+    const income = list.filter(c => c.type === 'income').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+    const expense = list.filter(c => c.type === 'expense').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const monthData = list.filter(c => c.date?.startsWith(thisMonth));
+    const monthBalance = monthData.filter(c => c.type === 'income').reduce((s, c) => s + parseFloat(c.amount || 0), 0) -
+                         monthData.filter(c => c.type === 'expense').reduce((s, c) => s + parseFloat(c.amount || 0), 0);
+    
+    document.getElementById('scb-income').textContent = '₩' + income.toLocaleString();
+    document.getElementById('scb-expense').textContent = '₩' + expense.toLocaleString();
+    document.getElementById('scb-balance').textContent = '₩' + (income - expense).toLocaleString();
+    document.getElementById('scb-month').textContent = '₩' + monthBalance.toLocaleString();
+    
+    const tbody = document.getElementById('secretCashbookBody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">데이터 없음</td></tr>';
         return;
     }
-    container.innerHTML = memos.map((m, i) => `
-        <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-            <div class="flex justify-between items-start mb-2">
-                <span class="text-xs text-gray-500">${m.date}</span>
-                <button onclick="deleteSecretMemo(${i})" class="text-red-400 text-xs hover:text-red-300">삭제</button>
-            </div>
-            <p class="text-sm text-gray-300 whitespace-pre-wrap">${m.content}</p>
-        </div>
+    
+    let balance = 0;
+    const sorted = [...list].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    sorted.forEach(c => {
+        if (c.type === 'income') balance += parseFloat(c.amount || 0);
+        else balance -= parseFloat(c.amount || 0);
+        c._balance = balance;
+    });
+    
+    tbody.innerHTML = sorted.reverse().map((c, i) => `
+        <tr>
+            <td>${c.date || '-'}</td>
+            <td><span class="badge ${c.type === 'income' ? 'badge-active' : 'badge-error'}">${c.type === 'income' ? '수입' : '지출'}</span></td>
+            <td>${c.desc || '-'}</td>
+            <td class="text-right font-bold ${c.type === 'income' ? 'text-green-400' : 'text-red-400'}">${c.type === 'income' ? '+' : '-'}₩${parseInt(c.amount || 0).toLocaleString()}</td>
+            <td class="text-right">₩${parseInt(c._balance || 0).toLocaleString()}</td>
+            <td><button onclick="deleteSecretCashbook(${list.length - 1 - i})" class="text-red-400 text-sm hover:text-red-300">삭제</button></td>
+        </tr>
     `).join('');
 }
 
-function addSecretMemo() {
-    const content = prompt('메모 내용:');
-    if (!content) return;
-    const memos = getSecretMemos();
-    memos.unshift({ content, date: new Date().toLocaleString('ko-KR') });
-    saveSecretMemos(memos);
-    renderSecretMemos();
-    showToast('메모 저장됨');
+function openSecretCashbookModal() {
+    const type = prompt('구분 (1: 수입, 2: 지출):');
+    if (!type) return;
+    const date = prompt('날짜 (YYYY-MM-DD):', new Date().toISOString().slice(0, 10));
+    const desc = prompt('내용:');
+    const amount = prompt('금액:');
+    
+    if (!amount || isNaN(amount)) { showToast('금액을 올바르게 입력하세요', 'error'); return; }
+    
+    const list = getSecretCashbook();
+    list.unshift({
+        type: type === '1' ? 'income' : 'expense',
+        date: date || new Date().toISOString().slice(0, 10),
+        desc: desc || '',
+        amount: parseFloat(amount)
+    });
+    saveSecretCashbook(list);
+    renderSecretCashbook();
+    showToast('내역 추가됨');
 }
 
-function deleteSecretMemo(index) {
+function deleteSecretCashbook(index) {
     if (!confirm('삭제하시겠습니까?')) return;
-    const memos = getSecretMemos();
-    memos.splice(index, 1);
-    saveSecretMemos(memos);
-    renderSecretMemos();
+    const list = getSecretCashbook();
+    list.splice(index, 1);
+    saveSecretCashbook(list);
+    renderSecretCashbook();
 }
 
-// 비밀 할일
-function getSecretTodos() {
-    const data = localStorage.getItem(SECRET_KEY + 'todos');
+// ==================== 📅 일수장부 ====================
+function getIlsuList() {
+    const data = localStorage.getItem(SECRET_KEY + 'ilsu');
     return data ? JSON.parse(data) : [];
 }
 
-function saveSecretTodos(todos) {
-    localStorage.setItem(SECRET_KEY + 'todos', JSON.stringify(todos));
+function saveIlsuList(list) {
+    localStorage.setItem(SECRET_KEY + 'ilsu', JSON.stringify(list));
 }
 
-function renderSecretTodos() {
-    const todos = getSecretTodos();
-    const container = document.getElementById('secretTodoList');
-    if (!todos.length) {
-        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">등록된 할일이 없습니다</p>';
+function renderIlsuTable() {
+    const list = getIlsuList();
+    const principal = list.reduce((s, i) => s + parseFloat(i.principal || 0), 0);
+    const interest = list.reduce((s, i) => s + parseFloat(i.dailyInterest || 0) * parseInt(i.days || 0), 0);
+    const collected = list.reduce((s, i) => s + parseFloat(i.collected || 0), 0);
+    const active = list.filter(i => i.status === 'active').length;
+    
+    document.getElementById('ilsu-principal').textContent = '₩' + principal.toLocaleString();
+    document.getElementById('ilsu-interest').textContent = '₩' + interest.toLocaleString();
+    document.getElementById('ilsu-collected').textContent = '₩' + collected.toLocaleString();
+    document.getElementById('ilsu-active').textContent = active + '건';
+    
+    const tbody = document.getElementById('ilsuTableBody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>';
         return;
     }
-    container.innerHTML = todos.map((t, i) => `
-        <div class="flex items-center gap-3 p-2 rounded-lg ${t.done ? 'bg-green-500/10' : 'bg-purple-500/10'}">
-            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleSecretTodo(${i})" class="w-4 h-4 accent-purple-500">
-            <span class="flex-1 text-sm ${t.done ? 'line-through text-gray-500' : 'text-gray-300'}">${t.text}</span>
-            <button onclick="deleteSecretTodo(${i})" class="text-red-400 text-xs hover:text-red-300">✕</button>
-        </div>
-    `).join('');
+    
+    tbody.innerHTML = list.map((i, idx) => {
+        const totalDue = parseFloat(i.principal || 0) + (parseFloat(i.dailyInterest || 0) * parseInt(i.days || 0));
+        const remaining = totalDue - parseFloat(i.collected || 0);
+        return `
+        <tr>
+            <td class="font-bold">${i.name || '-'}</td>
+            <td class="text-right">₩${parseInt(i.principal || 0).toLocaleString()}</td>
+            <td class="text-right text-yellow-400">₩${parseInt(i.dailyInterest || 0).toLocaleString()}</td>
+            <td>${i.startDate || '-'}</td>
+            <td>${i.days || 0}일</td>
+            <td class="text-right text-green-400">₩${parseInt(i.collected || 0).toLocaleString()}</td>
+            <td class="text-right text-red-400">₩${parseInt(remaining).toLocaleString()}</td>
+            <td><span class="badge ${i.status === 'completed' ? 'badge-active' : 'badge-pending'}">${i.status === 'completed' ? '완료' : '진행중'}</span></td>
+            <td>
+                <button onclick="collectIlsu(${idx})" class="btn-secondary btn-sm mr-1">회수</button>
+                <button onclick="deleteIlsu(${idx})" class="text-red-400 text-sm">삭제</button>
+            </td>
+        </tr>`;
+    }).join('');
 }
 
-function addSecretTodo() {
-    const text = prompt('할일 내용:');
-    if (!text) return;
-    const todos = getSecretTodos();
-    todos.unshift({ text, done: false, date: new Date().toISOString() });
-    saveSecretTodos(todos);
-    renderSecretTodos();
-    showToast('할일 추가됨');
+function openIlsuModal() {
+    const name = prompt('이름:');
+    if (!name) return;
+    const principal = prompt('원금:');
+    const dailyInterest = prompt('일 이자:');
+    const days = prompt('기간 (일):');
+    const startDate = prompt('시작일 (YYYY-MM-DD):', new Date().toISOString().slice(0, 10));
+    
+    const list = getIlsuList();
+    list.unshift({
+        name,
+        principal: parseFloat(principal) || 0,
+        dailyInterest: parseFloat(dailyInterest) || 0,
+        days: parseInt(days) || 30,
+        startDate: startDate || new Date().toISOString().slice(0, 10),
+        collected: 0,
+        status: 'active'
+    });
+    saveIlsuList(list);
+    renderIlsuTable();
+    showToast('일수 등록됨');
 }
 
-function toggleSecretTodo(index) {
-    const todos = getSecretTodos();
-    todos[index].done = !todos[index].done;
-    saveSecretTodos(todos);
-    renderSecretTodos();
+function collectIlsu(index) {
+    const amount = prompt('회수 금액:');
+    if (!amount || isNaN(amount)) return;
+    
+    const list = getIlsuList();
+    list[index].collected = (parseFloat(list[index].collected) || 0) + parseFloat(amount);
+    
+    const totalDue = parseFloat(list[index].principal || 0) + (parseFloat(list[index].dailyInterest || 0) * parseInt(list[index].days || 0));
+    if (list[index].collected >= totalDue) {
+        list[index].status = 'completed';
+    }
+    
+    saveIlsuList(list);
+    renderIlsuTable();
+    showToast('회수 처리됨');
 }
 
-function deleteSecretTodo(index) {
-    const todos = getSecretTodos();
-    todos.splice(index, 1);
-    saveSecretTodos(todos);
-    renderSecretTodos();
+function deleteIlsu(index) {
+    if (!confirm('삭제하시겠습니까?')) return;
+    const list = getIlsuList();
+    list.splice(index, 1);
+    saveIlsuList(list);
+    renderIlsuTable();
 }
 
-// 비밀 금고
+// ==================== 🏦 대출장부 ====================
+function getLoanList() {
+    const data = localStorage.getItem(SECRET_KEY + 'loans');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveLoanList(list) {
+    localStorage.setItem(SECRET_KEY + 'loans', JSON.stringify(list));
+}
+
+function renderLoanTable() {
+    const list = getLoanList();
+    const total = list.reduce((s, l) => s + parseFloat(l.amount || 0), 0);
+    const interest = list.reduce((s, l) => s + (parseFloat(l.amount || 0) * (parseFloat(l.rate || 0) / 100)), 0);
+    const paid = list.reduce((s, l) => s + parseFloat(l.paid || 0), 0);
+    const active = list.filter(l => l.status === 'active').length;
+    
+    document.getElementById('loan-total').textContent = '₩' + total.toLocaleString();
+    document.getElementById('loan-interest').textContent = '₩' + Math.round(interest).toLocaleString();
+    document.getElementById('loan-paid').textContent = '₩' + paid.toLocaleString();
+    document.getElementById('loan-active').textContent = active + '건';
+    
+    const tbody = document.getElementById('loanTableBody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-500">데이터 없음</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = list.map((l, idx) => {
+        const totalDue = parseFloat(l.amount || 0) + (parseFloat(l.amount || 0) * (parseFloat(l.rate || 0) / 100));
+        const remaining = totalDue - parseFloat(l.paid || 0);
+        return `
+        <tr>
+            <td class="font-bold">${l.name || '-'}</td>
+            <td class="text-right">₩${parseInt(l.amount || 0).toLocaleString()}</td>
+            <td class="text-right text-yellow-400">${l.rate || 0}%</td>
+            <td>${l.loanDate || '-'}</td>
+            <td>${l.dueDate || '-'}</td>
+            <td class="text-right text-green-400">₩${parseInt(l.paid || 0).toLocaleString()}</td>
+            <td class="text-right text-red-400">₩${parseInt(remaining).toLocaleString()}</td>
+            <td><span class="badge ${l.status === 'completed' ? 'badge-active' : 'badge-pending'}">${l.status === 'completed' ? '완료' : '진행중'}</span></td>
+            <td>
+                <button onclick="payLoan(${idx})" class="btn-secondary btn-sm mr-1">상환</button>
+                <button onclick="deleteLoan(${idx})" class="text-red-400 text-sm">삭제</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function openLoanModal() {
+    const name = prompt('이름:');
+    if (!name) return;
+    const amount = prompt('대출금:');
+    const rate = prompt('이율 (%):');
+    const loanDate = prompt('대출일 (YYYY-MM-DD):', new Date().toISOString().slice(0, 10));
+    const dueDate = prompt('만기일 (YYYY-MM-DD):');
+    
+    const list = getLoanList();
+    list.unshift({
+        name,
+        amount: parseFloat(amount) || 0,
+        rate: parseFloat(rate) || 0,
+        loanDate: loanDate || new Date().toISOString().slice(0, 10),
+        dueDate: dueDate || '',
+        paid: 0,
+        status: 'active'
+    });
+    saveLoanList(list);
+    renderLoanTable();
+    showToast('대출 등록됨');
+}
+
+function payLoan(index) {
+    const amount = prompt('상환 금액:');
+    if (!amount || isNaN(amount)) return;
+    
+    const list = getLoanList();
+    list[index].paid = (parseFloat(list[index].paid) || 0) + parseFloat(amount);
+    
+    const totalDue = parseFloat(list[index].amount || 0) + (parseFloat(list[index].amount || 0) * (parseFloat(list[index].rate || 0) / 100));
+    if (list[index].paid >= totalDue) {
+        list[index].status = 'completed';
+    }
+    
+    saveLoanList(list);
+    renderLoanTable();
+    showToast('상환 처리됨');
+}
+
+function deleteLoan(index) {
+    if (!confirm('삭제하시겠습니까?')) return;
+    const list = getLoanList();
+    list.splice(index, 1);
+    saveLoanList(list);
+    renderLoanTable();
+}
+
+// ==================== 🔑 비밀금고 ====================
 function getSecretVault() {
     const data = localStorage.getItem(SECRET_KEY + 'vault');
     return data ? JSON.parse(data) : [];
@@ -7717,18 +8005,23 @@ function renderSecretVault() {
     const vault = getSecretVault();
     const container = document.getElementById('secretVaultList');
     if (!vault.length) {
-        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">저장된 항목이 없습니다</p>';
+        container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4 col-span-full">저장된 항목이 없습니다</p>';
         return;
     }
     container.innerHTML = vault.map((v, i) => `
-        <div class="flex items-center gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-            <div class="text-2xl">${v.icon || '🔑'}</div>
-            <div class="flex-1">
-                <div class="font-bold text-purple-400">${v.title}</div>
-                <div class="text-xs text-gray-500">${v.username || ''}</div>
+        <div class="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="text-2xl">${v.icon || '🔑'}</div>
+                <div class="flex-1">
+                    <div class="font-bold text-purple-400">${v.title}</div>
+                    <div class="text-xs text-gray-500">${v.username || ''}</div>
+                </div>
             </div>
-            <button onclick="showVaultItem(${i})" class="btn-secondary btn-sm">보기</button>
-            <button onclick="deleteVaultItem(${i})" class="text-red-400 text-sm hover:text-red-300">✕</button>
+            <div class="flex gap-2">
+                <button onclick="showVaultItem(${i})" class="flex-1 btn-secondary btn-sm">보기</button>
+                <button onclick="copyVaultPassword(${i})" class="flex-1 btn-primary btn-sm" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)">복사</button>
+                <button onclick="deleteVaultItem(${i})" class="text-red-400 px-2">✕</button>
+            </div>
         </div>
     `).join('');
 }
@@ -7741,14 +8034,7 @@ function addSecretVault() {
     const memo = prompt('메모 (선택):');
     
     const vault = getSecretVault();
-    vault.unshift({ 
-        title, 
-        username: username || '', 
-        password: password || '', 
-        memo: memo || '',
-        icon: '🔑',
-        date: new Date().toISOString()
-    });
+    vault.unshift({ title, username: username || '', password: password || '', memo: memo || '', icon: '🔑', date: new Date().toISOString() });
     saveSecretVault(vault);
     renderSecretVault();
     showToast('금고에 저장됨');
@@ -7760,6 +8046,12 @@ function showVaultItem(index) {
     alert(`📌 ${v.title}\n\n👤 아이디: ${v.username || '-'}\n🔑 비밀번호: ${v.password || '-'}\n📝 메모: ${v.memo || '-'}`);
 }
 
+function copyVaultPassword(index) {
+    const vault = getSecretVault();
+    navigator.clipboard.writeText(vault[index].password || '');
+    showToast('비밀번호 복사됨');
+}
+
 function deleteVaultItem(index) {
     if (!confirm('삭제하시겠습니까?')) return;
     const vault = getSecretVault();
@@ -7767,6 +8059,133 @@ function deleteVaultItem(index) {
     saveSecretVault(vault);
     renderSecretVault();
 }
+
+// ==================== 📊 My BigData ====================
+// 메모
+function getSecretMemos() { return JSON.parse(localStorage.getItem(SECRET_KEY + 'memos') || '[]'); }
+function saveSecretMemos(memos) { localStorage.setItem(SECRET_KEY + 'memos', JSON.stringify(memos)); }
+function renderSecretMemos() {
+    const memos = getSecretMemos();
+    const container = document.getElementById('secretMemoList');
+    if (!container) return;
+    if (!memos.length) { container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">저장된 메모가 없습니다</p>'; return; }
+    container.innerHTML = memos.map((m, i) => `
+        <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-xs text-gray-500">${m.date}</span>
+                <button onclick="deleteSecretMemo(${i})" class="text-red-400 text-xs">삭제</button>
+            </div>
+            <p class="text-sm text-gray-300 whitespace-pre-wrap">${m.content}</p>
+        </div>
+    `).join('');
+}
+function addSecretMemo() {
+    const content = prompt('메모 내용:');
+    if (!content) return;
+    const memos = getSecretMemos();
+    memos.unshift({ content, date: new Date().toLocaleString('ko-KR') });
+    saveSecretMemos(memos);
+    renderSecretMemos();
+    showToast('메모 저장됨');
+}
+function deleteSecretMemo(index) {
+    if (!confirm('삭제?')) return;
+    const memos = getSecretMemos();
+    memos.splice(index, 1);
+    saveSecretMemos(memos);
+    renderSecretMemos();
+}
+
+// 할일
+function getSecretTodos() { return JSON.parse(localStorage.getItem(SECRET_KEY + 'todos') || '[]'); }
+function saveSecretTodos(todos) { localStorage.setItem(SECRET_KEY + 'todos', JSON.stringify(todos)); }
+function renderSecretTodos() {
+    const todos = getSecretTodos();
+    const container = document.getElementById('secretTodoList');
+    if (!container) return;
+    if (!todos.length) { container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">등록된 할일이 없습니다</p>'; return; }
+    container.innerHTML = todos.map((t, i) => `
+        <div class="flex items-center gap-3 p-2 rounded-lg ${t.done ? 'bg-green-500/10' : 'bg-purple-500/10'}">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleSecretTodo(${i})" class="w-4 h-4 accent-purple-500">
+            <span class="flex-1 text-sm ${t.done ? 'line-through text-gray-500' : 'text-gray-300'}">${t.text}</span>
+            <button onclick="deleteSecretTodo(${i})" class="text-red-400 text-xs">✕</button>
+        </div>
+    `).join('');
+}
+function addSecretTodo() {
+    const text = prompt('할일:');
+    if (!text) return;
+    const todos = getSecretTodos();
+    todos.unshift({ text, done: false });
+    saveSecretTodos(todos);
+    renderSecretTodos();
+}
+function toggleSecretTodo(i) { const todos = getSecretTodos(); todos[i].done = !todos[i].done; saveSecretTodos(todos); renderSecretTodos(); }
+function deleteSecretTodo(i) { const todos = getSecretTodos(); todos.splice(i, 1); saveSecretTodos(todos); renderSecretTodos(); }
+
+// 연락처
+function getSecretContacts() { return JSON.parse(localStorage.getItem(SECRET_KEY + 'contacts') || '[]'); }
+function saveSecretContacts(list) { localStorage.setItem(SECRET_KEY + 'contacts', JSON.stringify(list)); }
+function renderSecretContacts() {
+    const list = getSecretContacts();
+    const container = document.getElementById('secretContactList');
+    if (!container) return;
+    if (!list.length) { container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">저장된 연락처가 없습니다</p>'; return; }
+    container.innerHTML = list.map((c, i) => `
+        <div class="flex items-center gap-3 p-2 rounded-lg bg-purple-500/10">
+            <div class="flex-1">
+                <div class="font-bold text-sm">${c.name}</div>
+                <div class="text-xs text-gray-500">${c.phone || ''} ${c.memo ? '· ' + c.memo : ''}</div>
+            </div>
+            <button onclick="deleteSecretContact(${i})" class="text-red-400 text-xs">✕</button>
+        </div>
+    `).join('');
+}
+function addSecretContact() {
+    const name = prompt('이름:');
+    if (!name) return;
+    const phone = prompt('연락처:');
+    const memo = prompt('메모:');
+    const list = getSecretContacts();
+    list.unshift({ name, phone: phone || '', memo: memo || '' });
+    saveSecretContacts(list);
+    renderSecretContacts();
+}
+function deleteSecretContact(i) { const list = getSecretContacts(); list.splice(i, 1); saveSecretContacts(list); renderSecretContacts(); }
+
+// 일정
+function getSecretSchedules() { return JSON.parse(localStorage.getItem(SECRET_KEY + 'schedules') || '[]'); }
+function saveSecretSchedules(list) { localStorage.setItem(SECRET_KEY + 'schedules', JSON.stringify(list)); }
+function renderSecretSchedules() {
+    const list = getSecretSchedules();
+    const container = document.getElementById('secretScheduleList');
+    if (!container) return;
+    if (!list.length) { container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">등록된 일정이 없습니다</p>'; return; }
+    container.innerHTML = list.sort((a, b) => (a.date || '').localeCompare(b.date || '')).map((s, i) => `
+        <div class="flex items-center gap-3 p-2 rounded-lg bg-purple-500/10">
+            <div class="text-center px-2 py-1 rounded bg-purple-500/30">
+                <div class="text-xs text-purple-400">${(s.date || '').slice(5, 7)}월</div>
+                <div class="text-lg font-bold text-white">${(s.date || '').slice(8, 10)}</div>
+            </div>
+            <div class="flex-1">
+                <div class="font-bold text-sm">${s.title}</div>
+                <div class="text-xs text-gray-500">${s.memo || ''}</div>
+            </div>
+            <button onclick="deleteSecretSchedule(${i})" class="text-red-400 text-xs">✕</button>
+        </div>
+    `).join('');
+}
+function addSecretSchedule() {
+    const title = prompt('일정 제목:');
+    if (!title) return;
+    const date = prompt('날짜 (YYYY-MM-DD):');
+    const memo = prompt('메모:');
+    const list = getSecretSchedules();
+    list.unshift({ title, date: date || '', memo: memo || '' });
+    saveSecretSchedules(list);
+    renderSecretSchedules();
+}
+function deleteSecretSchedule(i) { const list = getSecretSchedules(); list.splice(i, 1); saveSecretSchedules(list); renderSecretSchedules(); }
 </script>
 </body>
 </html>
