@@ -9,49 +9,49 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
         
         :root {
             --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f7;
-            --bg-tertiary: #e8e8ed;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
             --bg-card: #ffffff;
-            --border: rgba(0, 0, 0, 0.08);
-            --border-hover: rgba(0, 0, 0, 0.15);
-            --text-primary: #1d1d1f;
-            --text-secondary: #6e6e73;
-            --text-muted: #86868b;
-            --accent: #0071e3;
-            --accent-hover: #0077ed;
-            --success: #34c759;
-            --warning: #ff9f0a;
-            --danger: #ff3b30;
+            --border: #e5e5e5;
+            --border-hover: #d0d0d0;
+            --text-primary: #111111;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --accent: #111111;
+            --accent-hover: #333333;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --sidebar-bg: #ffffff;
-            --header-bg: rgba(255, 255, 255, 0.8);
+            --header-bg: rgba(255, 255, 255, 0.95);
         }
         
-        /* 다크모드 */
+        /* 다크모드 - 심플 블랙 */
         [data-theme="dark"] {
-            --bg-primary: #000000;
-            --bg-secondary: #1c1c1e;
-            --bg-tertiary: #2c2c2e;
-            --bg-card: #1c1c1e;
-            --border: rgba(255, 255, 255, 0.1);
-            --border-hover: rgba(255, 255, 255, 0.2);
-            --text-primary: #f5f5f7;
-            --text-secondary: #a1a1a6;
-            --text-muted: #8e8e93;
-            --accent: #0a84ff;
-            --accent-hover: #409cff;
-            --success: #30d158;
-            --warning: #ff9f0a;
-            --danger: #ff453a;
-            --sidebar-bg: #1c1c1e;
-            --header-bg: rgba(28, 28, 30, 0.8);
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #141414;
+            --border: #2a2a2a;
+            --border-hover: #3a3a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --text-muted: #666666;
+            --accent: #ffffff;
+            --accent-hover: #e0e0e0;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --sidebar-bg: #0a0a0a;
+            --header-bg: rgba(10, 10, 10, 0.95);
         }
         
         * { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             box-sizing: border-box;
         }
         
@@ -62,117 +62,118 @@
             transition: background 0.3s, color 0.3s;
         }
         
-        /* 카드 - 애플 스타일 */
+        /* 카드 - 심플 */
         .glass-card { 
             background: var(--bg-card);
             border: 1px solid var(--border); 
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
             transition: all 0.2s ease;
         }
         .glass-card:hover { 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: var(--border-hover);
         }
         
-        /* 그라데이션 텍스트 - 애플 블루 */
+        /* 그라데이션 텍스트 제거 - 심플하게 */
         .gradient-text {
-            background: linear-gradient(90deg, var(--accent), #007aff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
+            font-weight: 800;
         }
         
         .hidden { display: none; }
         
-        /* 데이터 테이블 */
+        /* 데이터 테이블 - 크고 시원하게 */
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { 
             background: var(--bg-secondary); 
-            padding: 12px 16px; 
+            padding: 16px 20px; 
             text-align: left; 
-            font-size: 12px; 
-            font-weight: 600; 
-            color: var(--text-secondary); 
-            border-bottom: 1px solid var(--border);
+            font-size: 13px; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            border-bottom: 2px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         .data-table td { 
-            padding: 14px 16px; 
+            padding: 20px; 
             border-bottom: 1px solid var(--border); 
-            font-size: 14px; 
+            font-size: 15px; 
             color: var(--text-primary);
+            font-weight: 500;
         }
         .data-table tr:hover { background: var(--bg-secondary); }
         .data-table tr:last-child td { border-bottom: none; }
         
-        /* 인풋 필드 */
+        /* 인풋 필드 - 크게 */
         .input-field { 
             background: var(--bg-primary); 
-            border: 1px solid var(--border); 
+            border: 2px solid var(--border); 
             color: var(--text-primary); 
-            padding: 12px 16px; 
-            border-radius: 10px; 
+            padding: 16px 20px; 
+            border-radius: 12px; 
             width: 100%; 
             transition: all 0.2s;
-            font-size: 15px;
+            font-size: 16px;
+            font-weight: 500;
         }
         .input-field:focus { 
             outline: none; 
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+            border-color: var(--text-primary);
         }
         .input-field::placeholder { color: var(--text-muted); }
         
-        /* 버튼 - 애플 스타일 */
+        /* 버튼 - 심플 블랙/화이트 */
         .btn-primary { 
-            background: var(--accent);
-            color: white; 
-            font-weight: 500; 
-            padding: 12px 24px; 
-            border-radius: 10px; 
+            background: var(--text-primary);
+            color: var(--bg-primary); 
+            font-weight: 700; 
+            padding: 16px 32px; 
+            border-radius: 12px; 
             cursor: pointer; 
             border: none;
             transition: all 0.2s;
             font-size: 15px;
         }
         .btn-primary:hover { 
-            background: var(--accent-hover);
+            opacity: 0.85;
+            transform: translateY(-1px);
         }
         
         .btn-secondary { 
-            background: var(--bg-secondary); 
-            border: 1px solid var(--border); 
+            background: transparent; 
+            border: 2px solid var(--border); 
             color: var(--text-primary); 
-            padding: 12px 24px; 
-            border-radius: 10px; 
+            padding: 14px 28px; 
+            border-radius: 12px; 
             cursor: pointer;
             transition: all 0.2s;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
         }
         .btn-secondary:hover { 
-            background: var(--bg-tertiary);
+            border-color: var(--text-primary);
         }
         
         .btn-danger { 
-            background: rgba(255, 59, 48, 0.1); 
+            background: var(--danger); 
             border: none; 
-            color: var(--danger); 
-            padding: 12px 24px; 
-            border-radius: 10px; 
+            color: white; 
+            padding: 14px 28px; 
+            border-radius: 12px; 
             cursor: pointer;
             transition: all 0.2s;
-            font-weight: 500;
+            font-weight: 600;
         }
-        .btn-danger:hover { background: rgba(255, 59, 48, 0.15); }
+        .btn-danger:hover { opacity: 0.85; }
         
-        .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+        .btn-sm { padding: 10px 20px; font-size: 14px; }
         
         /* 모달 */
         .modal-overlay { 
             position: fixed; 
             inset: 0; 
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(4px);
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -181,52 +182,60 @@
         }
         .modal-content { 
             background: var(--bg-card); 
-            border-radius: 16px; 
-            padding: 28px; 
+            border: 1px solid var(--border);
+            border-radius: 20px; 
+            padding: 32px; 
             max-width: 600px; 
             width: 100%; 
             max-height: 90vh; 
             overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            animation: modalIn 0.25s ease-out;
+            animation: modalIn 0.2s ease-out;
         }
         @keyframes modalIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
         
-        /* 배지 - 애플 필 스타일 */
+        /* 배지 - 굵고 크게 */
         .badge { 
-            padding: 4px 10px; 
-            border-radius: 6px; 
-            font-size: 12px; 
-            font-weight: 500;
+            padding: 6px 14px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            font-weight: 700;
         }
-        .badge-active { background: rgba(52, 199, 89, 0.12); color: var(--success); }
+        .badge-active { background: #dcfce7; color: #166534; }
         .badge-inactive { background: var(--bg-tertiary); color: var(--text-muted); }
-        .badge-pending { background: rgba(255, 159, 10, 0.12); color: var(--warning); }
-        .badge-biz { background: rgba(0, 113, 227, 0.1); color: var(--accent); }
-        .badge-info { background: rgba(88, 86, 214, 0.1); color: #5856d6; }
-        .badge-error { background: rgba(255, 59, 48, 0.1); color: var(--danger); }
-        .badge-nonbiz { background: rgba(255, 149, 0, 0.1); color: #ff9500; }
-        .badge-success { background: rgba(52, 199, 89, 0.12); color: var(--success); }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-biz { background: #dbeafe; color: #1e40af; }
+        .badge-info { background: #f3e8ff; color: #7c3aed; }
+        .badge-error { background: #fee2e2; color: #dc2626; }
+        .badge-nonbiz { background: #ffedd5; color: #c2410c; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        
+        [data-theme="dark"] .badge-active { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        [data-theme="dark"] .badge-inactive { background: var(--bg-tertiary); color: var(--text-muted); }
+        [data-theme="dark"] .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        [data-theme="dark"] .badge-biz { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        [data-theme="dark"] .badge-info { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+        [data-theme="dark"] .badge-error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        [data-theme="dark"] .badge-nonbiz { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+        [data-theme="dark"] .badge-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
         
         /* 토스트 */
         .toast { 
             position: fixed; 
             top: 24px; 
             right: 24px; 
-            padding: 14px 20px; 
-            border-radius: 10px; 
+            padding: 16px 24px; 
+            border-radius: 12px; 
             z-index: 200;
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 15px;
             animation: toastIn 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         .toast-success { background: var(--success); color: white; }
         .toast-error { background: var(--danger); color: white; }
-        .toast-info { background: var(--accent); color: white; }
+        .toast-info { background: var(--text-primary); color: var(--bg-primary); }
         @keyframes toastIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -243,98 +252,121 @@
             .mobile-nav { display: flex !important; } 
         }
         
-        /* 사이드바 - 애플 스타일 */
-        .menu-group { margin-bottom: 4px; }
+        /* 사이드바 - 심플 */
+        .menu-group { margin-bottom: 8px; }
         .menu-title {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 800;
             color: var(--text-muted);
-            padding: 16px 16px 8px 16px;
+            padding: 20px 20px 12px 20px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
         }
         .sidebar-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            font-size: 14px;
+            gap: 12px;
+            padding: 14px 20px;
+            font-size: 15px;
             color: var(--text-secondary);
-            border-radius: 8px;
+            border-radius: 12px;
             transition: all 0.15s;
             text-align: left;
             background: transparent;
             border: none;
             cursor: pointer;
-            margin: 2px 8px;
-            font-weight: 450;
+            margin: 4px 12px;
+            font-weight: 600;
         }
         .sidebar-item:hover {
             background: var(--bg-secondary);
             color: var(--text-primary);
         }
         .sidebar-item.active {
-            background: rgba(0, 113, 227, 0.1);
-            color: var(--accent);
-        }
-        [data-theme="dark"] .sidebar-item.active {
-            background: rgba(10, 132, 255, 0.15);
-            color: var(--accent);
+            background: var(--text-primary);
+            color: var(--bg-primary);
         }
         .sidebar-item .dot {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: currentColor;
-            opacity: 0.5;
         }
         .sidebar-item .sidebar-icon {
-            font-size: 16px;
+            font-size: 18px;
         }
         
-        /* 다크모드 토글 스위치 */
+        /* 다크모드 토글 스위치 - 심플 */
         .theme-toggle {
             position: relative;
-            width: 50px;
-            height: 28px;
+            width: 56px;
+            height: 32px;
             background: var(--bg-tertiary);
-            border-radius: 14px;
+            border-radius: 16px;
             cursor: pointer;
             transition: all 0.3s;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
         }
         .theme-toggle::after {
             content: '☀️';
             position: absolute;
             top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background: white;
+            left: 4px;
+            width: 22px;
+            height: 22px;
+            background: var(--bg-card);
             border-radius: 50%;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         [data-theme="dark"] .theme-toggle {
-            background: var(--accent);
+            background: var(--bg-tertiary);
+            border-color: var(--border);
         }
         [data-theme="dark"] .theme-toggle::after {
             content: '🌙';
-            left: 25px;
+            left: 26px;
         }
         
         .glow-purple, .glow-blue, .glow-cyan {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: none;
         }
-        [data-theme="dark"] .glow-purple, 
-        [data-theme="dark"] .glow-blue, 
-        [data-theme="dark"] .glow-cyan {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        
+        /* 텍스트 색상 - 크고 굵게 */
+        .text-gray-400, .text-gray-500, .text-zinc-400, .text-zinc-500 { 
+            color: var(--text-muted) !important; 
         }
+        .text-gray-900, .text-zinc-900, .text-white {
+            color: var(--text-primary) !important;
+        }
+        
+        /* 숫자/포인트 텍스트 - 크고 굵게 */
+        .text-purple-400, .text-blue-400, .text-green-400, .text-red-400,
+        .text-yellow-400, .text-orange-400, .text-pink-400, .text-cyan-400 {
+            color: var(--text-primary) !important;
+            font-weight: 800 !important;
+        }
+        
+        /* 스탯 카드 숫자 강조 */
+        .text-xl { font-size: 1.5rem !important; }
+        .text-2xl { font-size: 2rem !important; }
+        .text-3xl { font-size: 2.5rem !important; }
+        
+        /* 배경색 */
+        .bg-white { background: var(--bg-card) !important; }
+        .bg-gray-50, .bg-gray-100 { background: var(--bg-secondary) !important; }
+        
+        /* 큰 타이틀 */
+        h2, h3 { 
+            color: var(--text-primary); 
+            font-weight: 800;
+        }
+        h2 { font-size: 1.75rem; }
+        h3 { font-size: 1.25rem; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -343,52 +375,49 @@
     <!-- 로딩 -->
     <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--bg-secondary)">
         <div class="text-center">
-            <h1 class="text-4xl font-semibold mb-6 tracking-tight" style="color: var(--text-primary)">TEAM BRO</h1>
-            <div class="flex items-center justify-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                <div class="w-2 h-2 rounded-full bg-blue-400 animate-pulse" style="animation-delay: 0.15s"></div>
-                <div class="w-2 h-2 rounded-full bg-blue-300 animate-pulse" style="animation-delay: 0.3s"></div>
+            <h1 class="text-5xl font-extrabold mb-6" style="color: var(--text-primary)">TEAM BRO</h1>
+            <div class="flex items-center justify-center gap-3">
+                <div class="w-3 h-3 rounded-full animate-pulse" style="background: var(--text-primary)"></div>
+                <div class="w-3 h-3 rounded-full animate-pulse" style="background: var(--text-muted); animation-delay: 0.15s"></div>
+                <div class="w-3 h-3 rounded-full animate-pulse" style="background: var(--text-muted); animation-delay: 0.3s"></div>
             </div>
         </div>
     </div>
 
     <!-- 로그인 -->
     <div id="loginPage" class="hidden relative z-10 min-h-screen flex items-center justify-center px-4" style="background: var(--bg-secondary)">
-        <div class="w-full max-w-sm">
-            <div class="text-center mb-10">
-                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                    <span class="text-2xl font-bold text-white">TB</span>
-                </div>
-                <h1 class="text-2xl font-semibold mb-2" style="color: var(--text-primary)">TEAM BRO</h1>
-                <p class="text-sm" style="color: var(--text-secondary)">본사 통합 ERP 시스템</p>
+        <div class="w-full max-w-md">
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-extrabold mb-3" style="color: var(--text-primary)">TEAM BRO</h1>
+                <p class="text-lg font-medium" style="color: var(--text-muted)">본사 통합 ERP</p>
             </div>
-            <div class="glass-card p-8">
-                <form onsubmit="handleLogin(event)" class="space-y-5">
+            <div class="glass-card p-10">
+                <form onsubmit="handleLogin(event)" class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary)">아이디</label>
-                        <input type="text" id="loginUsername" class="input-field" required placeholder="아이디를 입력하세요">
+                        <label class="block text-sm font-bold mb-3" style="color: var(--text-secondary)">아이디</label>
+                        <input type="text" id="loginUsername" class="input-field" required placeholder="아이디 입력">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary)">비밀번호</label>
-                        <input type="password" id="loginPassword" class="input-field" required placeholder="비밀번호를 입력하세요">
+                        <label class="block text-sm font-bold mb-3" style="color: var(--text-secondary)">비밀번호</label>
+                        <input type="password" id="loginPassword" class="input-field" required placeholder="비밀번호 입력">
                     </div>
-                    <div id="loginError" class="hidden p-3 rounded-lg text-sm" style="background: rgba(255,59,48,0.1); border: 1px solid rgba(255,59,48,0.2); color: var(--danger)"></div>
-                    <button type="submit" class="w-full btn-primary py-3 mt-2">로그인</button>
+                    <div id="loginError" class="hidden p-4 rounded-xl text-sm font-bold" style="background: rgba(239,68,68,0.1); color: var(--danger)"></div>
+                    <button type="submit" class="w-full btn-primary py-4 text-lg mt-4">로그인</button>
                 </form>
             </div>
-            <p class="text-center text-xs mt-8" style="color: var(--text-muted)">© 2025 TEAM BRO. All rights reserved.</p>
+            <p class="text-center text-sm mt-10 font-medium" style="color: var(--text-muted)">© 2025 TEAM BRO</p>
         </div>
     </div>
 
     <!-- 메인 -->
     <div id="mainSystem" class="hidden">
         <!-- 사이드바 -->
-        <aside class="sidebar fixed left-0 top-0 h-screen border-r hidden md:block" style="width: 260px; background: var(--sidebar-bg); border-color: var(--border); overflow-y:auto; z-index: 50;">
+        <aside class="sidebar fixed left-0 top-0 h-screen border-r hidden md:block" style="width: 280px; background: var(--sidebar-bg); border-color: var(--border); overflow-y:auto; z-index: 50;">
             <!-- 로고 -->
-            <div class="p-5 border-b" style="border-color: var(--border)">
+            <div class="p-6 border-b" style="border-color: var(--border)">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('dashboard')">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-semibold text-white text-sm shadow-sm">TB</div>
-                    <span class="text-lg font-semibold" style="color: var(--text-primary)">TeamBro</span>
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center font-extrabold text-lg" style="background: var(--text-primary); color: var(--bg-primary)">TB</div>
+                    <span class="text-xl font-extrabold" style="color: var(--text-primary)">TeamBro</span>
                 </div>
             </div>
             
@@ -466,16 +495,16 @@
         </aside>
 
         <!-- 상단 헤더 -->
-        <header class="fixed top-0 right-0 z-40 border-b" style="left: 260px; background: var(--header-bg); backdrop-filter: blur(20px); border-color: var(--border);">
-            <div class="px-8 py-4 flex items-center justify-between">
+        <header class="fixed top-0 right-0 z-40 border-b" style="left: 280px; background: var(--header-bg); backdrop-filter: blur(20px); border-color: var(--border);">
+            <div class="px-8 py-5 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleMobileMenu()" class="text-xl md:hidden" style="color: var(--text-secondary)">☰</button>
-                    <h2 id="pageTitle" class="text-lg font-semibold" style="color: var(--text-primary)">대시보드</h2>
+                    <h2 id="pageTitle" class="text-xl font-bold" style="color: var(--text-primary)">대시보드</h2>
                 </div>
-                <div class="flex items-center gap-5">
-                    <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드 전환"></div>
-                    <span id="headerUserName" class="text-sm hidden md:inline" style="color: var(--text-secondary)">관리자</span>
-                    <button onclick="logout()" class="text-sm transition-colors" style="color: var(--text-muted)">로그아웃</button>
+                <div class="flex items-center gap-6">
+                    <div class="theme-toggle" onclick="toggleTheme()" title="다크/라이트 모드"></div>
+                    <span id="headerUserName" class="text-sm font-semibold hidden md:inline" style="color: var(--text-secondary)">관리자</span>
+                    <button onclick="logout()" class="text-sm font-semibold transition-colors" style="color: var(--text-muted)">로그아웃</button>
                 </div>
             </div>
         </header>
@@ -2405,7 +2434,7 @@ async function handleLogin(e) {
         document.getElementById('mainSystem').classList.remove('hidden');
         // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '260px';
+            document.getElementById('mainContent').style.marginLeft = '280px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
@@ -2436,7 +2465,7 @@ async function restoreSession() {
         document.getElementById('mainSystem').classList.remove('hidden');
         // PC에서 main 영역 margin-left 설정
         if (window.innerWidth >= 768) {
-            document.getElementById('mainContent').style.marginLeft = '260px';
+            document.getElementById('mainContent').style.marginLeft = '280px';
         }
         document.getElementById('headerUserName').textContent = currentUser.name;
         loadDashboard();
