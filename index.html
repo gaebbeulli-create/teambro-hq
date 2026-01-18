@@ -6278,7 +6278,13 @@ function showEntityDetailTab(tab) {
 
 // 법인별 첨부서류 렌더
 function renderEntityDocs(entityName) {
+    console.log('renderEntityDocs - entityName:', entityName);
+    console.log('corpDocList:', corpDocList);
+    console.log('corpDocList entity_names:', corpDocList.map(d => d.entity_name));
+    
     const docs = corpDocList.filter(d => d.entity_name === entityName);
+    console.log('filtered docs:', docs);
+    
     const tbody = document.getElementById('entityDocTableBody');
     
     if (!docs.length) {
@@ -6549,7 +6555,10 @@ async function submitDocUpload(e) {
     }
     
     closeModal('docUploadModal');
-    renderCorpDocTable();
+    
+    // corpDocList 다시 로드
+    await loadCorpDocuments();
+    
     document.getElementById('docUploadProgress').classList.add('hidden');
     
     // 법인 상세에서 업로드한 경우, 해당 법인 상세 다시 열기
