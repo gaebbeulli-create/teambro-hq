@@ -1580,7 +1580,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
                         <div><label class="block text-sm text-blue-400 mb-1">쿠팡 ID</label><input type="text" id="rider-coupang-id" class="input-field" placeholder="쿠팡 라이더 ID"></div>
-                        <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="근무">근무</option><option value="퇴사">퇴사</option></select></div>
+                        <div><label class="block text-sm text-blue-400 mb-1">상태</label><select id="rider-status" class="input-field"><option value="계약중">계약중</option><option value="계약종료">계약종료</option></select></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
                         <div><label class="block text-sm text-blue-400 mb-1">예금주</label><input type="text" id="rider-account-holder" class="input-field"></div>
@@ -2784,7 +2784,7 @@ function renderTable(type) {
             const p = partnerList.find(x => x.id == r.partner_id);
             const ssnFull = r.resident_number || '-';
             const ssnMasked = r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-';
-            const statusBadge = r.status === '퇴사' ? 'badge-inactive">퇴사' : 'badge-active">근무';
+            const statusBadge = r.status === '계약종료' ? 'badge-inactive">계약종료' : 'badge-active">계약중';
             const deleteBtn = currentUser && currentUser.role === 'ADMIN' ? '<button onclick="deleteRider(' + r.id + ')" class="btn-danger btn-sm">삭제</button>' : '';
             return '<tr><td class="font-bold text-blue-400 cursor-pointer hover:underline" onclick="showRiderDetail(' + r.id + ')">' + r.name + '</td><td class="ssn-cell cursor-pointer" onclick="toggleSSN(this)" data-full="' + ssnFull + '" data-masked="' + ssnMasked + '" title="클릭하면 보기/숨기기">' + ssnMasked + '</td><td>' + (p?p.name:'-') + '</td><td>' + (r.baemin_id||'-') + '</td><td>' + (r.coupang_id||'-') + '</td><td>' + (r.tax_type||'-') + '</td><td><span class="badge ' + statusBadge + '</span></td><td><button onclick="editItem(\'rider\',' + r.id + ')" class="btn-secondary btn-sm mr-1">수정</button>' + deleteBtn + '</td></tr>';
         }).join('');
@@ -2862,7 +2862,7 @@ function editItem(type, id) {
         document.getElementById('rider-account-holder').value = r.account_holder || '';
         document.getElementById('rider-account-no').value = r.account_no || '';
         document.getElementById('rider-tax-type').value = r.tax_type || '';
-        document.getElementById('rider-status').value = r.status || '근무';
+        document.getElementById('rider-status').value = r.status || '계약중';
         document.getElementById('rider-memo').value = r.memo || '';
         // 파일 링크 표시
         document.getElementById('rider-file-contract-status').classList.add('hidden');
@@ -3007,7 +3007,7 @@ function showRiderDetail(id) {
             <h4 class="text-sm font-bold mb-3 text-blue-400">📋 기본 정보</h4>
             <div class="grid grid-cols-2 gap-3 text-sm">
                 <div><span class="text-gray-400">이름:</span> <span class="font-bold">${r.name || '-'}</span></div>
-                <div><span class="text-gray-400">상태:</span> <span class="badge ${r.status === '퇴사' ? 'badge-inactive">퇴사' : 'badge-active">근무'}</span></div>
+                <div><span class="text-gray-400">상태:</span> <span class="badge ${r.status === '계약종료' ? 'badge-inactive">계약종료' : 'badge-active">계약중'}</span></div>
                 <div><span class="text-gray-400">주민번호:</span> ${r.resident_number ? r.resident_number.substring(0, 8) + '******' : '-'}</div>
                 <div><span class="text-gray-400">연락처:</span> ${r.phone || '-'}</div>
                 <div><span class="text-gray-400">소속 협력사:</span> <span class="font-bold text-blue-400">${p ? p.name : '-'}</span></div>
@@ -3402,7 +3402,7 @@ async function submitUser(e) {
 
 // 엑셀 기능
 const TEMPLATES = {
-    rider: { filename: '라이더_양식.xlsx', headers: ['라이더이름*','주민번호','소속협력사','배민ID','쿠팡ID','예금주','계좌번호','세금처리(원천징수/과세지출)','상태(근무/퇴사)','메모'], fields: ['name','resident_number','partner_code','baemin_id','coupang_id','account_holder','account_no','tax_type','status','memo'], sample: ['홍길동','900101-1234567','DP123','baemin123','coupang456','홍길동','1234567890','원천징수','근무','메모'] },
+    rider: { filename: '라이더_양식.xlsx', headers: ['라이더이름*','주민번호','소속협력사','배민ID','쿠팡ID','예금주','계좌번호','세금처리(원천징수/과세지출)','상태(계약중/계약종료)','메모'], fields: ['name','resident_number','partner_code','baemin_id','coupang_id','account_holder','account_no','tax_type','status','memo'], sample: ['홍길동','900101-1234567','DP123','baemin123','coupang456','홍길동','1234567890','원천징수','계약중','메모'] },
     partner: { filename: '협력사_양식.xlsx', headers: ['협력사명*','협력사코드*','구분(biz/non_biz)','배달권역','운영자이름','운영자주민번호','연락처','사업자번호','업종','주소','은행','계좌번호','메모'], fields: ['name','code','type','region','rep_name','rep_ssn','phone','biz_no','biz_type','address','bank','account_no','memo'], sample: ['배민팀브로','DP123','biz','강남,서초','김운영','850101-1234567','02-1234-5678','123-45-67890','운송업','서울','KB','1234567890','메모'] },
     sales: { filename: '영업자_양식.xlsx', headers: ['영업자코드*','이름*','유형','연락처','이메일','지역','주소','사업자번호','대표자명','은행','예금주','계좌번호','원천징수율','지급주기','상태','메모'], fields: ['sales_code','name','sales_type','phone','email','region','address','biz_no','rep_name','bank_name','bank_holder','bank_account','withholding_rate','payout_cycle','status','memo'], sample: ['SB-0001','김영업','individual','010-1234-5678','sales@test.com','서울','서울시','','','KB','김영업','1234567890','0.033','monthly','active','메모'] },
     taxinvoice: { filename: '세금계산서_양식.xlsx', headers: ['유형(매입/매출)*','발행일*','거래처*','사업자번호','대표자','공급가액*','부가세','합계','지급상태','품목','메모'], sample: ['매입','2025-01-15','(주)테스트','123-45-67890','김대표','1000000','100000','1100000','미지급','물품대','메모'] },
