@@ -2563,10 +2563,24 @@
                 </div>
                 <div class="border-t border-white/10 pt-4">
                     <h4 class="text-blue-400 font-bold mb-3">💰 금액</h4>
+                    <div class="flex gap-4 mb-3">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="sp-vat-type" value="auto" checked onchange="toggleVatMode()">
+                            <span class="text-sm text-gray-300">부가세 자동 (10%)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="sp-vat-type" value="manual" onchange="toggleVatMode()">
+                            <span class="text-sm text-gray-300">직접 입력</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="sp-vat-type" value="none" onchange="toggleVatMode()">
+                            <span class="text-sm text-gray-300">부가세 없음</span>
+                        </label>
+                    </div>
                     <div class="grid grid-cols-3 gap-4">
-                        <div><label class="block text-sm text-gray-400 mb-1">공급가액 *</label><input type="number" id="sp-supply" class="input-field" value="0" required onchange="calcSPTotal()"></div>
-                        <div><label class="block text-sm text-gray-400 mb-1">부가세 (10%)</label><input type="number" id="sp-vat" class="input-field" value="0" readonly></div>
-                        <div><label class="block text-sm text-gray-400 mb-1">합계</label><input type="number" id="sp-total" class="input-field font-bold" value="0" readonly></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">공급가액 *</label><input type="number" id="sp-supply" class="input-field" value="0" required oninput="calcSPTotal()"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">부가세</label><input type="number" id="sp-vat" class="input-field" value="0" readonly style="background: var(--bg-tertiary);"></div>
+                        <div><label class="block text-sm text-gray-400 mb-1">합계</label><input type="number" id="sp-total" class="input-field font-bold" value="0" readonly style="background: var(--bg-tertiary); color: var(--accent);"></div>
                     </div>
                 </div>
                 <div class="border-t border-white/10 pt-4">
@@ -6072,9 +6086,53 @@ function openSalesPurchaseModal() {
 
 function calcSPTotal() {
     const supply = parseFloat(document.getElementById('sp-supply').value) || 0;
-    const vat = Math.round(supply * 0.1);
-    document.getElementById('sp-vat').value = vat;
-    document.getElementById('sp-total').value = supply + vat;
+    const vatType = document.querySelector('input[name="sp-vat-type"]:checked')?.value || 'auto';
+    
+    let vat = 0;
+    let total = 0;
+    
+    if (vatType === 'auto') {
+        // 부가세 자동 10%
+        vat = Math.round(supply * 0.1);
+        total = supply + vat;
+        document.getElementById('sp-vat').value = vat;
+        document.getElementById('sp-total').value = total;
+    } else if (vatType === 'manual') {
+        // 직접 입력 모드 - 부가세, 합계 직접 입력
+        vat = parseFloat(document.getElementById('sp-vat').value) || 0;
+        total = parseFloat(document.getElementById('sp-total').value) || 0;
+    } else if (vatType === 'none') {
+        // 부가세 없음
+        vat = 0;
+        total = supply;
+        document.getElementById('sp-vat').value = 0;
+        document.getElementById('sp-total').value = total;
+    }
+    
+    console.log('모드:', vatType, '공급가액:', supply, '부가세:', vat, '합계:', total);
+}
+
+function toggleVatMode() {
+    const vatType = document.querySelector('input[name="sp-vat-type"]:checked')?.value || 'auto';
+    const vatInput = document.getElementById('sp-vat');
+    const totalInput = document.getElementById('sp-total');
+    
+    if (vatType === 'manual') {
+        // 직접 입력 모드 - 부가세, 합계 입력 가능
+        vatInput.readOnly = false;
+        vatInput.style.background = '';
+        totalInput.readOnly = false;
+        totalInput.style.background = '';
+    } else {
+        // 자동 모드 또는 부가세 없음 - readonly
+        vatInput.readOnly = true;
+        vatInput.style.background = 'var(--bg-tertiary)';
+        totalInput.readOnly = true;
+        totalInput.style.background = 'var(--bg-tertiary)';
+    }
+    
+    // 재계산
+    calcSPTotal();
 }
 
 function toggleSPType() {
