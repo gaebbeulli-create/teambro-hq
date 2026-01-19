@@ -7426,10 +7426,13 @@ async function submitDocUpload(e) {
         
         try {
             const timestamp = Date.now();
-            const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._-]/g, '_');
-            const filePath = 'corp/' + category + '/' + timestamp + '_' + safeName;
+            // 파일 확장자 추출
+            const ext = file.name.split('.').pop().toLowerCase();
+            // Storage 경로는 영문+숫자만 (한글 파일명은 DB에 저장)
+            const safeFileName = timestamp + '_' + Math.random().toString(36).substr(2, 8) + '.' + ext;
+            const filePath = 'corp/' + category + '/' + safeFileName;
             
-            console.log('Uploading to:', BUCKET_NAME + '/' + filePath);
+            console.log('Uploading to:', BUCKET_NAME + '/' + filePath, '(원본:', file.name, ')');
             
             // Supabase Storage에 직접 fetch로 업로드
             const uploadRes = await fetch(SUPABASE_URL + '/storage/v1/object/' + BUCKET_NAME + '/' + filePath, {
