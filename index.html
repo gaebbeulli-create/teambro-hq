@@ -6085,22 +6085,28 @@ function openSalesPurchaseModal() {
 }
 
 function calcSPTotal() {
-    const supply = parseFloat(document.getElementById('sp-supply').value) || 0;
+    // 회계 기준: 모든 금액은 정수(원 단위)로 처리
+    const supply = Math.round(parseFloat(document.getElementById('sp-supply').value) || 0);
     const vatType = document.querySelector('input[name="sp-vat-type"]:checked')?.value || 'auto';
+    
+    // 공급가액 정수로 표시
+    document.getElementById('sp-supply').value = supply;
     
     let vat = 0;
     let total = 0;
     
     if (vatType === 'auto') {
-        // 부가세 자동 10%
+        // 부가세 자동 10% (반올림)
         vat = Math.round(supply * 0.1);
         total = supply + vat;
         document.getElementById('sp-vat').value = vat;
         document.getElementById('sp-total').value = total;
     } else if (vatType === 'manual') {
-        // 직접 입력 모드 - 부가세, 합계 직접 입력
-        vat = parseFloat(document.getElementById('sp-vat').value) || 0;
-        total = parseFloat(document.getElementById('sp-total').value) || 0;
+        // 직접 입력 모드 - 정수 처리
+        vat = Math.round(parseFloat(document.getElementById('sp-vat').value) || 0);
+        total = Math.round(parseFloat(document.getElementById('sp-total').value) || 0);
+        document.getElementById('sp-vat').value = vat;
+        document.getElementById('sp-total').value = total;
     } else if (vatType === 'none') {
         // 부가세 없음
         vat = 0;
@@ -6168,14 +6174,16 @@ function loadSPLinkOptions() {
 async function submitSalesPurchase(e) {
     e.preventDefault();
     const id = document.getElementById('sp-id').value;
+    
+    // 회계 기준: 모든 금액 정수(원 단위) 처리
     const data = {
         transaction_date: document.getElementById('sp-date').value,
         transaction_type: document.getElementById('sp-type').value,
         counterparty: document.getElementById('sp-counterparty').value,
         item_name: document.getElementById('sp-item').value || null,
-        supply_amount: parseFloat(document.getElementById('sp-supply').value) || 0,
-        vat_amount: parseFloat(document.getElementById('sp-vat').value) || 0,
-        total_amount: parseFloat(document.getElementById('sp-total').value) || 0,
+        supply_amount: Math.round(parseFloat(document.getElementById('sp-supply').value) || 0),
+        vat_amount: Math.round(parseFloat(document.getElementById('sp-vat').value) || 0),
+        total_amount: Math.round(parseFloat(document.getElementById('sp-total').value) || 0),
         tax_invoice_status: document.getElementById('sp-tax-status').value,
         link_type: document.getElementById('sp-link-type').value || null,
         link_id: document.getElementById('sp-link-id').value || null,
@@ -6294,14 +6302,25 @@ async function uploadSalesPurchaseExcel(input) {
         let cnt = 0;
         for (let i = 1; i < data.length; i++) {
             const row = data[i]; if (!row || row.length < 5) continue;
+            
+            // 회계 기준: 모든 금액 정수(원 단위) 처리
+            const supplyAmt = Math.round(parseFloat(row[4]) || 0);
+            const vatAmt = Math.round(parseFloat(row[5]) || 0);
+            let totalAmt = Math.round(parseFloat(row[6]) || 0);
+            
+            // 합계가 없으면 공급가액 + 부가세
+            if (!totalAmt && supplyAmt) {
+                totalAmt = supplyAmt + vatAmt;
+            }
+            
             const obj = {
                 transaction_date: formatExcelDate(row[0]),
-                transaction_type: (row[1] || '').toLowerCase() === 'purchase' ? 'purchase' : 'sales',
+                transaction_type: (row[1] || '').toLowerCase() === 'purchase' || (row[1] || '').includes('매입') ? 'purchase' : 'sales',
                 counterparty: row[2] || null,
                 item_name: row[3] || null,
-                supply_amount: parseFloat(row[4]) || 0,
-                vat_amount: parseFloat(row[5]) || 0,
-                total_amount: parseFloat(row[6]) || 0,
+                supply_amount: supplyAmt,
+                vat_amount: vatAmt,
+                total_amount: totalAmt,
                 tax_invoice_status: row[7] || 'pending',
                 memo: row[8] || null
             };
